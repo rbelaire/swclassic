@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Classic 2026 - Tournament Format</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #2a3f5f 100%);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, rgba(10,14,39,0.95) 0%, rgba(26,31,58,0.95) 100%);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid rgba(102,126,234,0.3);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 500;
+            padding: 10px 25px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            letter-spacing: 1px;
+        }
+
+        .nav-link:hover {
+            background: linear-gradient(135deg, rgba(102,126,234,0.2) 0%, rgba(118,75,162,0.2) 100%);
+            border-color: rgba(102,126,234,0.5);
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 60px 20px 40px;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(102,126,234,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.5; }
+            50% { transform: translateX(-50%) scale(1.2); opacity: 0.8; }
+        }
+
+        .hero h1 {
+            font-size: 4.5em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 30px rgba(102,126,234,0.8);
+            animation: fadeInDown 1s ease-out;
+            letter-spacing: 10px;
+            font-weight: 900;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero .subtitle {
+            font-size: 2em;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.3s both;
+            margin-top: 10px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+        }
+
+        .quick-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            border-radius: 15px;
+            border: 2px solid rgba(102,126,234,0.3);
+            animation: fadeInUp 1s ease-out 0.5s both;
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border-color: rgba(102,126,234,0.8);
+            transform: translateY(-5px);
+        }
+
+        .stat-box .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-box .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin: 60px 0 40px;
+            position: relative;
+        }
+
+        .section-header h2 {
+            font-size: 3em;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            display: inline-block;
+            padding: 20px 50px;
+            background: linear-gradient(135deg, rgba(102,126,234,0.2) 0%, rgba(118,75,162,0.2) 100%);
+            border-radius: 15px;
+            border: 2px solid rgba(102,126,234,0.5);
+            animation: slideIn 0.8s ease-out;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 35px;
+            border: 2px solid rgba(102,126,234,0.3);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(4) { animation-delay: 0.4s; }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(102,126,234,0.8);
+            box-shadow: 0 20px 60px rgba(102,126,234,0.4);
+        }
+
+        .card h2 {
+            color: #fff;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .card-content {
+            line-height: 1.8;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .card-content strong {
+            color: #667eea;
+            font-size: 1.05em;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(102,126,234,0.3) 0%, rgba(118,75,162,0.3) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-weight: 500;
+            border: 1px solid rgba(102,126,234,0.5);
+        }
+
+        .match-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+        }
+
+        .player-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1em;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+        }
+
+        .vs-text {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .info-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-item strong {
+            display: block;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .scoring-table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+
+        .scoring-table th,
+        .scoring-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 2px solid rgba(102,126,234,0.3);
+        }
+
+        .scoring-table th {
+            background: linear-gradient(135deg, rgba(102,126,234,0.3) 0%, rgba(118,75,162,0.3) 100%);
+            color: white;
+            font-weight: bold;
+        }
+
+        .scoring-table tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, rgba(255,193,7,0.2) 0%, rgba(255,152,0,0.2) 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 5px solid rgba(255,193,7,0.8);
+        }
+
+        .tip-box strong {
+            color: #ffc107;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .event-details {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 2px solid rgba(102,126,234,0.3);
+            margin: 40px 0;
+            text-align: center;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .event-details h2 {
+            color: #fff;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            letter-spacing: 3px;
+        }
+
+        .event-info-large {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .event-info-item {
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(102,126,234,0.2) 0%, rgba(118,75,162,0.2) 100%);
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(102,126,234,0.3);
+        }
+
+        .event-info-item:hover {
+            transform: scale(1.05);
+            border-color: rgba(102,126,234,0.6);
+        }
+
+        .event-info-item .label {
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .event-info-item .value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #fff;
+            margin-top: 5px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                gap: 15px;
+            }
+
+            .nav-link {
+                font-size: 0.95em;
+                padding: 8px 18px;
+            }
+
+            .hero h1 {
+                font-size: 2.5em;
+                letter-spacing: 4px;
+            }
+
+            .quick-stats {
+                gap: 20px;
+            }
+
+            .stat-box {
+                padding: 15px 20px;
+            }
+
+            .stat-box .number {
+                font-size: 2em;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .match-visual {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .event-info-large {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-link active">Tournament Format</a>
+            <a href="draft.html" class="nav-link">Selection Sunday</a>
+            <a href="rule.html" class="nav-link">Draft Rules</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>THE CLASSIC 2026</h1>
+        <div class="quick-stats">
+            <div class="stat-box">
+                <span class="number">8v8</span>
+                <span class="label">Team Battle</span>
+            </div>
+            <div class="stat-box">
+                <span class="number">16</span>
+                <span class="label">Warriors</span>
+            </div>
+            <div class="stat-box">
+                <span class="number">4</span>
+                <span class="label">Foursomes</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="section-header">
+            <h2>How The Battle Works</h2>
+        </div>
+        
+        <div class="card-grid">
+            <div class="card">
+                <h2>The Format</h2>
+                <div class="card-content">
+                    <div class="highlight-box">
+                        4 Foursomes | 4 Players Per Group
+                    </div>
+                    <p style="margin-top: 15px;">Each foursome becomes a mini-arena with <strong>TWO simultaneous 1v1 matches</strong>:</p>
+                    
+                    <div class="match-visual">
+                        <div class="player-box">Player A</div>
+                        <div class="vs-text">VS</div>
+                        <div class="player-box">Player B</div>
+                    </div>
+                    
+                    <div class="match-visual">
+                        <div class="player-box">Player C</div>
+                        <div class="vs-text">VS</div>
+                        <div class="player-box">Player D</div>
+                    </div>
+                    
+                    <div class="tip-box">
+                        <strong>Key Rule:</strong>
+                        You're only playing against YOUR 1v1 opponent. Your teammate is in your cart, but fighting their own battle!
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>The Shamble Twist</h2>
+                <div class="card-content">
+                    <p><strong>On every hole, here's the dance:</strong></p>
+                    
+                    <div class="info-grid" style="margin-top: 20px;">
+                        <div class="info-item">
+                            <strong>Step 1</strong>
+                            Both cart teammates hit drives
+                        </div>
+                        <div class="info-item">
+                            <strong>Step 2</strong>
+                            Each player picks ONE drive to play from
+                        </div>
+                        <div class="info-item">
+                            <strong>Step 3</strong>
+                            Play your own ball from there
+                        </div>
+                        <div class="info-item">
+                            <strong>Step 4</strong>
+                            Finish solo—no help allowed!
+                        </div>
+                    </div>
+                    
+                    <div class="highlight-box" style="margin-top: 20px;">
+                        Choose wisely: Your teammate's bomb off the tee OR your own safe play? It's poker meets golf!
+                    </div>
+                    
+                    <p style="margin-top: 15px; font-style: italic; color: rgba(255,255,255,0.7);">
+                        (Approach shots, chips, putts—all solo. No coaching, no help, just pure competition!)
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>The Pops System</h2>
+                <div class="card-content">
+                    <div class="highlight-box">
+                        Pops = Match-Play Power-Ups
+                    </div>
+                    
+                    <p style="margin-top: 20px;"><strong>Strokes are applied on the HARDEST holes</strong></p>
+                    
+                    <div style="background: rgba(255,255,255,0.05); padding: 25px; border-radius: 12px; margin: 20px 0;">
+                        <div style="font-size: 1.3em; color: #667eea; margin-bottom: 15px; font-weight: bold;">Example Time:</div>
+                        <div style="font-size: 1.1em; line-height: 2;">
+                            <span style="background: rgba(102,126,234,0.5); color: white; padding: 5px 15px; border-radius: 8px; display: inline-block; margin: 5px;">6 Pops</span>
+                            <span style="margin: 0 10px;">=</span>
+                            <span style="background: rgba(102,126,234,0.7); color: white; padding: 5px 15px; border-radius: 8px; display: inline-block; margin: 5px;">1 Stroke on the 6 Toughest Holes</span>
+                        </div>
+                    </div>
+                    
+                    <div class="tip-box">
+                        <strong>Strategy Unlocked:</strong>
+                        Know which holes have stroke advantages. That Par 5 beast? It might be your equalizer!
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Scoring Breakdown</h2>
+                <div class="card-content">
+                    <p><strong>Each 1v1 match is worth 2 points total:</strong></p>
+                    
+                    <table class="scoring-table">
+                        <thead>
+                            <tr>
+                                <th>Result</th>
+                                <th>Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Win the Front 9</strong></td>
+                                <td>1 Point</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Win the Back 9</strong></td>
+                                <td>1 Point</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tied on a Side?</strong></td>
+                                <td>Split it (0.5 / 0.5)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="highlight-box" style="margin-top: 20px;">
+                        Total Per Match: 2 Points<br>
+                        Maximum Team Points: 8 Points (if you sweep all 4 matches)
+                    </div>
+                    
+                    <p style="margin-top: 15px; font-style: italic; color: rgba(255,255,255,0.7);">
+                        Match play scoring is NET (pops apply). Keep it clean, keep it moving!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="event-details">
+            <h2>Event Details</h2>
+            <div class="event-info-large">
+                <div class="event-info-item">
+                    <div class="label">Date</div>
+                    <div class="value">August 29, 2026</div>
+                </div>
+                <div class="event-info-item">
+                    <div class="label">Course</div>
+                    <div class="value">Farm D' Allie Golf Club</div>
+                </div>
+                <div class="event-info-item">
+                    <div class="label">Tee Time</div>
+                    <div class="value">8:00 AM</div>
+                </div>
+                <div class="event-info-item">
+                    <div class="label">Captains</div>
+                    <div class="value">Gavin & Bel</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Important Notes</h2>
+            <div class="card-content">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Keep Pace</strong>
+                        Play ready golf—no dawdling!
+                    </div>
+                    <div class="info-item">
+                        <strong>Pops on Scorecard</strong>
+                        Check Stroke Index holes carefully
+                    </div>
+                    <div class="info-item">
+                        <strong>Concede Putts</strong>
+                        Be reasonable, keep it friendly
+                    </div>
+                    <div class="info-item">
+                        <strong>NET Scoring</strong>
+                        All match play uses pops
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
