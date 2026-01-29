@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Classic 2026 - Live Leaderboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Copperplate', 'Copperplate Gothic', Georgia, serif;
+            background: #f5f3e8;
+            color: #0d3d1f;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: #ffffff;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 3px solid #0d3d1f;
+            box-shadow: 0 2px 10px rgba(13,61,31,0.1);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: #0d3d1f;
+            text-decoration: none;
+            font-size: 0.95em;
+            font-weight: 600;
+            padding: 10px 25px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .nav-link:hover {
+            background: #f5f3e8;
+            border-color: #0d3d1f;
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: #0d3d1f;
+            color: #f5f3e8;
+            border-color: #0d3d1f;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 20px 60px;
+            background: #ffffff;
+            border-bottom: 2px solid #0d3d1f;
+            margin-bottom: 60px;
+        }
+
+        .hero h1 {
+            font-size: 4.5em;
+            margin-bottom: 15px;
+            animation: fadeInDown 1s ease-out;
+            letter-spacing: 12px;
+            font-weight: 700;
+            color: #0d3d1f;
+        }
+
+        .hero .subtitle {
+            font-size: 1.8em;
+            opacity: 0.8;
+            margin-top: 10px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #0d3d1f;
+        }
+
+        .team-scores {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin: 60px 0;
+        }
+
+        .team-card {
+            background: #ffffff;
+            border: 3px solid #0d3d1f;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(13,61,31,0.08);
+        }
+
+        .team-card.winning {
+            border-color: #d4af37;
+            background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(212,175,55,0.05) 100%);
+        }
+
+        .team-card h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #0d3d1f;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .team-card.winning h2 {
+            color: #d4af37;
+        }
+
+        .total-score {
+            font-size: 5em;
+            font-weight: bold;
+            color: #0d3d1f;
+            margin: 20px 0;
+        }
+
+        .team-card.winning .total-score {
+            color: #d4af37;
+        }
+
+        .score-label {
+            font-size: 1.2em;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin: 60px 0 40px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5em;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            display: inline-block;
+            padding: 20px 50px;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 2px solid #0d3d1f;
+            color: #0d3d1f;
+        }
+
+        .matches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .match-card {
+            background: #ffffff;
+            border: 2px solid #0d3d1f;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(13,61,31,0.08);
+        }
+
+        .match-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #0d3d1f;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #0d3d1f;
+        }
+
+        .matchup {
+            background: #f5f3e8;
+            border: 2px solid #0d3d1f;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .matchup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .player-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #0d3d1f;
+        }
+
+        .player-name.winner {
+            color: #d4af37;
+        }
+
+        .score-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .nine-score {
+            background: #ffffff;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            border: 2px solid #0d3d1f;
+        }
+
+        .nine-score.won {
+            background: #d4af37;
+            color: #0d3d1f;
+            border-color: #d4af37;
+        }
+
+        .nine-score.tied {
+            background: #f5f3e8;
+            border-style: dashed;
+        }
+
+        .nine-label {
+            font-size: 0.9em;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nine-result {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .match-status {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            background: #fff8e1;
+            border-radius: 6px;
+            font-weight: bold;
+            color: #0d3d1f;
+        }
+
+        .stats-bar {
+            background: #ffffff;
+            border: 2px solid #0d3d1f;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px 0;
+            box-shadow: 0 4px 15px rgba(13,61,31,0.08);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: #f5f3e8;
+            border-radius: 8px;
+            border: 2px solid #0d3d1f;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #0d3d1f;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        .last-updated {
+            text-align: center;
+            padding: 15px;
+            background: #fff8e1;
+            border-radius: 8px;
+            margin: 40px 0;
+            font-style: italic;
+            color: #0d3d1f;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                gap: 15px;
+            }
+
+            .nav-link {
+                font-size: 0.85em;
+                padding: 8px 18px;
+            }
+
+            .hero h1 {
+                font-size: 2.5em;
+                letter-spacing: 6px;
+            }
+
+            .team-scores {
+                grid-template-columns: 1fr;
+            }
+
+            .total-score {
+                font-size: 3.5em;
+            }
+
+            .matches-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-link">Tournament Format</a>
+            <a href="draft.html" class="nav-link">Official Rankings</a>
+            <a href="rule.html" class="nav-link">The Draft</a>
+            <a href="leaderboard.html" class="nav-link active">Live Leaderboard</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>LIVE LEADERBOARD</h1>
+        <div class="subtitle">The Classic 2026</div>
+    </div>
+
+    <div class="container">
+        <!-- Team Scores -->
+        <div class="team-scores">
+            <div class="team-card winning">
+                <h2>TEAM BROCK</h2>
+                <div class="total-score" id="team-brock-score">4.5</div>
+                <div class="score-label">Total Points</div>
+            </div>
+            <div class="team-card">
+                <h2>TEAM JARED</h2>
+                <div class="total-score" id="team-jared-score">3.5</div>
+                <div class="score-label">Total Points</div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h2>Individual Matches</h2>
+        </div>
+
+        <!-- Match Cards -->
+        <div class="matches-grid">
+            <!-- Foursome 1 -->
+            <div class="match-card">
+                <h3>Foursome 1</h3>
+                
+                <!-- Match 1A -->
+                <div class="matchup">
+                    <div class="matchup-header">
+                        <span class="player-name winner">Gavin (Brock)</span>
+                        <span style="font-size: 1.5em; color: #0d3d1f;">VS</span>
+                        <span class="player-name">Tyler (Jared)</span>
+                    </div>
+                    <div class="score-display">
+                        <div class="nine-score won">
+                            <div class="nine-label">Front 9</div>
+                            <div class="nine-result">Gavin 1-0</div>
+                        </div>
+                        <div class="nine-score tied">
+                            <div class="nine-label">Back 9</div>
+                            <div class="nine-result">0.5-0.5</div>
+                        </div>
+                    </div>
+                    <div class="match-status">Gavin wins 1.5 - 0.5</div>
+                </div>
+
+                <!-- Match 1B -->
+                <div class="matchup">
+                    <div class="matchup-header">
+                        <span class="player-name">Bruce (Brock)</span>
+                        <span style="font-size: 1.5em; color: #0d3d1f;">VS</span>
+                        <span class="player-name winner">Veed (Jared)</span>
+                    </div>
+                    <div class="score-display">
+                        <div class="nine-score tied">
+                            <div class="nine-label">Front 9</div>
+                            <div class="nine-result">0.5-0.5</div>
+                        </div>
+                        <div class="nine-score won">
+                            <div class="nine-label">Back 9</div>
+                            <div class="nine-result">Veed 1-0</div>
+                        </div>
+                    </div>
+                    <div class="match-status">Veed wins 1.5 - 0.5</div>
+                </div>
+            </div>
+
+            <!-- Foursome 2 -->
+            <div class="match-card">
+                <h3>Foursome 2</h3>
+                
+                <!-- Match 2A -->
+                <div class="matchup">
+                    <div class="matchup-header">
+                        <span class="player-name winner">Bel (Brock)</span>
+                        <span style="font-size: 1.5em; color: #0d3d1f;">VS</span>
+                        <span class="player-name">Hunter (Jared)</span>
+                    </div>
+                    <div class="score-display">
+                        <div class="nine-score won">
+                            <div class="nine-label">Front 9</div>
+                            <div class="nine-result">Bel 1-0</div>
+                        </div>
+                        <div class="nine-score won">
+                            <div class="nine-label">Back 9</div>
+                            <div class="nine-result">Bel 1-0</div>
+                        </div>
+                    </div>
+                    <div class="match-status">Bel wins 2 - 0</div>
+                </div>
+
+                <!-- Match 2B -->
+                <div class="matchup">
+                    <div class="matchup-header">
+                        <span class="player-name">Colby (Brock)</span>
+                        <span style="font-size: 1.5em; color: #0d3d1f;">VS</span>
+                        <span class="player-name winner">AK (Jared)</span>
+                    </div>
+                    <div class="score-display">
+                        <div class="nine-score tied">
+                            <div class="nine-label">Front 9</div>
+                            <div class="nine-result">0.5-0.5</div>
+                        </div>
+                        <div class="nine-score won">
+                            <div class="nine-label">Back 9</div>
+                            <div class="nine-result">AK 1-0</div>
+                        </div>
+                    </div>
+                    <div class="match-status">AK wins 1.5 - 0.5</div>
+                </div>
+            </div>
+
+            <!-- Foursome 3 -->
+            <div class="match-card">
+                <h3>Foursome 3</h3>
+                
+                <!-- Match 3A -->
+                <div class="matchup">
+                    <div class="matchup-header">
+                        <span class="player-name">Miles (Brock)</span>
+                        <span style="font-size: 1.5em; color: #0d3d1f;">VS</span>
+                        <span class="player-name">Lane (Jared)</span>
+                    </div>
+                    <div class="score-display">
+                        <div class="nine-score">
+                            <div class="nine-label">Front 9</div>
+                            <div class="nine-result">In Progress</div>
+                        </div>
+                        <div class="nine-score">
+                            <div class="nine-label">Back 9</div>
+                            <div class="nine-result">-</div>
+                        </div>
+                    </div>
+                    <div class="match-status">On Course</div>
+                </div>
+
+                <!-- Match 3B -->
+                <div class="matchup">
+                    <div class="matchup-header">
+                        <span class="player-name">Dex (Brock)</span>
+                        <span style="font-size: 1.5em; color: #0d3d1f;">VS</span>
+                        <span class="player-name">Ross (Jared)</span>
+                    </div>
+                    <div class="score-display">
+                        <div class="nine-score">
+                            <div class="nine-label">Front 9</div>
+                            <div class="nine-result">In Progress</div>
+                        </div>
+                        <div class="nine-score">
+                            <div class="nine-label">Back 9</div>
+                            <div class="nine-result">-</div>
+                        </div>
+                    </div>
+                    <div class="match-status">On Course</div>
+                </div>
+            </div>
+
+            <!-- Foursome 4 -->
+            <div class="match-card">
+                <h3>Foursome 4</h3>
+                
+                <!-- Match 4A -->
+                <div class="matchup">
+                    <div class="matchup-header">
+                        <span class="player-name">JV (Brock)</span>
+                        <span style="font-size: 1.5em; color: #0d3d1f;">VS</span>
+                        <span class="player-name">Alex (Jared)</span>
+                    </div>
+                    <div class="score-display">
+                        <div class="nine-score">
+                            <div class="nine-label">Front 9</div>
+                            <div class="nine-result">-</div>
+                        </div>
+                        <div class="nine-score">
+                            <div class="nine-label">Back 9</div>
+                            <div class="nine-result">-</div>
+                        </div>
+                    </div>
+                    <div class="match-status">Not Started</div>
+                </div>
+
+                <!-- Match 4B -->
+                <div class="matchup">
+                    <div class="matchup-header">
+                        <span class="player-name">Brock (Captain)</span>
+                        <span style="font-size: 1.5em; color: #0d3d1f;">VS</span>
+                        <span class="player-name">Jared (Captain)</span>
+                    </div>
+                    <div class="score-display">
+                        <div class="nine-score">
+                            <div class="nine-label">Front 9</div>
+                            <div class="nine-result">-</div>
+                        </div>
+                        <div class="nine-score">
+                            <div class="nine-label">Back 9</div>
+                            <div class="nine-result">-</div>
+                        </div>
+                    </div>
+                    <div class="match-status">Not Started</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tournament Stats -->
+        <div class="section-header">
+            <h2>Tournament Stats</h2>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value">4</span>
+                    <span class="stat-label">Matches Complete</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">2</span>
+                    <span class="stat-label">In Progress</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">2</span>
+                    <span class="stat-label">Not Started</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">8.0</span>
+                    <span class="stat-label">Points Awarded</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="last-updated">
+            Last updated: 10:45 AM - August 29, 2026
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh functionality (optional)
+        // Uncomment to enable auto-refresh every 2 minutes
+        // setInterval(() => {
+        //     location.reload();
+        // }, 120000);
+    </script>
+</body>
+</html>
