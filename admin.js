@@ -47,3 +47,47 @@ function render() {
     container.appendChild(div);
   });
 }
+function buildPlayerSelect(match, index, usedPlayers) {
+  const select = document.createElement("select");
+  select.innerHTML = `<option value="">-- Select Player --</option>`;
+
+  Object.entries(data.players).forEach(([id, player]) => {
+    const option = document.createElement("option");
+    option.value = id;
+    option.textContent = `${player.name} (${data.teams[player.team].name})`;
+
+    if (usedPlayers.has(id) && match.playerIds[index] !== id) {
+      option.disabled = true;
+    }
+
+    if (match.playerIds[index] === id) {
+      option.selected = true;
+    }
+
+    select.appendChild(option);
+  });
+
+  select.onchange = e => {
+    match.playerIds[index] = e.target.value || null;
+    render();
+  };
+
+  return select;
+}
+
+function getUsedPlayers(round, currentMatchId) {
+  const used = new Set();
+  data.matches.forEach(m => {
+    if (m.round === round && m.id !== currentMatchId) {
+      m.playerIds.forEach(p => p && used.add(p));
+    }
+  });
+  return used;
+}
+
+function isValidMatchup(match) {
+  const [p1, p2] = match.playerIds;
+  if (!p1 || !p2) return true;
+
+  return data.players[p1].team !== data.players[p2].team;
+}
