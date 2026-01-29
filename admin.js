@@ -1,3 +1,11 @@
+const GITHUB_OWNER = "rbelaire";
+const GITHUB_REPO = "swclassic";
+const DATA_PATH = "data.json";
+
+// TEMP MVP AUTH (do not commit token)
+const GITHUB_TOKEN = prompt("Enter GitHub admin token:");
+
+
 let data;
 
 fetch("./data.json")
