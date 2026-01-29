@@ -3,42 +3,44 @@ fetch("./data.json")
   .then(data => {
     renderTotals(data);
     renderMatches(data);
-    renderStats(data);
     renderLastUpdated(data);
   });
 
 /* ======================
-   TEAM TOTALS
+   TOTALS
    ====================== */
 
 function renderTotals(data) {
   const totals = calculateTotals(data);
 
-  const brock = totals.brock || 0;
-  const jared = totals.jared || 0;
+  document.getElementById("team-brock-score").textContent =
+    (totals.brock || 0).toFixed(1);
 
-  document.getElementById("team-brock-score").textContent = brock.toFixed(1);
-  document.getElementById("team-jared-score").textContent = jared.toFixed(1);
+  document.getElementById("team-jared-score").textContent =
+    (totals.jared || 0).toFixed(1);
 
-  const cards = document.querySelectorAll(".team-card");
-  cards.forEach(c => c.classList.remove("winning"));
+  const brockCard = document.getElementById("team-brock");
+  const jaredCard = document.getElementById("team-jared");
 
-  if (brock > jared) cards[0].classList.add("winning");
-  if (jared > brock) cards[1].classList.add("winning");
+  brockCard.classList.remove("winning");
+  jaredCard.classList.remove("winning");
+
+  if (totals.brock > totals.jared) brockCard.classList.add("winning");
+  if (totals.jared > totals.brock) jaredCard.classList.add("winning");
 }
 
 function calculateTotals(data) {
   const totals = { brock: 0, jared: 0 };
 
-  data.matches.forEach(m => {
-    const [p1, p2] = m.playerIds;
+  data.matches.forEach(match => {
+    const [p1, p2] = match.playerIds;
     if (!p1 || !p2) return;
 
     const t1 = data.players[p1].team;
     const t2 = data.players[p2].team;
 
-    ["front9", "back9"].forEach(k => {
-      const v = m.points[k];
+    ["front9", "back9"].forEach(key => {
+      const v = match.points[key];
       if (v === null) return;
       totals[t1] += v;
       totals[t2] += 1 - v;
@@ -49,32 +51,34 @@ function calculateTotals(data) {
 }
 
 /* ======================
-   MATCH CARDS
+   MATCHES → FOURSOMES
    ====================== */
 
 function renderMatches(data) {
   const grid = document.getElementById("matches-grid");
   grid.innerHTML = "";
 
-  const rounds = groupByRound(data.matches);
+  const foursomes = chunk(data.matches, 2);
 
-  Object.entries(rounds).forEach(([round, matches]) => {
-    const card = document.createElement("div");
-    card.className = "match-card";
+  foursomes.forEach((group, index) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "foursome";
 
-    const h3 = document.createElement("h3");
-    h3.textContent = `Foursome ${round}`;
-    card.appendChild(h3);
+    const header = document.createElement("div");
+    header.className = "foursome-header";
+    header.textContent = `Foursome ${index + 1}`;
 
-    matches.forEach(m => {
-      card.appendChild(buildMatchup(m, data));
+    wrapper.appendChild(header);
+
+    group.forEach(match => {
+      wrapper.appendChild(buildMatch(match, data));
     });
 
-    grid.appendChild(card);
+    grid.appendChild(wrapper);
   });
 }
 
-function buildMatchup(match, data) {
+function buildMatch(match, data) {
   const div = document.createElement("div");
   div.className = "matchup";
 
@@ -83,39 +87,35 @@ function buildMatchup(match, data) {
 
   const [p1, p2] = match.playerIds;
 
-  const p1Name = p1 ? `${data.players[p1].name} (${data.players[p1].team})` : "TBD";
-  const p2Name = p2 ? `${data.players[p2].name} (${data.players[p2].team})` : "TBD";
-
   const left = document.createElement("span");
   left.className = "player-name";
-  left.textContent = p1Name;
+  left.textContent = p1 ? data.players[p1].name : "TBD";
 
   const vs = document.createElement("span");
   vs.textContent = "VS";
-  vs.style.fontSize = "1.5em";
 
   const right = document.createElement("span");
   right.className = "player-name";
-  right.textContent = p2Name;
+  right.textContent = p2 ? data.players[p2].name : "TBD";
 
   header.append(left, vs, right);
 
-  const scoreDisplay = document.createElement("div");
-  scoreDisplay.className = "score-display";
-  scoreDisplay.append(
-    buildNine("Front 9", match.points.front9, p1, data),
-    buildNine("Back 9", match.points.back9, p1, data)
+  const scores = document.createElement("div");
+  scores.className = "score-display";
+  scores.append(
+    buildNine("Front 9", match.points.front9),
+    buildNine("Back 9", match.points.back9)
   );
 
   const status = document.createElement("div");
   status.className = "match-status";
   status.textContent = formatStatus(match);
 
-  div.append(header, scoreDisplay, status);
+  div.append(header, scores, status);
   return div;
 }
 
-function buildNine(label, val, p1, data) {
+function buildNine(label, val) {
   const div = document.createElement("div");
   div.className = "nine-score";
 
@@ -130,27 +130,8 @@ function buildNine(label, val, p1, data) {
 }
 
 /* ======================
-   STATS + META
+   META
    ====================== */
-
-function renderStats(data) {
-  let complete = 0, progress = 0, notStarted = 0, points = 0;
-
-  data.matches.forEach(m => {
-    if (m.status === "complete") complete++;
-    else if (m.status === "in_progress") progress++;
-    else notStarted++;
-
-    ["front9", "back9"].forEach(k => {
-      if (m.points[k] !== null) points++;
-    });
-  });
-
-  document.getElementById("stat-complete").textContent = complete;
-  document.getElementById("stat-progress").textContent = progress;
-  document.getElementById("stat-not-started").textContent = notStarted;
-  document.getElementById("stat-points").textContent = points.toFixed(1);
-}
 
 function renderLastUpdated(data) {
   const d = new Date(data.meta.lastUpdated);
@@ -158,20 +139,20 @@ function renderLastUpdated(data) {
     `Last updated: ${d.toLocaleString()}`;
 }
 
-/* ======================
-   HELPERS
-   ====================== */
-
-function groupByRound(matches) {
-  return matches.reduce((acc, m) => {
-    acc[m.round] = acc[m.round] || [];
-    acc[m.round].push(m);
-    return acc;
-  }, {});
-}
-
 function formatStatus(match) {
   if (match.status === "complete") return "Final";
   if (match.status === "in_progress") return "On Course";
   return "Not Started";
+}
+
+/* ======================
+   HELPERS
+   ====================== */
+
+function chunk(arr, size) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) {
+    out.push(arr.slice(i, i + size));
+  }
+  return out;
 }
