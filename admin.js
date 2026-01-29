@@ -99,3 +99,47 @@ function isValidMatchup(match) {
 
   return data.players[p1].team !== data.players[p2].team;
 }
+async function saveToGitHub() {
+  if (!GITHUB_TOKEN) {
+    alert("Missing GitHub token");
+    return;
+  }
+
+  // Update timestamp
+  data.meta.lastUpdated = new Date().toISOString();
+
+  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${DATA_PATH}`;
+
+  // Step 1: get current file SHA
+  const existing = await fetch(url, {
+    headers: {
+      Authorization: `token ${GITHUB_TOKEN}`
+    }
+  }).then(r => r.json());
+
+  if (!existing.sha) {
+    alert("Could not fetch data.json SHA");
+    return;
+  }
+
+  // Step 2: push update
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: {
+      Authorization: `token ${GITHUB_TOKEN}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      message: "Update matchups",
+      content: btoa(JSON.stringify(data, null, 2)),
+      sha: existing.sha
+    })
+  });
+
+  if (response.ok) {
+    alert("✅ Matchups saved to GitHub");
+  } else {
+    alert("❌ Save failed");
+    console.error(await response.text());
+  }
+}
