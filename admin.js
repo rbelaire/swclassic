@@ -2,7 +2,7 @@
  * ADMIN PASSWORD GATE
  *************************/
 
-const ADMIN_PASSWORD = "classic2026"; // change this
+const ADMIN_PASSWORD = "fellinmylap"; // change this
 
 const entered = prompt("Enter admin password:");
 
