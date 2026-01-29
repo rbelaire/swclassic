@@ -2,7 +2,7 @@
   "meta": {
     "event": "The Classic",
     "year": 2026,
-    "lastUpdated": "2026-01-29T21:29:48.552Z"
+    "lastUpdated": "2026-01-29T21:29:58.186Z"
   },
   "teams": {
     "brock": {
@@ -154,8 +154,8 @@
         "brock4"
       ],
       "points": {
-        "front9": 1,
-        "back9": 0
+        "front9": 0.5,
+        "back9": 0.5
       },
       "status": "not_started"
     },
