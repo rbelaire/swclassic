@@ -1,4 +1,17 @@
 /*************************
+ * ADMIN PASSWORD GATE
+ *************************/
+
+const ADMIN_PASSWORD = "classic2026"; // change this
+
+const entered = prompt("Enter admin password:");
+
+if (entered !== ADMIN_PASSWORD) {
+  alert("Access denied");
+  window.location.href = "index.html";
+}
+
+/*************************
  * CONFIG
  *************************/
 
