@@ -1,7 +1,7 @@
 /*************************
  * ADMIN PASSWORD GATE
  *************************/
-const ADMIN_PASSWORD = "Fellinmylap";
+const ADMIN_PASSWORD = "classic2026";
 
 if (sessionStorage.getItem("adminAuth") !== "true") {
   const entered = prompt("Enter admin password:");
@@ -208,7 +208,7 @@ function renderTotals() {
 }
 
 /*************************
- * SAVE TO GITHUB
+ * SAVE TO GITHUB (FIXED)
  *************************/
 function saveToGitHub() {
   const token = prompt("GitHub token:");
@@ -216,26 +216,41 @@ function saveToGitHub() {
 
   data.meta.lastUpdated = new Date().toISOString();
 
+  // Step 1: fetch current SHA
   fetch("https://api.github.com/repos/rbelaire/swclassic/contents/data.json", {
-    method: "PUT",
     headers: {
-      Authorization: `token ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      message: "Update tournament data",
-      content: btoa(JSON.stringify(data, null, 2)),
-      sha: data._sha
-    })
+      Authorization: `token ${token}`
+    }
   })
+    .then(res => res.json())
+    .then(file => {
+      const sha = file.sha;
+
+      // Step 2: overwrite file
+      return fetch("https://api.github.com/repos/rbelaire/swclassic/contents/data.json", {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: "Update tournament data",
+          content: btoa(JSON.stringify(data, null, 2)),
+          sha: sha
+        })
+      });
+    })
     .then(res => res.json())
     .then(resp => {
       if (resp.content) {
-        alert("Saved!");
-        data._sha = resp.content.sha;
+        alert("Saved successfully!");
       } else {
-        alert("Save failed");
         console.error(resp);
+        alert("Save failed. Check token permissions.");
       }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Save failed due to network or auth error.");
     });
 }
