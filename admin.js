@@ -1,32 +1,21 @@
 /*************************
  * ADMIN PASSWORD GATE
  *************************/
+const ADMIN_PASSWORD = "classic2026";
 
-const ADMIN_PASSWORD = "fellinmylap"; // change this
-
-const entered = prompt("Enter admin password:");
-
-if (entered !== ADMIN_PASSWORD) {
-  alert("Access denied");
-  window.location.href = "index.html";
+if (sessionStorage.getItem("adminAuth") !== "true") {
+  const entered = prompt("Enter admin password:");
+  if (entered !== ADMIN_PASSWORD) {
+    alert("Access denied");
+    window.location.href = "index.html";
+  }
+  sessionStorage.setItem("adminAuth", "true");
 }
-
-/*************************
- * CONFIG
- *************************/
-
-const GITHUB_OWNER = "rbelaire";
-const GITHUB_REPO = "swclassic";
-const DATA_PATH = "data.json";
-
-// MVP auth (do NOT commit token)
-const GITHUB_TOKEN = prompt("Enter GitHub admin token:");
-
-let data;
 
 /*************************
  * LOAD DATA
  *************************/
+let data;
 
 fetch("./data.json")
   .then(res => res.json())
@@ -36,9 +25,8 @@ fetch("./data.json")
   });
 
 /*************************
- * MAIN RENDER
+ * RENDER
  *************************/
-
 function render() {
   const container = document.getElementById("matches");
   container.innerHTML = "";
@@ -47,27 +35,31 @@ function render() {
     const div = document.createElement("div");
     div.className = "match";
 
+    if (!isValidMatchup(match)) {
+      div.classList.add("invalid");
+    }
+
     const title = document.createElement("h3");
-    title.textContent = `Match ${match.id} (Round ${match.round})`;
+    title.textContent = `Match ${match.id}`;
 
-    const usedPlayers = getUsedPlayers(match.round, match.id);
-
-    const p1 = buildPlayerSelect(match, 0, usedPlayers);
-    const p2 = buildPlayerSelect(match, 1, usedPlayers);
+    const p1 = buildPlayerSelect(match, 0);
+    const p2 = buildPlayerSelect(match, 1);
 
     const front9 = buildScoreSelect(match, "front9");
     const back9 = buildScoreSelect(match, "back9");
 
     const swapBtn = document.createElement("button");
-    swapBtn.textContent = "Swap";
+    swapBtn.textContent = "Swap Players";
     swapBtn.onclick = () => {
       [match.playerIds[0], match.playerIds[1]] =
         [match.playerIds[1], match.playerIds[0]];
+      match.points.front9 = null;
+      match.points.back9 = null;
       render();
     };
 
     const clearBtn = document.createElement("button");
-    clearBtn.textContent = "Clear";
+    clearBtn.textContent = "Clear Match";
     clearBtn.onclick = () => {
       match.playerIds = [null, null];
       match.points.front9 = null;
@@ -75,25 +67,28 @@ function render() {
       render();
     };
 
-    if (!isValidMatchup(match)) {
-      div.classList.add("invalid");
-    }
+    const players = document.createElement("div");
+    players.className = "players";
 
-  const players = document.createElement("div");
-players.className = "players";
-players.append(p1, p2);
+    const p1Wrap = document.createElement("div");
+    p1Wrap.innerHTML = "<strong>Player 1</strong>";
+    p1Wrap.appendChild(p1);
 
-const scores = document.createElement("div");
-scores.className = "scores";
-scores.append(front9, back9);
+    const p2Wrap = document.createElement("div");
+    p2Wrap.innerHTML = "<strong>Player 2</strong>";
+    p2Wrap.appendChild(p2);
 
-const actions = document.createElement("div");
-actions.className = "actions";
-actions.append(swapBtn, clearBtn);
+    players.append(p1Wrap, p2Wrap);
 
-div.append(title, players, scores, actions);
+    const scores = document.createElement("div");
+    scores.className = "scores";
+    scores.append(front9, back9);
 
+    const actions = document.createElement("div");
+    actions.className = "actions";
+    actions.append(swapBtn, clearBtn);
 
+    div.append(title, players, scores, actions);
     container.appendChild(div);
   });
 
@@ -103,29 +98,26 @@ div.append(title, players, scores, actions);
 /*************************
  * PLAYER SELECT
  *************************/
-
-function buildPlayerSelect(match, index, usedPlayers) {
+function buildPlayerSelect(match, index) {
   const select = document.createElement("select");
-  select.innerHTML = `<option value="">-- Select Player --</option>`;
 
-  Object.entries(data.players).forEach(([id, player]) => {
-    const option = document.createElement("option");
-    option.value = id;
-    option.textContent = `${player.name} (${data.teams[player.team].name})`;
+  const blank = document.createElement("option");
+  blank.value = "";
+  blank.textContent = "-- Select Player --";
+  select.appendChild(blank);
 
-    if (usedPlayers.has(id) && match.playerIds[index] !== id) {
-      option.disabled = true;
-    }
-
-    if (match.playerIds[index] === id) {
-      option.selected = true;
-    }
-
-    select.appendChild(option);
+  Object.entries(data.players).forEach(([id, p]) => {
+    const opt = document.createElement("option");
+    opt.value = id;
+    opt.textContent = `${p.name} (${p.team})`;
+    if (match.playerIds[index] === id) opt.selected = true;
+    select.appendChild(opt);
   });
 
   select.onchange = e => {
     match.playerIds[index] = e.target.value || null;
+    match.points.front9 = null;
+    match.points.back9 = null;
     render();
   };
 
@@ -133,32 +125,26 @@ function buildPlayerSelect(match, index, usedPlayers) {
 }
 
 /*************************
- * SCORE SELECT
+ * SCORE SELECT (PLAYER 1)
  *************************/
-
 function buildScoreSelect(match, key) {
   const select = document.createElement("select");
   select.className = "score";
 
   const options = [
-    { label: "--", value: "" },
-    { label: "Win (1)", value: "1" },
-    { label: "Tie (0.5)", value: "0.5" },
-    { label: "Loss (0)", value: "0" }
+    { label: "-- Result (Player 1) --", value: "" },
+    { label: "Win", value: "1" },
+    { label: "Tie", value: "0.5" },
+    { label: "Loss", value: "0" }
   ];
 
   options.forEach(o => {
     const opt = document.createElement("option");
     opt.textContent = o.label;
     opt.value = o.value;
-
-    if (
-      match.points[key] !== null &&
-      String(match.points[key]) === o.value
-    ) {
+    if (match.points[key] !== null && String(match.points[key]) === o.value) {
       opt.selected = true;
     }
-
     select.appendChild(opt);
   });
 
@@ -167,8 +153,7 @@ function buildScoreSelect(match, key) {
   if (!valid) select.classList.add("disabled");
 
   select.onchange = e => {
-    match.points[key] =
-      e.target.value === "" ? null : Number(e.target.value);
+    match.points[key] = e.target.value === "" ? null : Number(e.target.value);
     render();
   };
 
@@ -178,46 +163,18 @@ function buildScoreSelect(match, key) {
 /*************************
  * VALIDATION
  *************************/
-
 function isValidMatchup(match) {
   const [p1, p2] = match.playerIds;
-
-  if (!p1 || !p2) {
-    match.points.front9 = null;
-    match.points.back9 = null;
-    return false;
-  }
-
-  const valid =
-    data.players[p1].team !== data.players[p2].team;
-
-  if (!valid) {
-    match.points.front9 = null;
-    match.points.back9 = null;
-  }
-
-  return valid;
-}
-
-function getUsedPlayers(round, currentMatchId) {
-  const used = new Set();
-
-  data.matches.forEach(m => {
-    if (m.round === round && m.id !== currentMatchId) {
-      m.playerIds.forEach(p => p && used.add(p));
-    }
-  });
-
-  return used;
+  if (!p1 || !p2) return false;
+  return data.players[p1].team !== data.players[p2].team;
 }
 
 /*************************
  * TOTALS
  *************************/
-
 function calculateTotals() {
   const totals = {};
-  Object.keys(data.teams).forEach(t => (totals[t] = 0));
+  Object.keys(data.teams).forEach(t => totals[t] = 0);
 
   data.matches.forEach(match => {
     const [p1, p2] = match.playerIds;
@@ -253,45 +210,32 @@ function renderTotals() {
 /*************************
  * SAVE TO GITHUB
  *************************/
-
-async function saveToGitHub() {
-  if (!GITHUB_TOKEN) {
-    alert("Missing GitHub token");
-    return;
-  }
+function saveToGitHub() {
+  const token = prompt("GitHub token:");
+  if (!token) return;
 
   data.meta.lastUpdated = new Date().toISOString();
 
-  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${DATA_PATH}`;
-
-  const existing = await fetch(url, {
-    headers: {
-      Authorization: `token ${GITHUB_TOKEN}`
-    }
-  }).then(r => r.json());
-
-  if (!existing.sha) {
-    alert("Could not fetch data.json SHA");
-    return;
-  }
-
-  const response = await fetch(url, {
+  fetch("https://api.github.com/repos/rbelaire/swclassic/contents/data.json", {
     method: "PUT",
     headers: {
-      Authorization: `token ${GITHUB_TOKEN}`,
+      Authorization: `token ${token}`,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      message: "Update matchups and scores",
+      message: "Update tournament data",
       content: btoa(JSON.stringify(data, null, 2)),
-      sha: existing.sha
+      sha: data._sha
     })
-  });
-
-  if (response.ok) {
-    alert("✅ Saved to GitHub");
-  } else {
-    alert("❌ Save failed");
-    console.error(await response.text());
-  }
+  })
+    .then(res => res.json())
+    .then(resp => {
+      if (resp.content) {
+        alert("Saved!");
+        data._sha = resp.content.sha;
+      } else {
+        alert("Save failed");
+        console.error(resp);
+      }
+    });
 }
