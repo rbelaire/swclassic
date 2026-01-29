@@ -1,7 +1,7 @@
 /*************************
  * ADMIN PASSWORD GATE
  *************************/
-const ADMIN_PASSWORD = "classic2026";
+const ADMIN_PASSWORD = "Fellinmylap";
 
 if (sessionStorage.getItem("adminAuth") !== "true") {
   const entered = prompt("Enter admin password:");
