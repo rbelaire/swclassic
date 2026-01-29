@@ -324,4 +324,42 @@ body {
     margin: 25px 0;
   }
 }
+/* =====================
+   FOURSOMES
+   ===================== */
+
+.foursome {
+  background: #ffffff;
+  border: 3px solid #0d3d1f;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 6px 18px rgba(13,61,31,0.12);
+}
+
+.foursome + .foursome {
+  margin-top: 30px;
+}
+
+.foursome-header {
+  text-align: center;
+  font-size: 1.4em;
+  font-weight: bold;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #0d3d1f;
+}
+
+/* Mobile refinement */
+@media (max-width: 768px) {
+  .foursome {
+    padding: 15px;
+  }
+
+  .foursome-header {
+    font-size: 1.1em;
+    letter-spacing: 2px;
+  }
+}
 
