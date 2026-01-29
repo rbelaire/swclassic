@@ -79,15 +79,20 @@ function render() {
       div.classList.add("invalid");
     }
 
-    div.append(
-      title,
-      p1,
-      p2,
-      front9,
-      back9,
-      swapBtn,
-      clearBtn
-    );
+  const players = document.createElement("div");
+players.className = "players";
+players.append(p1, p2);
+
+const scores = document.createElement("div");
+scores.className = "scores";
+scores.append(front9, back9);
+
+const actions = document.createElement("div");
+actions.className = "actions";
+actions.append(swapBtn, clearBtn);
+
+div.append(title, players, scores, actions);
+
 
     container.appendChild(div);
   });
