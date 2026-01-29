@@ -2,69 +2,372 @@
   "meta": {
     "event": "The Classic",
     "year": 2026,
-    "lastUpdated": "2026-01-29T00:00:00Z"
+    "lastUpdated": "2026-01-29T21:10:26.943Z"
   },
-
   "teams": {
-    "brock": { "name": "Brock", "color": "blue" },
-    "jared": { "name": "Jared", "color": "red" }
+    "brock": {
+      "name": "Brock",
+      "color": "blue"
+    },
+    "jared": {
+      "name": "Jared",
+      "color": "red"
+    }
   },
-
   "players": {
-    "brock1":  { "name": "Brock Player 1",  "team": "brock" },
-    "brock2":  { "name": "Brock Player 2",  "team": "brock" },
-    "brock3":  { "name": "Brock Player 3",  "team": "brock" },
-    "brock4":  { "name": "Brock Player 4",  "team": "brock" },
-    "brock5":  { "name": "Brock Player 5",  "team": "brock" },
-    "brock6":  { "name": "Brock Player 6",  "team": "brock" },
-    "brock7":  { "name": "Brock Player 7",  "team": "brock" },
-    "brock8":  { "name": "Brock Player 8",  "team": "brock" },
-    "brock9":  { "name": "Brock Player 9",  "team": "brock" },
-    "brock10": { "name": "Brock Player 10", "team": "brock" },
-    "brock11": { "name": "Brock Player 11", "team": "brock" },
-    "brock12": { "name": "Brock Player 12", "team": "brock" },
-    "brock13": { "name": "Brock Player 13", "team": "brock" },
-    "brock14": { "name": "Brock Player 14", "team": "brock" },
-    "brock15": { "name": "Brock Player 15", "team": "brock" },
-    "brock16": { "name": "Brock Player 16", "team": "brock" },
-
-    "jared1":  { "name": "Jared Player 1",  "team": "jared" },
-    "jared2":  { "name": "Jared Player 2",  "team": "jared" },
-    "jared3":  { "name": "Jared Player 3",  "team": "jared" },
-    "jared4":  { "name": "Jared Player 4",  "team": "jared" },
-    "jared5":  { "name": "Jared Player 5",  "team": "jared" },
-    "jared6":  { "name": "Jared Player 6",  "team": "jared" },
-    "jared7":  { "name": "Jared Player 7",  "team": "jared" },
-    "jared8":  { "name": "Jared Player 8",  "team": "jared" },
-    "jared9":  { "name": "Jared Player 9",  "team": "jared" },
-    "jared10": { "name": "Jared Player 10", "team": "jared" },
-    "jared11": { "name": "Jared Player 11", "team": "jared" },
-    "jared12": { "name": "Jared Player 12", "team": "jared" },
-    "jared13": { "name": "Jared Player 13", "team": "jared" },
-    "jared14": { "name": "Jared Player 14", "team": "jared" },
-    "jared15": { "name": "Jared Player 15", "team": "jared" },
-    "jared16": { "name": "Jared Player 16", "team": "jared" }
+    "brock1": {
+      "name": "Brock Player 1",
+      "team": "brock"
+    },
+    "brock2": {
+      "name": "Brock Player 2",
+      "team": "brock"
+    },
+    "brock3": {
+      "name": "Brock Player 3",
+      "team": "brock"
+    },
+    "brock4": {
+      "name": "Brock Player 4",
+      "team": "brock"
+    },
+    "brock5": {
+      "name": "Brock Player 5",
+      "team": "brock"
+    },
+    "brock6": {
+      "name": "Brock Player 6",
+      "team": "brock"
+    },
+    "brock7": {
+      "name": "Brock Player 7",
+      "team": "brock"
+    },
+    "brock8": {
+      "name": "Brock Player 8",
+      "team": "brock"
+    },
+    "brock9": {
+      "name": "Brock Player 9",
+      "team": "brock"
+    },
+    "brock10": {
+      "name": "Brock Player 10",
+      "team": "brock"
+    },
+    "brock11": {
+      "name": "Brock Player 11",
+      "team": "brock"
+    },
+    "brock12": {
+      "name": "Brock Player 12",
+      "team": "brock"
+    },
+    "brock13": {
+      "name": "Brock Player 13",
+      "team": "brock"
+    },
+    "brock14": {
+      "name": "Brock Player 14",
+      "team": "brock"
+    },
+    "brock15": {
+      "name": "Brock Player 15",
+      "team": "brock"
+    },
+    "brock16": {
+      "name": "Brock Player 16",
+      "team": "brock"
+    },
+    "jared1": {
+      "name": "Jared Player 1",
+      "team": "jared"
+    },
+    "jared2": {
+      "name": "Jared Player 2",
+      "team": "jared"
+    },
+    "jared3": {
+      "name": "Jared Player 3",
+      "team": "jared"
+    },
+    "jared4": {
+      "name": "Jared Player 4",
+      "team": "jared"
+    },
+    "jared5": {
+      "name": "Jared Player 5",
+      "team": "jared"
+    },
+    "jared6": {
+      "name": "Jared Player 6",
+      "team": "jared"
+    },
+    "jared7": {
+      "name": "Jared Player 7",
+      "team": "jared"
+    },
+    "jared8": {
+      "name": "Jared Player 8",
+      "team": "jared"
+    },
+    "jared9": {
+      "name": "Jared Player 9",
+      "team": "jared"
+    },
+    "jared10": {
+      "name": "Jared Player 10",
+      "team": "jared"
+    },
+    "jared11": {
+      "name": "Jared Player 11",
+      "team": "jared"
+    },
+    "jared12": {
+      "name": "Jared Player 12",
+      "team": "jared"
+    },
+    "jared13": {
+      "name": "Jared Player 13",
+      "team": "jared"
+    },
+    "jared14": {
+      "name": "Jared Player 14",
+      "team": "jared"
+    },
+    "jared15": {
+      "name": "Jared Player 15",
+      "team": "jared"
+    },
+    "jared16": {
+      "name": "Jared Player 16",
+      "team": "jared"
+    }
   },
-
   "matches": [
-    { "id": "1A", "round": 1, "course": "Front / Back", "playerIds": ["brock4",  "jared11"], "points": { "front9": null, "back9": null }, "status": "not_started" },
-    { "id": "1B", "round": 1, "course": "Front / Back", "playerIds": ["brock12", "jared3"],  "points": { "front9": null, "back9": null }, "status": "not_started" },
-    { "id": "1C", "round": 1, "course": "Front / Back", "playerIds": ["brock7",  "jared14"], "points": { "front9": null, "back9": null }, "status": "not_started" },
-    { "id": "1D", "round": 1, "course": "Front / Back", "playerIds": ["brock1",  "jared6"],  "points": { "front9": null, "back9": null }, "status": "not_started" },
-
-    { "id": "1E", "round": 1, "course": "Front / Back", "playerIds": ["brock9",  "jared1"],  "points": { "front9": null, "back9": null }, "status": "not_started" },
-    { "id": "1F", "round": 1, "course": "Front / Back", "playerIds": ["brock15", "jared8"],  "points": { "front9": null, "back9": null }, "status": "not_started" },
-    { "id": "1G", "round": 1, "course": "Front / Back", "playerIds": ["brock3",  "jared16"], "points": { "front9": null, "back9": null }, "status": "not_started" },
-    { "id": "1H", "round": 1, "course": "Front / Back", "playerIds": ["brock6",  "jared10"], "points": { "front9": null, "back9": null }, "status": "not_started" },
-
-    { "id": "1I", "round": 1, "course": "Front / Back", "playerIds": ["brock11", "jared4"],  "points": { "front9": null, "back9": null }, "status": "not_started" },
-    { "id": "1J", "round": 1, "course": "Front / Back", "playerIds": ["brock14", "jared12"], "points": { "front9": null, "back9": null }, "status": "not_started" },
-    { "id": "1K", "round": 1, "course": "Front / Back", "playerIds": ["brock2",  "jared5"],  "points": { "front9": null, "back9": null }, "status": "not_started" },
-    { "id": "1L", "round": 1, "course": "Front / Back", "playerIds": ["brock10", "jared9"],  "points": { "front9": null, "back9": null }, "status": "not_started" },
-
-    { "id": "1M", "round": 1, "course": "Front / Back", "playerIds": ["brock5",  "jared2"],  "points": { "front9": null, "back9": null }, "status": "not_started" },
-    { "id": "1N", "round": 1, "course": "Front / Back", "playerIds": ["brock16", "jared7"],  "points": { "front9": null, "back9": null }, "status": "not_started" },
-    { "id": "1O", "round": 1, "course": "Front / Back", "playerIds": ["brock8",  "jared13"], "points": { "front9": null, "back9": null }, "status": "not_started" },
-    { "id": "1P", "round": 1, "course": "Front / Back", "playerIds": ["brock13", "jared15"], "points": { "front9": null, "back9": null }, "status": "not_started" }
+    {
+      "id": "1A",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "jared11",
+        "brock4"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    },
+    {
+      "id": "1B",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "brock12",
+        "jared3"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    },
+    {
+      "id": "1C",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "brock7",
+        "jared14"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    },
+    {
+      "id": "1D",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "brock1",
+        "jared6"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    },
+    {
+      "id": "1E",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "brock9",
+        "jared1"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    },
+    {
+      "id": "1F",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "brock15",
+        "jared8"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    },
+    {
+      "id": "1G",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "brock3",
+        "jared16"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    },
+    {
+      "id": "1H",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "brock6",
+        "jared10"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    },
+    {
+      "id": "1I",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "brock11",
+        "jared4"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    },
+    {
+      "id": "1J",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "brock14",
+        "jared12"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    },
+    {
+      "id": "1K",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "brock2",
+        "jared5"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    },
+    {
+      "id": "1L",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "brock10",
+        "jared9"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    },
+    {
+      "id": "1M",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "brock5",
+        "jared2"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    },
+    {
+      "id": "1N",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "brock16",
+        "jared7"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    },
+    {
+      "id": "1O",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "brock8",
+        "jared13"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    },
+    {
+      "id": "1P",
+      "round": 1,
+      "course": "Front / Back",
+      "playerIds": [
+        "brock13",
+        "jared15"
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
+      "status": "not_started"
+    }
   ]
 }
