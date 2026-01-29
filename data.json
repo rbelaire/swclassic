@@ -2,7 +2,7 @@
   "meta": {
     "event": "The Classic",
     "year": 2026,
-    "lastUpdated": "2026-01-29T21:10:26.943Z"
+    "lastUpdated": "2026-01-29T21:29:48.552Z"
   },
   "teams": {
     "brock": {
@@ -154,8 +154,8 @@
         "brock4"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 1,
+        "back9": 0
       },
       "status": "not_started"
     },
@@ -168,8 +168,8 @@
         "jared3"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 0,
+        "back9": 1
       },
       "status": "not_started"
     },
@@ -182,8 +182,8 @@
         "jared14"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 0,
+        "back9": 1
       },
       "status": "not_started"
     },
@@ -196,8 +196,8 @@
         "jared6"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 0,
+        "back9": 1
       },
       "status": "not_started"
     },
@@ -210,8 +210,8 @@
         "jared1"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 0.5,
+        "back9": 0.5
       },
       "status": "not_started"
     },
@@ -224,8 +224,8 @@
         "jared8"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 0.5,
+        "back9": 0.5
       },
       "status": "not_started"
     },
@@ -238,8 +238,8 @@
         "jared16"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 1,
+        "back9": 0
       },
       "status": "not_started"
     },
@@ -252,8 +252,8 @@
         "jared10"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 0,
+        "back9": 1
       },
       "status": "not_started"
     },
@@ -266,8 +266,8 @@
         "jared4"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 0.5,
+        "back9": 0.5
       },
       "status": "not_started"
     },
@@ -280,8 +280,8 @@
         "jared12"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 1,
+        "back9": 0
       },
       "status": "not_started"
     },
@@ -294,8 +294,8 @@
         "jared5"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 0,
+        "back9": 1
       },
       "status": "not_started"
     },
@@ -308,8 +308,8 @@
         "jared9"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 0.5,
+        "back9": 0.5
       },
       "status": "not_started"
     },
@@ -322,8 +322,8 @@
         "jared2"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 1,
+        "back9": 0
       },
       "status": "not_started"
     },
@@ -336,8 +336,8 @@
         "jared7"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 0,
+        "back9": 1
       },
       "status": "not_started"
     },
@@ -350,8 +350,8 @@
         "jared13"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 1,
+        "back9": 0
       },
       "status": "not_started"
     },
@@ -364,8 +364,8 @@
         "jared15"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 1,
+        "back9": 0
       },
       "status": "not_started"
     }
