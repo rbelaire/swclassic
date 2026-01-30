@@ -609,6 +609,102 @@ font-style: italic;
 color: var(–color-primary);
 }
 
+/* ======================
+AUTO-REFRESH CONTROLS
+====================== */
+
+.refresh-controls {
+background: var(–color-card);
+border: 2px solid var(–color-primary);
+border-radius: var(–radius-lg);
+padding: 20px;
+margin-bottom: 30px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+flex-wrap: wrap;
+gap: 15px;
+}
+
+.refresh-indicator {
+font-size: 1.1em;
+font-weight: 600;
+color: var(–color-primary);
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.refresh-indicator::before {
+content: ‘🔄’;
+font-size: 1.2em;
+animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+from {
+transform: rotate(0deg);
+}
+to {
+transform: rotate(360deg);
+}
+}
+
+.refresh-buttons {
+display: flex;
+gap: 10px;
+flex-wrap: wrap;
+}
+
+.refresh-btn {
+padding: 10px 20px;
+font-size: 1em;
+background: var(–color-primary);
+color: var(–color-bg);
+border: 2px solid var(–color-primary);
+border-radius: var(–radius-md);
+cursor: pointer;
+transition: all 0.3s ease;
+font-family: ‘Copperplate’, ‘Copperplate Gothic’, Georgia, serif;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 1px;
+}
+
+.refresh-btn:hover {
+background: var(–color-accent);
+border-color: var(–color-accent);
+color: var(–color-primary);
+transform: translateY(-2px);
+}
+
+.refresh-btn:active {
+transform: translateY(0);
+}
+
+.refresh-btn:disabled {
+opacity: 0.5;
+cursor: not-allowed;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+.refresh-controls {
+flex-direction: column;
+text-align: center;
+}
+
+.refresh-buttons {
+width: 100%;
+justify-content: center;
+}
+
+.refresh-btn {
+flex: 1;
+min-width: 140px;
+}
+}
+
 /* =====================================================
 RULE PAGE SPECIFIC STYLES
 ===================================================== */
