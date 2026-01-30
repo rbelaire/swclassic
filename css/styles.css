@@ -137,6 +137,14 @@ animation: fadeInUp 1s ease-out 0.3s both;
 color: var(–color-primary);
 }
 
+.hero .date {
+font-size: 1.2em;
+margin-top: 20px;
+opacity: 0.6;
+animation: fadeInUp 1s ease-out 0.5s both;
+color: var(–color-primary);
+}
+
 /* =====================
 SECTION HEADERS
 ===================== */
