@@ -42,7 +42,7 @@ let data;
 
 function loadData() {
   // Add cache-busting parameter to ensure fresh data
-  fetch(`./data.json?t=${Date.now()}`)
+  fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
     .then(res => res.json())
     .then(json => {
       data = json;

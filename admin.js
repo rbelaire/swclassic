@@ -22,16 +22,20 @@ if (sessionStorage.getItem("adminAuth") !== "true") {
  *************************/
 let data;
 
-fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
-  .then(res => res.json())
-  .then(json => {
-    data = json;
-    render();
-  })
-  .catch(err => {
-    alert("Error loading tournament data. Please refresh.");
-    console.error(err);
-  });
+function loadData() {
+  fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
+    .then(res => res.json())
+    .then(json => {
+      data = json;
+      render();
+    })
+    .catch(err => {
+      alert("Error loading tournament data. Please refresh.");
+      console.error(err);
+    });
+}
+
+loadData();
 
 /*************************
  * RENDER
@@ -399,6 +403,7 @@ function saveToGitHub() {
     .then(resp => {
       if (resp.content) {
         markSaved();
+        loadData();
         alert("✅ Scores saved successfully!\n\nThe leaderboard will update automatically within 30 seconds.");
         saveBtn.textContent = originalText;
         saveBtn.disabled = false;
