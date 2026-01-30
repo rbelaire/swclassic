@@ -289,6 +289,25 @@ body {
   flex-wrap: wrap;
 }
 
+@media (min-width: 1024px) {
+  .hero:has(.quick-stats) {
+    padding: 60px 20px 45px;
+    margin-bottom: 40px;
+  }
+
+  .hero:has(.quick-stats) h1 {
+    margin-bottom: 10px;
+  }
+
+  .hero:has(.quick-stats) .quick-stats {
+    margin-top: 28px;
+  }
+
+  .hero:has(.quick-stats) + .container .section-header {
+    margin: 40px 0 30px;
+  }
+}
+
 .stat-box {
   background: var(--color-bg);
   padding: 20px 35px;
