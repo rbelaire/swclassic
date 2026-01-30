@@ -2582,7 +2582,6 @@ RESULT:
 - Still readable and professional
 */
 
-<style>
 /* Event Header */
 .event-header {
     background: var(--masters-black);
@@ -2737,8 +2736,6 @@ RESULT:
         font-size: clamp(2rem, 8vw, 2.6rem);
     }
 }
-</style>
-<style>
 /* Captains Section */
 .captains-section {
     background: var(--color-card);
@@ -2899,4 +2896,3 @@ RESULT:
         min-width: clamp(65px, 20vw, 80px);
     }
 }
-</style>
