@@ -26,21 +26,6 @@
 
 <div class="container">
 
-  <!-- AUTO-REFRESH CONTROLS -->
-  <div class="refresh-controls">
-    <div class="refresh-indicator" id="refresh-indicator">
-      Loading scores...
-    </div>
-    <div class="refresh-buttons">
-      <button id="manual-refresh-btn" onclick="manualRefresh()" class="refresh-btn">
-        ⟳ Refresh Now
-      </button>
-      <button id="toggle-refresh-btn" onclick="toggleAutoRefresh()" class="refresh-btn">
-        ⏸ Pause Updates
-      </button>
-    </div>
-  </div>
-
   <!-- TEAM TOTALS -->
   <div class="team-scores team-scores--sticky">
     <div class="team-card" id="team-brock">
@@ -65,6 +50,21 @@
 
   <div class="last-updated" id="last-updated"></div>
 
+    <!-- AUTO-REFRESH CONTROLS -->
+  <div class="refresh-controls">
+    <div class="refresh-indicator" id="refresh-indicator">
+      Loading scores...
+    </div>
+    <div class="refresh-buttons">
+      <button id="manual-refresh-btn" onclick="manualRefresh()" class="refresh-btn">
+        ⟳ Refresh Now
+      </button>
+      <button id="toggle-refresh-btn" onclick="toggleAutoRefresh()" class="refresh-btn">
+        ⏸ Pause Updates
+      </button>
+    </div>
+  </div>
+  
 </div>
 
 <script src="leaderboard.js"></script>
