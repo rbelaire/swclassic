@@ -641,9 +641,9 @@ body {
 }
 
 .foursome-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   flex-wrap: wrap;
   gap: clamp(10px, 2vw, 16px);
   text-align: center;
@@ -658,11 +658,14 @@ body {
 }
 
 .foursome-title {
-  flex: 1 1 auto;
+  grid-column: 2;
+  justify-self: center;
   margin: 0;
 }
 
 .foursome-status {
+  grid-column: 3;
+  justify-self: end;
   padding: 6px 14px;
   border-radius: 999px;
   font-size: 0.65em;
