@@ -1,613 +1,407 @@
-<!DOCTYPE html>
+/*************************
+ * ENHANCED ADMIN INTERFACE
+ * The Classic 2026
+ *************************/
 
-<html>
-<head>
-  <meta charset="UTF-8" />
-  <title>The Classic 2026 - Tournament Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="css/styles.css">
-</head>
+const ADMIN_PASSWORD = "classic2026";
+let hasUnsavedChanges = false;
 
-<body>
+// Password check
+if (sessionStorage.getItem("adminAuth") !== "true") {
+  const entered = prompt("Enter admin password:");
+  if (entered !== ADMIN_PASSWORD) {
+    alert("Access denied");
+    window.location.href = "index.html";
+  }
+  sessionStorage.setItem("adminAuth", "true");
+}
 
-  <!-- HEADER -->
+/*************************
+ * LOAD DATA
+ *************************/
+let data;
 
-  <div class="admin-header">
-    <div class="admin-header-content">
-      <div class="admin-title">
-        <h1>🏆 Tournament Admin</h1>
-        <p class="admin-subtitle">The Classic 2026 | Live Score Management</p>
+fetch("./data.json")
+  .then(res => res.json())
+  .then(json => {
+    data = json;
+    render();
+  })
+  .catch(err => {
+    alert("Error loading tournament data. Please refresh.");
+    console.error(err);
+  });
+
+/*************************
+ * RENDER
+ *************************/
+function render() {
+  renderStats();
+  renderTotals();
+  renderMatches();
+}
+
+/*************************
+ * STATISTICS DASHBOARD
+ *************************/
+function renderStats() {
+  let complete = 0;
+  let inProgress = 0;
+  let notStarted = 0;
+
+  data.matches.forEach(match => {
+    const front = match.points.front9;
+    const back = match.points.back9;
+
+    if (front !== null && back !== null) {
+      complete++;
+    } else if (front !== null || back !== null) {
+      inProgress++;
+    } else {
+      notStarted++;
+    }
+  });
+
+  const totalMatches = data.matches.length;
+  const progress = Math.round((complete / totalMatches) * 100);
+
+  document.getElementById("stat-complete").textContent = complete;
+  document.getElementById("stat-in-progress").textContent = inProgress;
+  document.getElementById("stat-not-started").textContent = notStarted;
+  document.getElementById("stat-progress").textContent = progress + "%";
+}
+
+/*************************
+ * TOTALS
+ *************************/
+function renderTotals() {
+  const totals = calculateTotals();
+
+  document.getElementById("total-brock").textContent = totals.brock.toFixed(1);
+  document.getElementById("total-jared").textContent = totals.jared.toFixed(1);
+
+  // Highlight winner
+  const brockCard = document.querySelector(".total-card.brock");
+  const jaredCard = document.querySelector(".total-card.jared");
+
+  brockCard.classList.remove("winning");
+  jaredCard.classList.remove("winning");
+
+  if (totals.brock > totals.jared) {
+    brockCard.classList.add("winning");
+  } else if (totals.jared > totals.brock) {
+    jaredCard.classList.add("winning");
+  }
+}
+
+function calculateTotals() {
+  const totals = { brock: 0, jared: 0 };
+
+  data.matches.forEach(match => {
+    const [p1, p2] = match.playerIds;
+    if (!p1 || !p2) return;
+
+    const t1 = data.players[p1].team;
+    const t2 = data.players[p2].team;
+
+    ["front9", "back9"].forEach(key => {
+      const v = match.points[key];
+      if (v === null) return;
+      totals[t1] += v;
+      totals[t2] += 1 - v;
+    });
+  });
+
+  return totals;
+}
+
+/*************************
+ * MATCHES
+ *************************/
+function renderMatches() {
+  const container = document.getElementById("matches");
+  container.innerHTML = "";
+
+  data.matches.forEach((match, index) => {
+    const div = document.createElement("div");
+    div.className = "match";
+    div.id = `match-${index}`;
+
+    // Determine status
+    const front = match.points.front9;
+    const back = match.points.back9;
+    let status = "not-started";
+    let statusText = "Not Started";
+
+    if (front !== null && back !== null) {
+      status = "complete";
+      statusText = "Complete";
+      div.classList.add("complete");
+    } else if (front !== null || back !== null) {
+      status = "in-progress";
+      statusText = "In Progress";
+    }
+
+    // Check validity
+    const valid = isValidMatchup(match);
+    if (!valid) {
+      div.classList.add("invalid");
+    }
+
+    // Match Header (always visible)
+    const [p1, p2] = match.playerIds;
+    const p1Name = p1 ? data.players[p1].name : "TBD";
+    const p2Name = p2 ? data.players[p2].name : "TBD";
+
+    const header = `
+      <div class="match-header" onclick="toggleMatch(${index})">
+        <div class="match-title">Match ${match.id}</div>
+        <div class="match-status-badge ${status}">${statusText}</div>
       </div>
-      <div class="admin-actions">
-        <button onclick="saveToGitHub()" class="btn-primary">
-          💾 Save to GitHub
-        </button>
-        <a href="leaderboard.html" target="_blank" class="btn-secondary">
-          👁️ View Live Board
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- PROGRESS DASHBOARD -->
-
-  <div class="admin-container">
-    <div class="dashboard-section">
-      <h2>📊 Tournament Progress</h2>
-      <div class="stats-grid" id="stats-grid">
-        <div class="stat-card">
-          <div class="stat-number" id="stat-complete">0</div>
-          <div class="stat-label">Matches Complete</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number" id="stat-in-progress">0</div>
-          <div class="stat-label">In Progress</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number" id="stat-not-started">16</div>
-          <div class="stat-label">Not Started</div>
-        </div>
-        <div class="stat-card highlight">
-          <div class="stat-number" id="stat-progress">0%</div>
-          <div class="stat-label">Overall Progress</div>
+      <div class="match-preview" onclick="toggleMatch(${index})">
+        <div><strong>${p1Name}</strong> vs <strong>${p2Name}</strong></div>
+        <div>
+          F9: ${front === null ? "-" : front} | 
+          B9: ${back === null ? "-" : back}
         </div>
       </div>
-    </div>
+    `;
 
-```
-<!-- TEAM TOTALS -->
-<div class="totals-section" id="totals">
-  <div class="total-card brock">
-    <div class="team-name">Team Brock</div>
-    <div class="team-score" id="total-brock">0.0</div>
-  </div>
-  <div class="vs-divider">VS</div>
-  <div class="total-card jared">
-    <div class="team-name">Team Jared</div>
-    <div class="team-score" id="total-jared">0.0</div>
-  </div>
-</div>
+    // Match Details (collapsible)
+    const details = `
+      <div class="match-details">
+        ${!valid ? '<div style="color: #c62828; font-weight: bold; margin-bottom: 15px;">⚠️ Invalid matchup: Players must be from different teams</div>' : ''}
+        
+        <div class="players-grid">
+          <div class="player-select-wrap">
+            <label>Player 1</label>
+            ${buildPlayerSelect(match, 0, index)}
+          </div>
+          <div class="player-select-wrap">
+            <label>Player 2</label>
+            ${buildPlayerSelect(match, 1, index)}
+          </div>
+        </div>
 
-<!-- QUICK ACTIONS -->
-<div class="quick-actions">
-  <button onclick="markAllNotStarted()" class="action-btn">
-    🔄 Reset All Scores
-  </button>
-  <button onclick="markAllInProgress()" class="action-btn">
-    ▶️ Mark All In Progress
-  </button>
-  <button onclick="expandAll()" class="action-btn">
-    📂 Expand All
-  </button>
-  <button onclick="collapseAll()" class="action-btn">
-    📁 Collapse All
-  </button>
-</div>
+        <div class="scores-grid">
+          <div class="score-wrap">
+            <label>Front 9 (Player 1)</label>
+            ${buildScoreSelect(match, "front9", index, valid)}
+          </div>
+          <div class="score-wrap">
+            <label>Back 9 (Player 1)</label>
+            ${buildScoreSelect(match, "back9", index, valid)}
+          </div>
+        </div>
 
-<!-- MATCHES -->
-<div class="matches-section">
-  <h2>⛳ Match Scores</h2>
-  <p class="section-note">Click on a match to expand and enter scores</p>
-  <div id="matches"></div>
-</div>
+        <div class="match-actions">
+          <button class="match-btn" onclick="swapPlayers(${index})">
+            🔄 Swap Players
+          </button>
+          <button class="match-btn" onclick="clearMatch(${index})">
+            ❌ Clear Scores
+          </button>
+        </div>
+      </div>
+    `;
 
-<!-- SAVE REMINDER -->
-<div class="save-reminder" id="save-reminder" style="display: none;">
-  <div class="reminder-content">
-    ⚠️ You have unsaved changes! 
-    <button onclick="saveToGitHub()" class="btn-primary-small">Save Now</button>
-  </div>
-</div>
-```
+    div.innerHTML = header + details;
+    container.appendChild(div);
+  });
+}
 
-  </div>
+/*************************
+ * PLAYER SELECT
+ *************************/
+function buildPlayerSelect(match, index, matchIndex) {
+  const selectId = `player-${matchIndex}-${index}`;
+  let html = `<select id="${selectId}" onchange="updatePlayer(${matchIndex}, ${index}, this.value)">`;
+  html += '<option value="">-- Select Player --</option>';
 
-  <script src="admin.js"></script>
+  Object.entries(data.players).forEach(([id, p]) => {
+    const selected = match.playerIds[index] === id ? 'selected' : '';
+    html += `<option value="${id}" ${selected}>${p.name} (${p.team})</option>`;
+  });
 
-  <style>
-    /* ======================
-       ADMIN-SPECIFIC STYLES
-       ====================== */
-    
-    body {
-      background: #f5f3e8;
-      margin: 0;
-      padding: 0;
+  html += '</select>';
+  return html;
+}
+
+/*************************
+ * SCORE SELECT
+ *************************/
+function buildScoreSelect(match, key, matchIndex, valid) {
+  const selectId = `score-${matchIndex}-${key}`;
+  const disabled = !valid ? 'disabled' : '';
+  
+  let html = `<select id="${selectId}" onchange="updateScore(${matchIndex}, '${key}', this.value)" ${disabled}>`;
+  html += '<option value="">-- Select Result --</option>';
+  html += '<option value="1"' + (match.points[key] === 1 ? ' selected' : '') + '>Win (1.0)</option>';
+  html += '<option value="0.5"' + (match.points[key] === 0.5 ? ' selected' : '') + '>Tie (0.5)</option>';
+  html += '<option value="0"' + (match.points[key] === 0 ? ' selected' : '') + '>Loss (0.0)</option>';
+  html += '</select>';
+  
+  return html;
+}
+
+/*************************
+ * VALIDATION
+ *************************/
+function isValidMatchup(match) {
+  const [p1, p2] = match.playerIds;
+  if (!p1 || !p2) return false;
+  return data.players[p1].team !== data.players[p2].team;
+}
+
+/*************************
+ * UPDATE FUNCTIONS
+ *************************/
+function updatePlayer(matchIndex, playerIndex, playerId) {
+  data.matches[matchIndex].playerIds[playerIndex] = playerId || null;
+  data.matches[matchIndex].points.front9 = null;
+  data.matches[matchIndex].points.back9 = null;
+  markUnsaved();
+  render();
+}
+
+function updateScore(matchIndex, key, value) {
+  data.matches[matchIndex].points[key] = value === "" ? null : Number(value);
+  markUnsaved();
+  render();
+}
+
+function swapPlayers(matchIndex) {
+  const match = data.matches[matchIndex];
+  [match.playerIds[0], match.playerIds[1]] = [match.playerIds[1], match.playerIds[0]];
+  match.points.front9 = null;
+  match.points.back9 = null;
+  markUnsaved();
+  render();
+}
+
+function clearMatch(matchIndex) {
+  if (!confirm("Clear all scores for this match?")) return;
+  const match = data.matches[matchIndex];
+  match.points.front9 = null;
+  match.points.back9 = null;
+  markUnsaved();
+  render();
+}
+
+/*************************
+ * TOGGLE MATCH
+ *************************/
+function toggleMatch(index) {
+  const match = document.getElementById(`match-${index}`);
+  match.classList.toggle("expanded");
+}
+
+/*************************
+ * QUICK ACTIONS
+ *************************/
+function markAllNotStarted() {
+  if (!confirm("Reset all scores to Not Started?")) return;
+  data.matches.forEach(m => {
+    m.points.front9 = null;
+    m.points.back9 = null;
+  });
+  markUnsaved();
+  render();
+}
+
+function markAllInProgress() {
+  if (!confirm("Mark all matches as In Progress (Front 9 only)?")) return;
+  data.matches.forEach(m => {
+    if (isValidMatchup(m)) {
+      m.points.front9 = m.points.front9 === null ? 0 : m.points.front9;
     }
+  });
+  markUnsaved();
+  render();
+}
 
-    .admin-header {
-      background: linear-gradient(135deg, #0d3d1f 0%, #1a5c2f 100%);
-      color: #f5f3e8;
-      padding: 25px 20px;
-      box-shadow: 0 4px 20px rgba(13,61,31,0.3);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
+function expandAll() {
+  document.querySelectorAll('.match').forEach(m => m.classList.add('expanded'));
+}
+
+function collapseAll() {
+  document.querySelectorAll('.match').forEach(m => m.classList.remove('expanded'));
+}
+
+/*************************
+ * UNSAVED CHANGES
+ *************************/
+function markUnsaved() {
+  hasUnsavedChanges = true;
+  document.getElementById("save-reminder").style.display = "block";
+}
+
+function markSaved() {
+  hasUnsavedChanges = false;
+  document.getElementById("save-reminder").style.display = "none";
+}
+
+// Warn on page exit
+window.addEventListener('beforeunload', (e) => {
+  if (hasUnsavedChanges) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+/*************************
+ * SAVE TO GITHUB
+ *************************/
+function saveToGitHub() {
+  const token = prompt("GitHub Personal Access Token:");
+  if (!token) return;
+
+  const saveBtn = document.querySelector('.btn-primary');
+  const originalText = saveBtn.textContent;
+  saveBtn.textContent = "💾 Saving...";
+  saveBtn.disabled = true;
+
+  data.meta.lastUpdated = new Date().toISOString();
+
+  // Step 1: Get current file SHA
+  fetch("https://api.github.com/repos/rbelaire/swclassic/contents/data.json", {
+    headers: {
+      Authorization: `token ${token}`
     }
+  })
+    .then(res => res.json())
+    .then(file => {
+      const sha = file.sha;
 
-    .admin-header-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    .admin-title h1 {
-      margin: 0;
-      font-size: 2em;
-      letter-spacing: 2px;
-    }
-
-    .admin-subtitle {
-      margin: 5px 0 0 0;
-      opacity: 0.9;
-      font-size: 0.95em;
-    }
-
-    .admin-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .btn-primary {
-      background: #d4af37;
-      color: #0d3d1f;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 1em;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(212,175,55,0.4);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: #f5f3e8;
-      padding: 12px 24px;
-      border: 2px solid #f5f3e8;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 1em;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .btn-secondary:hover {
-      background: #f5f3e8;
-      color: #0d3d1f;
-    }
-
-    .btn-primary-small {
-      background: #d4af37;
-      color: #0d3d1f;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 0.9em;
-      margin-left: 10px;
-    }
-
-    .admin-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 30px 20px;
-    }
-
-    /* Dashboard */
-    .dashboard-section {
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      margin-bottom: 30px;
-      border: 2px solid #0d3d1f;
-      box-shadow: 0 4px 15px rgba(13,61,31,0.08);
-    }
-
-    .dashboard-section h2 {
-      margin: 0 0 20px 0;
-      color: #0d3d1f;
-      font-size: 1.8em;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-    }
-
-    .stat-card {
-      background: #f5f3e8;
-      padding: 25px;
-      border-radius: 10px;
-      text-align: center;
-      border: 2px solid #0d3d1f;
-      transition: all 0.3s ease;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(13,61,31,0.15);
-    }
-
-    .stat-card.highlight {
-      background: linear-gradient(135deg, #d4af37 0%, #f4d976 100%);
-      border-color: #d4af37;
-    }
-
-    .stat-number {
-      font-size: 3em;
-      font-weight: bold;
-      color: #0d3d1f;
-      margin-bottom: 10px;
-    }
-
-    .stat-label {
-      font-size: 1em;
-      color: #0d3d1f;
-      opacity: 0.8;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    /* Team Totals */
-    .totals-section {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: 20px;
-      margin-bottom: 30px;
-      align-items: center;
-    }
-
-    .total-card {
-      background: white;
-      padding: 40px;
-      border-radius: 12px;
-      text-align: center;
-      border: 3px solid #0d3d1f;
-      transition: all 0.3s ease;
-    }
-
-    .total-card.winning {
-      border-color: #d4af37;
-      background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(212,175,55,0.05) 100%);
-      transform: scale(1.05);
-    }
-
-    .team-name {
-      font-size: 1.5em;
-      font-weight: bold;
-      color: #0d3d1f;
-      margin-bottom: 15px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-
-    .team-score {
-      font-size: 4em;
-      font-weight: bold;
-      color: #0d3d1f;
-    }
-
-    .total-card.winning .team-score {
-      color: #d4af37;
-    }
-
-    .vs-divider {
-      font-size: 2.5em;
-      font-weight: bold;
-      color: #0d3d1f;
-      text-align: center;
-    }
-
-    /* Quick Actions */
-    .quick-actions {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 30px;
-      flex-wrap: wrap;
-    }
-
-    .action-btn {
-      background: white;
-      color: #0d3d1f;
-      padding: 12px 20px;
-      border: 2px solid #0d3d1f;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 0.95em;
-      transition: all 0.3s ease;
-    }
-
-    .action-btn:hover {
-      background: #0d3d1f;
-      color: #f5f3e8;
-      transform: translateY(-2px);
-    }
-
-    /* Matches Section */
-    .matches-section {
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      border: 2px solid #0d3d1f;
-      box-shadow: 0 4px 15px rgba(13,61,31,0.08);
-    }
-
-    .matches-section h2 {
-      margin: 0 0 10px 0;
-      color: #0d3d1f;
-      font-size: 1.8em;
-    }
-
-    .section-note {
-      margin: 0 0 25px 0;
-      color: #0d3d1f;
-      opacity: 0.7;
-      font-style: italic;
-    }
-
-    .match {
-      background: #f5f3e8;
-      border: 2px solid #0d3d1f;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 15px;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-
-    .match:hover {
-      border-color: #d4af37;
-      transform: translateX(5px);
-    }
-
-    .match.expanded {
-      background: white;
-      border-color: #d4af37;
-      border-width: 3px;
-    }
-
-    .match.invalid {
-      background: #ffecec;
-      border-color: #c62828;
-    }
-
-    .match.complete {
-      background: #e8f5e9;
-      border-color: #2e7d32;
-    }
-
-    .match-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .match-title {
-      font-size: 1.3em;
-      font-weight: bold;
-      color: #0d3d1f;
-    }
-
-    .match-status-badge {
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.85em;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-
-    .match-status-badge.not-started {
-      background: #e0e0e0;
-      color: #666;
-    }
-
-    .match-status-badge.in-progress {
-      background: #fff8e1;
-      color: #f57c00;
-    }
-
-    .match-status-badge.complete {
-      background: #c8e6c9;
-      color: #2e7d32;
-    }
-
-    .match-preview {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: #0d3d1f;
-    }
-
-    .match-details {
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 2px solid #0d3d1f;
-      display: none;
-    }
-
-    .match.expanded .match-details {
-      display: block;
-    }
-
-    .players-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .player-select-wrap {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      border: 2px solid #0d3d1f;
-    }
-
-    .player-select-wrap label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 8px;
-      color: #0d3d1f;
-    }
-
-    .player-select-wrap select {
-      width: 100%;
-      padding: 10px;
-      border: 2px solid #0d3d1f;
-      border-radius: 6px;
-      font-size: 1em;
-      background: white;
-    }
-
-    .scores-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .score-wrap {
-      background: #f5f3e8;
-      padding: 15px;
-      border-radius: 8px;
-      border: 2px solid #0d3d1f;
-    }
-
-    .score-wrap label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 8px;
-      color: #0d3d1f;
-    }
-
-    .score-wrap select {
-      width: 100%;
-      padding: 10px;
-      border: 2px solid #0d3d1f;
-      border-radius: 6px;
-      font-size: 1.1em;
-      background: white;
-      font-weight: bold;
-    }
-
-    .score-wrap select:disabled {
-      opacity: 0.5;
-      background: #e0e0e0;
-      cursor: not-allowed;
-    }
-
-    .match-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-    }
-
-    .match-btn {
-      padding: 10px 20px;
-      border: 2px solid #0d3d1f;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 0.95em;
-      transition: all 0.3s ease;
-      background: white;
-      color: #0d3d1f;
-    }
-
-    .match-btn:hover {
-      background: #0d3d1f;
-      color: white;
-    }
-
-    /* Save Reminder */
-    .save-reminder {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #ff9800;
-      color: white;
-      padding: 15px 20px;
-      border-radius: 10px;
-      box-shadow: 0 6px 25px rgba(255,152,0,0.4);
-      z-index: 1000;
-      animation: slideInUp 0.3s ease;
-    }
-
-    @keyframes slideInUp {
-      from {
-        transform: translateY(100px);
-        opacity: 0;
+      // Step 2: Update file
+      return fetch("https://api.github.com/repos/rbelaire/swclassic/contents/data.json", {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: "Update tournament scores",
+          content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))),
+          sha: sha
+        })
+      });
+    })
+    .then(res => res.json())
+    .then(resp => {
+      if (resp.content) {
+        markSaved();
+        alert("✅ Scores saved successfully!\n\nThe leaderboard will update automatically within 30 seconds.");
+        saveBtn.textContent = originalText;
+        saveBtn.disabled = false;
+      } else {
+        throw new Error("Save failed");
       }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    .reminder-content {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      font-weight: bold;
-    }
-
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-      .admin-header-content {
-        flex-direction: column;
-        text-align: center;
-      }
-
-      .admin-actions {
-        flex-direction: column;
-        width: 100%;
-      }
-
-      .btn-primary, .btn-secondary {
-        width: 100%;
-      }
-
-      .totals-section {
-        grid-template-columns: 1fr;
-      }
-
-      .vs-divider {
-        transform: rotate(90deg);
-        margin: 10px 0;
-      }
-
-      .players-grid,
-      .scores-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .match-actions {
-        flex-direction: column;
-      }
-
-      .match-btn {
-        width: 100%;
-      }
-    }
-  </style>
-
-</body>
-</html>
+    })
+    .catch(err => {
+      console.error(err);
+      alert("❌ Save failed. Check your token and try again.");
+      saveBtn.textContent = originalText;
+      saveBtn.disabled = false;
+    });
+}
