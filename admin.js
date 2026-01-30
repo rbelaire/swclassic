@@ -239,15 +239,16 @@ function buildMatch(match, matchIndex) {
  *************************/
 function buildTeamSelect(match, playerIndex, matchIndex, team) {
   const selectId = `player-${matchIndex}-${playerIndex}`;
-  let html = `<select id="${selectId}" onchange="updatePlayer(${matchIndex}, ${playerIndex}, this.value)">`;
+  let html = `<select id="${selectId}" onchange="updatePlayer(${matchIndex}, ${playerIndex}, this.value, '${team}')">`;
   html += '<option value="">-- Select Player --</option>';
 
-  // Filter players by team
-  Object.entries(data.players).forEach(([id, p]) => {
-    if (p.team === team) {
-      const selected = match.playerIds[playerIndex] === id ? 'selected' : '';
-      html += `<option value="${id}" ${selected}>${p.name} (${p.pops} pops)</option>`;
-    }
+  // Show ALL players, sorted by rank
+  const sortedPlayers = Object.entries(data.players).sort((a, b) => a[1].rank - b[1].rank);
+  
+  sortedPlayers.forEach(([id, p]) => {
+    const selected = match.playerIds[playerIndex] === id ? 'selected' : '';
+    const teamLabel = p.team !== 'TBD' ? ` [${p.team === 'brock' ? 'Team Brock' : 'Team Jared'}]` : '';
+    html += `<option value="${id}" ${selected}>${p.name} (${p.pops} pops)${teamLabel}</option>`;
   });
 
   html += '</select>';
@@ -283,8 +284,14 @@ function isValidMatchup(match) {
 /*************************
  * UPDATE FUNCTIONS
  *************************/
-function updatePlayer(matchIndex, playerIndex, playerId) {
+function updatePlayer(matchIndex, playerIndex, playerId, team) {
   data.matches[matchIndex].playerIds[playerIndex] = playerId || null;
+  
+  // Auto-assign team when player is selected
+  if (playerId && data.players[playerId]) {
+    data.players[playerId].team = team;
+  }
+  
   markUnsaved();
   render();
 }
