@@ -1,134 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>SW Classic – Admin</title>
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 15px;
-      background: #f5f3e8;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    button {
-      padding: 10px 14px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #444;
-      background: #fff;
-    }
-
-    button:active {
-      transform: scale(0.97);
-    }
-
-    .toolbar {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-    }
-
-    select {
-      padding: 10px;
-      font-size: 16px;
-      width: 100%;
-    }
-
-    .match {
-      background: #ffffff;
-      border: 2px solid #0d3d1f;
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 15px;
-    }
-
-    .match.invalid {
-      background: #ffecec;
-      border-color: #c0392b;
-    }
-
-    .match h3 {
-      text-align: center;
-      margin-bottom: 12px;
-    }
-
-    .players {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .scores {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .score.disabled {
-      opacity: 0.5;
-    }
-
-    .actions {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .actions button {
-      flex: 1;
-    }
-
-    #totals {
-      background: #ffffff;
-      border: 2px solid #0d3d1f;
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 20px;
-      text-align: center;
-      font-size: 18px;
-    }
-
-    /* Desktop tweaks */
-    @media (min-width: 768px) {
-      .players {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .actions {
-        justify-content: flex-end;
-      }
-
-      .actions button {
-        flex: 0;
-      }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matchup Editor</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
-
 <body>
 
+<div class="hero">
   <h1>Matchup Editor</h1>
+</div>
 
-  <div class="toolbar">
-    <button onclick="saveToGitHub()">💾 Save</button>
-  </div>
+<div class="container">
 
-  <div id="totals"></div>
+  <button onclick="saveToGitHub()">💾 Save</button>
+
+  <div id="totals" class="match-card" style="margin-top:20px;"></div>
 
   <div id="matches"></div>
 
-  <script src="admin.js"></script>
+</div>
+
+<script src="admin.js"></script>
 </body>
 </html>
