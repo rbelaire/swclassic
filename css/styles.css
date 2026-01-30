@@ -634,7 +634,7 @@ body {
 /* Foursome Containers */
 .foursome {
   padding: clamp(20px, 4vw, 30px);
-  background: rgba(0, 103, 71, 0.03);
+  background: #ffffff;
   border: 1px solid rgba(0, 77, 53, 0.2);
   border-radius: var(--radius-lg);
   box-shadow: none;
@@ -718,11 +718,10 @@ body {
 }
 
 .matchup-names {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: baseline;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: clamp(10px, 2vw, 14px);
+  column-gap: clamp(10px, 2vw, 14px);
   width: 100%;
 }
 
@@ -730,6 +729,14 @@ body {
   font-size: clamp(1.05em, 3vw, 1.35em);
   font-weight: 700;
   color: var(--masters-dark-green);
+}
+
+.matchup-names .player-name:first-child {
+  text-align: right;
+}
+
+.matchup-names .player-name:last-child {
+  text-align: left;
 }
 
 /* MASTERS RED FOR WINNERS */
