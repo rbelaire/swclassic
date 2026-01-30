@@ -102,6 +102,33 @@ body {
   border-color: var(--color-primary);
 }
 
+/* Admin Link - Small but Noticeable */
+.nav-link.admin-link {
+  background: var(--color-accent);
+  color: var(--color-primary);
+  border-color: var(--color-accent);
+  font-size: 0.85em;
+  padding: 8px 20px;
+  animation: subtlePulse 3s ease-in-out infinite;
+}
+
+.nav-link.admin-link:hover {
+  background: var(--color-primary);
+  color: var(--color-accent);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  animation: none;
+}
+
+@keyframes subtlePulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+  }
+}
+
 /* =====================
    HERO SECTION
    ===================== */
@@ -638,17 +665,19 @@ body {
 }
 
 .refresh-indicator::before {
-  content: '🔄';
+  content: '⛳';
   font-size: 1.2em;
-  animation: spin 2s linear infinite;
+  animation: pulse 2s ease-in-out infinite;
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
   }
 }
 
