@@ -181,7 +181,16 @@ function renderMatches(data) {
 
     const header = document.createElement("div");
     header.className = "foursome-header";
-    header.textContent = `Foursome ${index + 1}`;
+    const title = document.createElement("div");
+    title.className = "foursome-title";
+    title.textContent = `Foursome ${index + 1}`;
+
+    const status = document.createElement("div");
+    const statusData = getFoursomeStatus(group);
+    status.className = `foursome-status ${statusData.className}`;
+    status.textContent = statusData.label;
+
+    header.append(title, status);
 
     wrapper.appendChild(header);
 
@@ -224,11 +233,7 @@ function buildMatch(match, data) {
     buildNine("Back 9", match.points.back9)
   );
 
-  const status = document.createElement("div");
-  status.className = "match-status";
-  status.textContent = formatStatus(match);
-
-  div.append(header, scores, status);
+    div.append(header, scores);
   return div;
 }
 
@@ -256,10 +261,22 @@ function renderLastUpdated(data) {
     `Last updated: ${d.toLocaleString()}`;
 }
 
-function formatStatus(match) {
-  if (match.status === "complete") return "Final";
-  if (match.status === "in_progress") return "On Course";
-  return "Not Started";
+function getFoursomeStatus(group) {
+  const hasPlayers = group.every(match => match.playerIds?.every(Boolean));
+  if (!hasPlayers) {
+    return { label: "Not Started", className: "foursome-status--not-started" };
+  }
+
+  const front9Complete = group.every(match => match.points.front9 !== null);
+  const back9Complete = group.every(match => match.points.back9 !== null);
+
+  if (front9Complete && back9Complete) {
+    return { label: "Complete", className: "foursome-status--complete" };
+  }
+  if (front9Complete) {
+    return { label: "In Progress", className: "foursome-status--in-progress" };
+  }
+  return { label: "Not Started", className: "foursome-status--not-started" };
 }
 
 /* ======================
