@@ -584,36 +584,38 @@ body {
 .team-card {
   text-align: center;
   padding: clamp(25px, 4vw, 40px);
+  background: rgba(0, 103, 71, 0.04);
+  border: 1px solid rgba(0, 77, 53, 0.25);
+  box-shadow: none;
 }
 
 .team-card.winning {
-  border-color: var(--masters-gold);
-  background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(212,175,55,0.05) 100%);
+  border-color: rgba(0, 77, 53, 0.45);
+  background: rgba(0, 103, 71, 0.08);
 }
 
 .team-card h2 {
   font-size: clamp(1.4em, 4vw, 2.5em);
   margin-bottom: clamp(15px, 3vw, 20px);
-  color: var(--masters-green);
+  color: var(--masters-dark-green);
   text-transform: uppercase;
   letter-spacing: 4px;
 }
 
 .team-card.winning h2 {
-  color: var(--masters-gold);
+  color: var(--masters-green);
 }
 
 /* MASTERS RED NUMBERS FOR WINNING TEAM */
 .total-score {
   font-size: clamp(2.5em, 7vw, 5em);
   font-weight: bold;
-  color: var(--masters-black);
+  color: var(--masters-dark-green);
   margin: clamp(15px, 3vw, 20px) 0;
 }
 
 .team-card.winning .total-score {
-  color: var(--masters-red);
-  text-shadow: 0 2px 4px rgba(200, 16, 46, 0.2);
+  color: var(--masters-green);
 }
 
 .score-label {
@@ -632,6 +634,10 @@ body {
 /* Foursome Containers */
 .foursome {
   padding: clamp(20px, 4vw, 30px);
+  background: rgba(0, 103, 71, 0.03);
+  border: 1px solid rgba(0, 77, 53, 0.2);
+  border-radius: var(--radius-lg);
+  box-shadow: none;
 }
 
 .foursome-header {
@@ -640,19 +646,20 @@ body {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: clamp(10px, 2vw, 16px);
-   text-align: center;
+  text-align: center;
   font-size: clamp(1.1em, 3vw, 1.5em);
   font-weight: bold;
   letter-spacing: 3px;
   margin-bottom: clamp(20px, 4vw, 25px);
   padding-bottom: clamp(12px, 2vw, 15px);
-  border-bottom: 2px solid var(--masters-green);
-  color: var(--masters-green);
+  border-bottom: 1px solid rgba(0, 77, 53, 0.35);
+  color: var(--masters-dark-green);
   text-transform: uppercase;
 }
 
 .foursome-title {
   flex: 1 1 auto;
+  margin: 0;
 }
 
 .foursome-status {
@@ -662,33 +669,33 @@ body {
   letter-spacing: 2px;
   text-transform: uppercase;
   font-weight: 700;
-  background: #f5f5f5;
-  color: #666;
-  border: 1px solid rgba(0, 103, 71, 0.2);
+  background: rgba(0, 103, 71, 0.08);
+  color: var(--masters-dark-green);
+  border: 1px solid rgba(0, 77, 53, 0.25);
 }
 
 .foursome-status--in-progress {
-  background: #fff4e0;
-  color: #b85a00;
-  border-color: rgba(184, 90, 0, 0.35);
+  background: rgba(0, 103, 71, 0.12);
+  color: var(--masters-green);
+  border-color: rgba(0, 77, 53, 0.3);
 }
 
 .foursome-status--complete {
-  background: #e8f5e9;
-  color: #2e7d32;
-  border-color: rgba(46, 125, 50, 0.35);
+  background: rgba(0, 103, 71, 0.16);
+  color: var(--masters-green);
+  border-color: rgba(0, 77, 53, 0.35);
 }
 
 .foursome-status--not-started {
-  background: #f5f5f5;
-  color: #666;
-  border-color: rgba(102, 102, 102, 0.2);
+  background: rgba(0, 103, 71, 0.05);
+  color: var(--masters-dark-green);
+  border-color: rgba(0, 77, 53, 0.2);
 }
 
 /* Individual Matchups */
 .matchup {
-  background: var(--color-bg);
-  border: 2px solid var(--masters-green);
+  background: rgba(0, 103, 71, 0.04);
+  border: 1px solid rgba(0, 77, 53, 0.2);
   border-radius: var(--radius-md);
   padding: clamp(15px, 3vw, 20px);
   margin-top: var(--gap-small);
@@ -697,8 +704,8 @@ body {
 }
 
 .matchup:hover {
-  transform: translateX(5px);
-  border-color: var(--masters-gold);
+  border-color: rgba(0, 77, 53, 0.45);
+  background: rgba(0, 103, 71, 0.07);
 }
 
 .matchup-header {
@@ -710,29 +717,46 @@ body {
   flex-wrap: wrap;
 }
 
+.matchup-names {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: clamp(10px, 2vw, 14px);
+  width: 100%;
+}
+
 .player-name {
-  font-size: clamp(1em, 3vw, 1.3em);
-  font-weight: bold;
-  color: var(--masters-green);
+  font-size: clamp(1.05em, 3vw, 1.35em);
+  font-weight: 700;
+  color: var(--masters-dark-green);
 }
 
 /* MASTERS RED FOR WINNERS */
 .player-name.winner {
-  color: var(--masters-red);
-  text-shadow: 0 2px 4px rgba(200, 16, 46, 0.15);
+  color: var(--masters-dark-green);
+  text-shadow: none;
+}
+
+.matchup-vs {
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--masters-black);
+  opacity: 0.4;
 }
 
 /* Score Display */
 .score-display {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 110px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
   gap: clamp(8px, 2vw, 10px);
   margin-top: var(--gap-small);
 }
 
 .nine-score {
-  background: var(--color-card);
-  border: 2px solid var(--masters-green);
+  background: rgba(0, 103, 71, 0.06);
+  border: 1px solid rgba(0, 77, 53, 0.2);
   border-radius: var(--radius-md);
   padding: clamp(10px, 2vw, 12px);
   text-align: center;
@@ -740,24 +764,34 @@ body {
 
 /* MASTERS RED NUMBERS FOR WINNING SCORES */
 .nine-score.won {
-  background: linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(212,175,55,0.08) 100%);
-  border: 2px solid var(--masters-red);
+  background: rgba(0, 103, 71, 0.14);
+  border-color: rgba(0, 77, 53, 0.35);
 }
 
 .nine-score.won .nine-result {
-  color: var(--masters-red);
+  color: var(--masters-dark-green);
   font-weight: 800;
-  text-shadow: 0 1px 2px rgba(200, 16, 46, 0.1);
 }
 
 .nine-score.tied {
-  background: var(--color-bg);
-  border-style: dashed;
+  background: rgba(0, 103, 71, 0.04);
+  border-style: solid;
+}
+
+.nine-score.lost {
+  background: rgba(200, 16, 46, 0.12);
+  border-color: rgba(200, 16, 46, 0.35);
+}
+
+.nine-score.lost .nine-result {
+  color: var(--masters-red);
 }
 
 .nine-label {
   font-size: clamp(0.8em, 2vw, 0.9em);
-  opacity: 0.7;
+  opacity: 0.75;
+  font-weight: 600;
+  color: var(--masters-dark-green);
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 5px;
@@ -767,16 +801,17 @@ body {
   font-size: clamp(1.1em, 2.5vw, 1.3em);
   font-weight: bold;
   margin-top: 5px;
+  color: var(--masters-dark-green);
 }
 
 .match-status {
   text-align: center;
   margin-top: var(--gap-small);
   padding: clamp(8px, 2vw, 10px);
-  background: var(--color-highlight);
+  background: rgba(0, 103, 71, 0.06);
   border-radius: var(--radius-md);
   font-weight: bold;
-  color: var(--masters-green);
+  color: var(--masters-dark-green);
   font-size: clamp(0.9em, 2vw, 1em);
 }
 
@@ -784,12 +819,12 @@ body {
 .last-updated {
   text-align: center;
   padding: clamp(12px, 2vw, 15px);
-  background: var(--color-card);
+  background: rgba(0, 103, 71, 0.04);
   border-radius: var(--radius-md);
-  border: 2px solid var(--masters-green);
+  border: 1px solid rgba(0, 77, 53, 0.25);
   margin: var(--gap-section) 0;
   font-style: italic;
-  color: var(--masters-green);
+  color: var(--masters-dark-green);
   font-size: clamp(0.9em, 2vw, 1em);
 }
 
