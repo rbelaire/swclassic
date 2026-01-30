@@ -1917,3 +1917,264 @@ select:focus {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+/* =====================================================
+   SPACING FIXES FOR POPS CARD & PLAYER CARDS
+   Add these to your styles-masters-complete.css
+   ===================================================== */
+
+/* =====================================================
+   FIX 1: POPS SYSTEM CARD - TIGHTER SPACING
+   ===================================================== */
+
+/* Target the pops explanation card on index.html */
+.card h2 {
+  color: var(--masters-green);
+  font-size: clamp(1.4em, 4vw, 1.8em);
+  margin-bottom: clamp(10px, 2vw, 15px);  /* REDUCED from 15-20px */
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+/* Tighter spacing for highlight boxes (pops rules) */
+.highlight-box {
+  background: var(--color-bg);
+  color: var(--masters-black);
+  padding: clamp(12px, 2.5vw, 16px);  /* REDUCED from 15-20px */
+  border-radius: var(--radius-md);
+  margin: 10px 0;  /* REDUCED from 15px */
+  font-weight: 500;
+  border: 2px solid var(--masters-green);
+  line-height: 1.5;  /* TIGHTER line height */
+}
+
+/* Compact bullet points in highlight box */
+.highlight-box ul {
+  margin: 8px 0;  /* REDUCED spacing */
+  padding-left: 20px;
+}
+
+.highlight-box li {
+  margin-bottom: 6px;  /* REDUCED from default */
+  line-height: 1.4;  /* TIGHTER */
+}
+
+/* Make the "Pops = Match-Play Power-Ups" box more compact */
+.highlight-box:last-of-type {
+  padding: clamp(10px, 2vw, 14px);
+  margin: 8px 0;
+  text-align: center;
+  font-size: 1em;
+}
+
+/* Reduce spacing after pops card heading */
+.card .highlight-box:first-of-type {
+  margin-top: 8px;  /* REDUCED from default */
+}
+
+/* =====================================================
+   FIX 2: PLAYER RANKING CARDS - MUCH MORE COMPACT
+   ===================================================== */
+
+.player-card {
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  padding: clamp(16px, 3vw, 22px);  /* REDUCED from 20-30px */
+  border: 2px solid var(--masters-green);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.6s ease-out backwards;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Smaller rank badge */
+.rank-badge {
+  position: absolute;
+  top: 14px;  /* REDUCED from 20px */
+  right: 14px;  /* REDUCED from 20px */
+  width: clamp(45px, 9vw, 54px);  /* REDUCED from 50-60px */
+  height: clamp(45px, 9vw, 54px);
+  background: var(--masters-green);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.3em, 3.5vw, 1.6em);  /* REDUCED from 1.4-1.8em */
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(0, 103, 71, 0.3);
+  color: var(--color-bg);
+}
+
+/* Smaller player name */
+.player-name {
+  font-size: clamp(1.4em, 3.5vw, 1.7em);  /* REDUCED from 1.6-2em */
+  font-weight: bold;
+  margin-bottom: 10px;  /* REDUCED from 15px */
+  padding-right: clamp(50px, 11vw, 60px);
+  color: var(--masters-green);
+}
+
+/* More compact badge */
+.badge {
+  display: inline-block;
+  padding: 4px 12px;  /* REDUCED from 5px 15px */
+  border-radius: 6px;
+  font-size: clamp(0.75em, 1.8vw, 0.85em);  /* REDUCED from 0.8-0.9em */
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 10px;  /* REDUCED from 15px */
+}
+
+/* Compact player stats section */
+.player-stats {
+  display: flex;
+  gap: clamp(10px, 2.5vw, 16px);  /* REDUCED from 12-20px */
+  margin-top: 14px;  /* REDUCED from 20px */
+  flex-wrap: wrap;
+}
+
+/* Smaller stat boxes */
+.stat {
+  flex: 1;
+  min-width: clamp(75px, 18%, 110px);  /* REDUCED from 80-120px */
+  text-align: center;
+  padding: clamp(10px, 1.8vw, 13px);  /* REDUCED from 12-15px */
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--masters-green);
+}
+
+/* Smaller stat labels */
+.stat-label {
+  font-size: clamp(0.75em, 1.8vw, 0.85em);  /* REDUCED from 0.8-0.9em */
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;  /* REDUCED from 5px */
+  color: var(--masters-green);
+}
+
+/* Smaller stat values */
+.stat-value {
+  font-size: clamp(1.3em, 3.5vw, 1.6em);  /* REDUCED from 1.4-1.8em */
+  font-weight: bold;
+  color: var(--masters-green);
+}
+
+/* =====================================================
+   FIX 3: RANKINGS GRID - TIGHTER VERTICAL SPACING
+   ===================================================== */
+
+.rankings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: clamp(16px, 3.5vw, 20px);  /* REDUCED from 20-25px */
+  margin: var(--gap-section) 0;
+}
+
+/* =====================================================
+   FIX 4: REMOVE EXTRA SECTIONS FROM DRAFT.HTML
+   ===================================================== */
+
+/* Hide "Understanding Pops" section on draft page */
+#understanding-pops,
+.pops-legend {
+  display: none !important;
+}
+
+/* Hide "Special Draft Rule" section */
+.special-rules {
+  display: none !important;
+}
+
+/* Hide "The Captains" section on draft page */
+.draft-info {
+  display: none !important;
+}
+
+/* Hide draft order toggle section */
+#draft-order {
+  display: none !important;
+}
+
+/* Hide "View Draft Order" button */
+button[onclick="showDraftOrder()"],
+.cta-button {
+  display: none !important;
+}
+
+/* =====================================================
+   FIX 5: COMPACT POPS EXAMPLE BOX
+   ===================================================== */
+
+/* Make the pops example box more compact */
+.card > div[style*="background: #f5f3e8"] {
+  padding: 15px !important;  /* REDUCED from 25px */
+  margin: 15px 0 !important;  /* REDUCED from 20px */
+}
+
+/* Tighter spacing for example text */
+.card > div[style*="font-size: 1.3em"] {
+  font-size: 1.1em !important;  /* REDUCED */
+  line-height: 1.6 !important;  /* TIGHTER */
+}
+
+/* =====================================================
+   MOBILE ADJUSTMENTS - EVEN MORE COMPACT
+   ===================================================== */
+
+@media (max-width: 768px) {
+  .player-card {
+    padding: clamp(14px, 2.5vw, 18px);  /* EXTRA compact on mobile */
+  }
+
+  .rankings-grid {
+    gap: clamp(14px, 3vw, 16px);  /* TIGHTER on mobile */
+  }
+
+  .rank-badge {
+    width: clamp(40px, 8vw, 48px);
+    height: clamp(40px, 8vw, 48px);
+    font-size: clamp(1.2em, 3vw, 1.4em);
+  }
+
+  .player-name {
+    font-size: clamp(1.3em, 3vw, 1.5em);
+  }
+
+  .stat {
+    padding: clamp(8px, 1.5vw, 11px);
+  }
+
+  .highlight-box {
+    padding: clamp(10px, 2vw, 14px);
+    margin: 8px 0;
+  }
+
+  .card h2 {
+    margin-bottom: 8px;
+  }
+}
+
+/* =====================================================
+   SUMMARY OF CHANGES
+   ===================================================== */
+
+/*
+SPACING REDUCTIONS:
+- Player card padding: 20-30px → 16-22px (27% reduction)
+- Rank badge size: 50-60px → 45-54px (10% reduction)
+- Player name size: 1.6-2em → 1.4-1.7em (15% reduction)
+- Stats margin-top: 20px → 14px (30% reduction)
+- Stats gap: 12-20px → 10-16px (20% reduction)
+- Rankings grid gap: 20-25px → 16-20px (20% reduction)
+- Pops card padding: 15-20px → 12-16px (20% reduction)
+- Highlight box margin: 15px → 10px (33% reduction)
+
+RESULT: 
+- Player cards ~35% more compact vertically
+- Pops card ~25% more compact
+- Less scrolling required
+- Still readable and professional
+*/
