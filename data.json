@@ -16,85 +16,85 @@
       "name": "AK",
       "rank": 3,
       "pops": 4,
-      "team": "brock"
+      "team": "TBD"
     },
     "bruce": {
       "name": "Bruce",
       "rank": 4,
       "pops": 6,
-      "team": "jared"
+      "team": "TBD"
     },
     "tyler": {
       "name": "Tyler",
       "rank": 5,
       "pops": 8,
-      "team": "brock"
+      "team": "TBD"
     },
     "brock": {
       "name": "Brock",
       "rank": 6,
       "pops": 10,
-      "team": "brock"
+      "team": "TBD"
     },
     "jared": {
       "name": "Jared",
       "rank": 7,
       "pops": 12,
-      "team": "jared"
+      "team": "TBD"
     },
     "veed": {
       "name": "Veed",
       "rank": 8,
       "pops": 14,
-      "team": "jared"
+      "team": "TBD"
     },
     "hunter": {
       "name": "Hunter",
       "rank": 9,
       "pops": 16,
-      "team": "brock"
+      "team": "TBD"
     },
     "colby": {
       "name": "Colby",
       "rank": 10,
       "pops": 18,
-      "team": "brock"
+      "team": "TBD"
     },
     "miles": {
       "name": "Miles",
       "rank": 11,
       "pops": 20,
-      "team": "jared"
+      "team": "TBD"
     },
     "lane": {
       "name": "Lane",
       "rank": 12,
       "pops": 22,
-      "team": "jared"
+      "team": "TBD"
     },
     "ross": {
       "name": "Ross",
       "rank": 13,
       "pops": 24,
-      "team": "jared"
+      "team": "TBD"
     },
     "alex": {
       "name": "Alex",
       "rank": 14,
       "pops": 24,
-      "team": "brock"
+      "team": "TBD"
     },
     "dex": {
       "name": "Dex",
       "rank": 15,
       "pops": 24,
-      "team": "brock"
+      "team": "TBD"
     },
     "jv": {
       "name": "JV",
       "rank": 16,
       "pops": 24,
-      "team": "jared"
+      "team": "TBD"
     }
   },
   "matches": [
@@ -113,8 +113,8 @@
     {
       "id": 2,
       "playerIds": [
-        "ak",
-        "bruce"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -125,8 +125,8 @@
     {
       "id": 3,
       "playerIds": [
-        "alex",
-        "jv"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -137,8 +137,8 @@
     {
       "id": 4,
       "playerIds": [
-        "tyler",
-        "veed"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -149,8 +149,8 @@
     {
       "id": 5,
       "playerIds": [
-        "hunter",
-        "ross"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -161,8 +161,8 @@
     {
       "id": 6,
       "playerIds": [
-        "colby",
-        "miles"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -173,8 +173,8 @@
     {
       "id": 7,
       "playerIds": [
-        "dex",
-        "lane"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -185,8 +185,8 @@
     {
       "id": 8,
       "playerIds": [
-        "brock",
-        "jared"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -196,7 +196,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-01-30T14:51:15.166Z",
+    "lastUpdated": "2026-01-30T14:55:25.189Z",
     "tournamentDate": "2026-08-29",
     "venue": "Farm D' Allie Golf Club"
   },
