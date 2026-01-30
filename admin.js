@@ -1,256 +1,433 @@
 /*************************
- * ADMIN PASSWORD GATE
- *************************/
-const ADMIN_PASSWORD = "classic2026";
 
-if (sessionStorage.getItem("adminAuth") !== "true") {
-  const entered = prompt("Enter admin password:");
-  if (entered !== ADMIN_PASSWORD) {
-    alert("Access denied");
-    window.location.href = "index.html";
-  }
-  sessionStorage.setItem("adminAuth", "true");
+- ENHANCED ADMIN INTERFACE
+- The Classic 2026
+  *************************/
+
+const ADMIN_PASSWORD = “classic2026”;
+let hasUnsavedChanges = false;
+
+// Password check
+if (sessionStorage.getItem(“adminAuth”) !== “true”) {
+const entered = prompt(“Enter admin password:”);
+if (entered !== ADMIN_PASSWORD) {
+alert(“Access denied”);
+window.location.href = “index.html”;
+}
+sessionStorage.setItem(“adminAuth”, “true”);
 }
 
 /*************************
- * LOAD DATA
- *************************/
-let data;
 
-fetch("./data.json")
-  .then(res => res.json())
-  .then(json => {
-    data = json;
-    render();
-  });
+- LOAD DATA
+  *************************/
+  let data;
+
+fetch(”./data.json”)
+.then(res => res.json())
+.then(json => {
+data = json;
+render();
+})
+.catch(err => {
+alert(“Error loading tournament data. Please refresh.”);
+console.error(err);
+});
 
 /*************************
- * RENDER
- *************************/
-function render() {
-  const container = document.getElementById("matches");
-  container.innerHTML = "";
 
-  data.matches.forEach(match => {
-    const div = document.createElement("div");
-    div.className = "match";
-
-    if (!isValidMatchup(match)) {
-      div.classList.add("invalid");
-    }
-
-    const title = document.createElement("h3");
-    title.textContent = `Match ${match.id}`;
-
-    const p1 = buildPlayerSelect(match, 0);
-    const p2 = buildPlayerSelect(match, 1);
-
-    const front9 = buildScoreSelect(match, "front9");
-    const back9 = buildScoreSelect(match, "back9");
-
-    const swapBtn = document.createElement("button");
-    swapBtn.textContent = "Swap Players";
-    swapBtn.onclick = () => {
-      [match.playerIds[0], match.playerIds[1]] =
-        [match.playerIds[1], match.playerIds[0]];
-      match.points.front9 = null;
-      match.points.back9 = null;
-      render();
-    };
-
-    const clearBtn = document.createElement("button");
-    clearBtn.textContent = "Clear Match";
-    clearBtn.onclick = () => {
-      match.playerIds = [null, null];
-      match.points.front9 = null;
-      match.points.back9 = null;
-      render();
-    };
-
-    const players = document.createElement("div");
-    players.className = "players";
-
-    const p1Wrap = document.createElement("div");
-    p1Wrap.innerHTML = "<strong>Player 1</strong>";
-    p1Wrap.appendChild(p1);
-
-    const p2Wrap = document.createElement("div");
-    p2Wrap.innerHTML = "<strong>Player 2</strong>";
-    p2Wrap.appendChild(p2);
-
-    players.append(p1Wrap, p2Wrap);
-
-    const scores = document.createElement("div");
-    scores.className = "scores";
-    scores.append(front9, back9);
-
-    const actions = document.createElement("div");
-    actions.className = "actions";
-    actions.append(swapBtn, clearBtn);
-
-    div.append(title, players, scores, actions);
-    container.appendChild(div);
-  });
-
+- RENDER
+  *************************/
+  function render() {
+  renderStats();
   renderTotals();
+  renderMatches();
+  }
+
+/*************************
+
+- STATISTICS DASHBOARD
+  *************************/
+  function renderStats() {
+  let complete = 0;
+  let inProgress = 0;
+  let notStarted = 0;
+
+data.matches.forEach(match => {
+const front = match.points.front9;
+const back = match.points.back9;
+
+```
+if (front !== null && back !== null) {
+  complete++;
+} else if (front !== null || back !== null) {
+  inProgress++;
+} else {
+  notStarted++;
+}
+```
+
+});
+
+const totalMatches = data.matches.length;
+const progress = Math.round((complete / totalMatches) * 100);
+
+document.getElementById(“stat-complete”).textContent = complete;
+document.getElementById(“stat-in-progress”).textContent = inProgress;
+document.getElementById(“stat-not-started”).textContent = notStarted;
+document.getElementById(“stat-progress”).textContent = progress + “%”;
 }
 
 /*************************
- * PLAYER SELECT
- *************************/
-function buildPlayerSelect(match, index) {
-  const select = document.createElement("select");
 
-  const blank = document.createElement("option");
-  blank.value = "";
-  blank.textContent = "-- Select Player --";
-  select.appendChild(blank);
+- TOTALS
+  *************************/
+  function renderTotals() {
+  const totals = calculateTotals();
 
-  Object.entries(data.players).forEach(([id, p]) => {
-    const opt = document.createElement("option");
-    opt.value = id;
-    opt.textContent = `${p.name} (${p.team})`;
-    if (match.playerIds[index] === id) opt.selected = true;
-    select.appendChild(opt);
-  });
+document.getElementById(“total-brock”).textContent = totals.brock.toFixed(1);
+document.getElementById(“total-jared”).textContent = totals.jared.toFixed(1);
 
-  select.onchange = e => {
-    match.playerIds[index] = e.target.value || null;
-    match.points.front9 = null;
-    match.points.back9 = null;
-    render();
-  };
+// Highlight winner
+const brockCard = document.querySelector(”.total-card.brock”);
+const jaredCard = document.querySelector(”.total-card.jared”);
 
-  return select;
+brockCard.classList.remove(“winning”);
+jaredCard.classList.remove(“winning”);
+
+if (totals.brock > totals.jared) {
+brockCard.classList.add(“winning”);
+} else if (totals.jared > totals.brock) {
+jaredCard.classList.add(“winning”);
+}
+}
+
+function calculateTotals() {
+const totals = { brock: 0, jared: 0 };
+
+data.matches.forEach(match => {
+const [p1, p2] = match.playerIds;
+if (!p1 || !p2) return;
+
+```
+const t1 = data.players[p1].team;
+const t2 = data.players[p2].team;
+
+["front9", "back9"].forEach(key => {
+  const v = match.points[key];
+  if (v === null) return;
+  totals[t1] += v;
+  totals[t2] += 1 - v;
+});
+```
+
+});
+
+return totals;
 }
 
 /*************************
- * SCORE SELECT (PLAYER 1)
- *************************/
-function buildScoreSelect(match, key) {
-  const select = document.createElement("select");
-  select.className = "score";
 
-  const options = [
-    { label: "-- Result (Player 1) --", value: "" },
-    { label: "Win", value: "1" },
-    { label: "Tie", value: "0.5" },
-    { label: "Loss", value: "0" }
-  ];
+- MATCHES
+  *************************/
+  function renderMatches() {
+  const container = document.getElementById(“matches”);
+  container.innerHTML = “”;
 
-  options.forEach(o => {
-    const opt = document.createElement("option");
-    opt.textContent = o.label;
-    opt.value = o.value;
-    if (match.points[key] !== null && String(match.points[key]) === o.value) {
-      opt.selected = true;
-    }
-    select.appendChild(opt);
-  });
+data.matches.forEach((match, index) => {
+const div = document.createElement(“div”);
+div.className = “match”;
+div.id = `match-${index}`;
 
-  const valid = isValidMatchup(match);
-  select.disabled = !valid;
-  if (!valid) select.classList.add("disabled");
+```
+// Determine status
+const front = match.points.front9;
+const back = match.points.back9;
+let status = "not-started";
+let statusText = "Not Started";
 
-  select.onchange = e => {
-    match.points[key] = e.target.value === "" ? null : Number(e.target.value);
-    render();
-  };
+if (front !== null && back !== null) {
+  status = "complete";
+  statusText = "Complete";
+  div.classList.add("complete");
+} else if (front !== null || back !== null) {
+  status = "in-progress";
+  statusText = "In Progress";
+}
 
-  return select;
+// Check validity
+const valid = isValidMatchup(match);
+if (!valid) {
+  div.classList.add("invalid");
+}
+
+// Match Header (always visible)
+const [p1, p2] = match.playerIds;
+const p1Name = p1 ? data.players[p1].name : "TBD";
+const p2Name = p2 ? data.players[p2].name : "TBD";
+
+const header = `
+  <div class="match-header" onclick="toggleMatch(${index})">
+    <div class="match-title">Match ${match.id}</div>
+    <div class="match-status-badge ${status}">${statusText}</div>
+  </div>
+  <div class="match-preview" onclick="toggleMatch(${index})">
+    <div><strong>${p1Name}</strong> vs <strong>${p2Name}</strong></div>
+    <div>
+      F9: ${front === null ? "-" : front} | 
+      B9: ${back === null ? "-" : back}
+    </div>
+  </div>
+`;
+
+// Match Details (collapsible)
+const details = `
+  <div class="match-details">
+    ${!valid ? '<div style="color: #c62828; font-weight: bold; margin-bottom: 15px;">⚠️ Invalid matchup: Players must be from different teams</div>' : ''}
+    
+    <div class="players-grid">
+      <div class="player-select-wrap">
+        <label>Player 1</label>
+        ${buildPlayerSelect(match, 0, index)}
+      </div>
+      <div class="player-select-wrap">
+        <label>Player 2</label>
+        ${buildPlayerSelect(match, 1, index)}
+      </div>
+    </div>
+
+    <div class="scores-grid">
+      <div class="score-wrap">
+        <label>Front 9 (Player 1)</label>
+        ${buildScoreSelect(match, "front9", index, valid)}
+      </div>
+      <div class="score-wrap">
+        <label>Back 9 (Player 1)</label>
+        ${buildScoreSelect(match, "back9", index, valid)}
+      </div>
+    </div>
+
+    <div class="match-actions">
+      <button class="match-btn" onclick="swapPlayers(${index})">
+        🔄 Swap Players
+      </button>
+      <button class="match-btn" onclick="clearMatch(${index})">
+        ❌ Clear Scores
+      </button>
+    </div>
+  </div>
+`;
+
+div.innerHTML = header + details;
+container.appendChild(div);
+```
+
+});
 }
 
 /*************************
- * VALIDATION
- *************************/
-function isValidMatchup(match) {
+
+- PLAYER SELECT
+  *************************/
+  function buildPlayerSelect(match, index, matchIndex) {
+  const selectId = `player-${matchIndex}-${index}`;
+  let html = `<select id="${selectId}" onchange="updatePlayer(${matchIndex}, ${index}, this.value)">`;
+  html += ‘<option value="">– Select Player –</option>’;
+
+Object.entries(data.players).forEach(([id, p]) => {
+const selected = match.playerIds[index] === id ? ‘selected’ : ‘’;
+html += `<option value="${id}" ${selected}>${p.name} (${p.team})</option>`;
+});
+
+html += ‘</select>’;
+return html;
+}
+
+/*************************
+
+- SCORE SELECT
+  *************************/
+  function buildScoreSelect(match, key, matchIndex, valid) {
+  const selectId = `score-${matchIndex}-${key}`;
+  const disabled = !valid ? ‘disabled’ : ‘’;
+
+let html = `<select id="${selectId}" onchange="updateScore(${matchIndex}, '${key}', this.value)" ${disabled}>`;
+html += ‘<option value="">– Select Result –</option>’;
+html += ‘<option value=“1”’ + (match.points[key] === 1 ? ’ selected’ : ‘’) + ‘>Win (1.0)</option>’;
+html += ‘<option value=“0.5”’ + (match.points[key] === 0.5 ? ’ selected’ : ‘’) + ‘>Tie (0.5)</option>’;
+html += ‘<option value=“0”’ + (match.points[key] === 0 ? ’ selected’ : ‘’) + ‘>Loss (0.0)</option>’;
+html += ‘</select>’;
+
+return html;
+}
+
+/*************************
+
+- VALIDATION
+  *************************/
+  function isValidMatchup(match) {
   const [p1, p2] = match.playerIds;
   if (!p1 || !p2) return false;
   return data.players[p1].team !== data.players[p2].team;
+  }
+
+/*************************
+
+- UPDATE FUNCTIONS
+  *************************/
+  function updatePlayer(matchIndex, playerIndex, playerId) {
+  data.matches[matchIndex].playerIds[playerIndex] = playerId || null;
+  data.matches[matchIndex].points.front9 = null;
+  data.matches[matchIndex].points.back9 = null;
+  markUnsaved();
+  render();
+  }
+
+function updateScore(matchIndex, key, value) {
+data.matches[matchIndex].points[key] = value === “” ? null : Number(value);
+markUnsaved();
+render();
+}
+
+function swapPlayers(matchIndex) {
+const match = data.matches[matchIndex];
+[match.playerIds[0], match.playerIds[1]] = [match.playerIds[1], match.playerIds[0]];
+match.points.front9 = null;
+match.points.back9 = null;
+markUnsaved();
+render();
+}
+
+function clearMatch(matchIndex) {
+if (!confirm(“Clear all scores for this match?”)) return;
+const match = data.matches[matchIndex];
+match.points.front9 = null;
+match.points.back9 = null;
+markUnsaved();
+render();
 }
 
 /*************************
- * TOTALS
- *************************/
-function calculateTotals() {
-  const totals = {};
-  Object.keys(data.teams).forEach(t => totals[t] = 0);
 
-  data.matches.forEach(match => {
-    const [p1, p2] = match.playerIds;
-    if (!p1 || !p2) return;
+- TOGGLE MATCH
+  *************************/
+  function toggleMatch(index) {
+  const match = document.getElementById(`match-${index}`);
+  match.classList.toggle(“expanded”);
+  }
 
-    const team1 = data.players[p1].team;
-    const team2 = data.players[p2].team;
+/*************************
 
-    ["front9", "back9"].forEach(key => {
-      const val = match.points[key];
-      if (val === null) return;
-      totals[team1] += val;
-      totals[team2] += 1 - val;
-    });
+- QUICK ACTIONS
+  *************************/
+  function markAllNotStarted() {
+  if (!confirm(“Reset all scores to Not Started?”)) return;
+  data.matches.forEach(m => {
+  m.points.front9 = null;
+  m.points.back9 = null;
   });
+  markUnsaved();
+  render();
+  }
 
-  return totals;
+function markAllInProgress() {
+if (!confirm(“Mark all matches as In Progress (Front 9 only)?”)) return;
+data.matches.forEach(m => {
+if (isValidMatchup(m)) {
+m.points.front9 = m.points.front9 === null ? 0 : m.points.front9;
+}
+});
+markUnsaved();
+render();
 }
 
-function renderTotals() {
-  const div = document.getElementById("totals");
-  div.innerHTML = "";
+function expandAll() {
+document.querySelectorAll(’.match’).forEach(m => m.classList.add(‘expanded’));
+}
 
-  const totals = calculateTotals();
-
-  Object.entries(totals).forEach(([teamId, score]) => {
-    const row = document.createElement("div");
-    row.textContent = `${data.teams[teamId].name}: ${score.toFixed(1)}`;
-    div.appendChild(row);
-  });
+function collapseAll() {
+document.querySelectorAll(’.match’).forEach(m => m.classList.remove(‘expanded’));
 }
 
 /*************************
- * SAVE TO GITHUB (FIXED)
- *************************/
-function saveToGitHub() {
-  const token = prompt("GitHub token:");
+
+- UNSAVED CHANGES
+  *************************/
+  function markUnsaved() {
+  hasUnsavedChanges = true;
+  document.getElementById(“save-reminder”).style.display = “block”;
+  }
+
+function markSaved() {
+hasUnsavedChanges = false;
+document.getElementById(“save-reminder”).style.display = “none”;
+}
+
+// Warn on page exit
+window.addEventListener(‘beforeunload’, (e) => {
+if (hasUnsavedChanges) {
+e.preventDefault();
+e.returnValue = ‘’;
+}
+});
+
+/*************************
+
+- SAVE TO GITHUB
+  *************************/
+  function saveToGitHub() {
+  const token = prompt(“GitHub Personal Access Token:”);
   if (!token) return;
 
-  data.meta.lastUpdated = new Date().toISOString();
+const saveBtn = document.querySelector(’.btn-primary’);
+const originalText = saveBtn.textContent;
+saveBtn.textContent = “💾 Saving…”;
+saveBtn.disabled = true;
 
-  // Step 1: fetch current SHA
-  fetch("https://api.github.com/repos/rbelaire/swclassic/contents/data.json", {
+data.meta.lastUpdated = new Date().toISOString();
+
+// Step 1: Get current file SHA
+fetch(“https://api.github.com/repos/rbelaire/swclassic/contents/data.json”, {
+headers: {
+Authorization: `token ${token}`
+}
+})
+.then(res => res.json())
+.then(file => {
+const sha = file.sha;
+
+```
+  // Step 2: Update file
+  return fetch("https://api.github.com/repos/rbelaire/swclassic/contents/data.json", {
+    method: "PUT",
     headers: {
-      Authorization: `token ${token}`
-    }
-  })
-    .then(res => res.json())
-    .then(file => {
-      const sha = file.sha;
+      Authorization: `token ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      message: "Update tournament scores",
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))),
+      sha: sha
+    })
+  });
+})
+.then(res => res.json())
+.then(resp => {
+  if (resp.content) {
+    markSaved();
+    alert("✅ Scores saved successfully!\n\nThe leaderboard will update automatically within 30 seconds.");
+    saveBtn.textContent = originalText;
+    saveBtn.disabled = false;
+  } else {
+    throw new Error("Save failed");
+  }
+})
+.catch(err => {
+  console.error(err);
+  alert("❌ Save failed. Check your token and try again.");
+  saveBtn.textContent = originalText;
+  saveBtn.disabled = false;
+});
+```
 
-      // Step 2: overwrite file
-      return fetch("https://api.github.com/repos/rbelaire/swclassic/contents/data.json", {
-        method: "PUT",
-        headers: {
-          Authorization: `token ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: "Update tournament data",
-          content: btoa(JSON.stringify(data, null, 2)),
-          sha: sha
-        })
-      });
-    })
-    .then(res => res.json())
-    .then(resp => {
-      if (resp.content) {
-        alert("Saved successfully!");
-      } else {
-        console.error(resp);
-        alert("Save failed. Check token permissions.");
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Save failed due to network or auth error.");
-    });
 }
