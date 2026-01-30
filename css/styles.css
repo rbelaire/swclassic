@@ -2592,7 +2592,8 @@ RESULT:
     padding: clamp(28px, 4vw, 40px);
     border: 2px solid var(--masters-green);
     margin: 0 auto var(--gap-section);
-    max-width: 960px;
+    max-width: 1120px;
+    width: min(100%, 1120px);
 }
 
 .event-header__inner {
@@ -2613,7 +2614,7 @@ RESULT:
 
 .event-header__divider {
     width: 2px;
-    height: 90px;
+    height: 100%;
     background: var(--masters-red);
     opacity: 0.75;
     align-self: center;
@@ -2642,14 +2643,14 @@ RESULT:
 .countdown {
     display: grid;
     grid-auto-flow: column;
-    align-items: end;
+    align-items: center;
     gap: clamp(12px, 2vw, 18px);
 }
 
 .countdown__unit {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 6px;
 }
 
