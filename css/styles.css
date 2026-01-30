@@ -976,8 +976,10 @@ body {
   }
 
   .modal-vs {
-    transform: rotate(90deg);
+    transform: none;
     margin: 10px 0;
+     text-align: center;
+    width: 100%;
   }
 
   .modal-player-name {
