@@ -213,11 +213,11 @@ function buildMatch(match, matchIndex) {
 
       <div class="scores-grid">
         <div class="score-wrap">
-          <label>Front 9 (Team Brock Player Points)</label>
+          <label>Front 9 Winner</label>
           ${buildScoreSelect(match, "front9", matchIndex, valid)}
         </div>
         <div class="score-wrap">
-          <label>Back 9 (Team Brock Player Points)</label>
+          <label>Back 9 Winner</label>
           ${buildScoreSelect(match, "back9", matchIndex, valid)}
         </div>
       </div>
@@ -262,11 +262,15 @@ function buildScoreSelect(match, key, matchIndex, valid) {
   const selectId = `score-${matchIndex}-${key}`;
   const disabled = !valid ? 'disabled' : '';
   
+  const [p1Id, p2Id] = match.playerIds;
+  const p1Name = p1Id ? data.players[p1Id].name : "Team Brock Player";
+  const p2Name = p2Id ? data.players[p2Id].name : "Team Jared Player";
+  
   let html = `<select id="${selectId}" onchange="updateScore(${matchIndex}, '${key}', this.value)" ${disabled}>`;
-  html += '<option value="">-- Select Result --</option>';
-  html += '<option value="1"' + (match.points[key] === 1 ? ' selected' : '') + '>Win (1.0)</option>';
-  html += '<option value="0.5"' + (match.points[key] === 0.5 ? ' selected' : '') + '>Tie (0.5)</option>';
-  html += '<option value="0"' + (match.points[key] === 0 ? ' selected' : '') + '>Loss (0.0)</option>';
+  html += '<option value="">-- Select Winner --</option>';
+  html += `<option value="1"${match.points[key] === 1 ? ' selected' : ''}>${p1Name} Wins</option>`;
+  html += `<option value="0.5"${match.points[key] === 0.5 ? ' selected' : ''}>Tie</option>`;
+  html += `<option value="0"${match.points[key] === 0 ? ' selected' : ''}>${p2Name} Wins</option>`;
   html += '</select>';
   
   return html;
