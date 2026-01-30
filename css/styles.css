@@ -22,6 +22,9 @@ DESIGN TOKENS
 –gap-card: clamp(16px, 3vw, 30px);
 –radius-lg: 14px;
 –radius-md: 8px;
+–shadow-sm: 0 4px 15px rgba(13,61,31,0.08);
+–shadow-md: 0 8px 20px rgba(13,61,31,0.15);
+–shadow-lg: 0 12px 30px rgba(13,61,31,0.2);
 }
 
 /* =====================
