@@ -2578,10 +2578,10 @@ RESULT:
 <style>
 /* Event Header */
 .event-header {
-    background: var(--color-card);
+    background: var(--masters-black);
     border-radius: var(--radius-lg);
     padding: clamp(28px, 4vw, 40px);
-    border: 2px solid var(--masters-dark-green);
+    border: 2px solid var(--masters-green);
     margin: 0 auto var(--gap-section);
     max-width: 960px;
 }
@@ -2589,15 +2589,25 @@ RESULT:
 .event-header__inner {
     display: grid;
     grid-template-columns: minmax(0, 1.6fr) auto minmax(0, 1fr);
-    align-items: center;
+    align-items: stretch;
     gap: clamp(24px, 5vw, 40px);
+}
+
+.event-header__countdown,
+.event-header__course {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    padding: clamp(10px, 2vw, 16px) 0;
 }
 
 .event-header__divider {
     width: 2px;
     height: 90px;
     background: var(--masters-red);
-    opacity: 0.6;
+    opacity: 0.75;
+    align-self: center;
 }
 
 .event-header__label {
@@ -2605,17 +2615,19 @@ RESULT:
     letter-spacing: 0.28em;
     text-transform: uppercase;
     font-weight: 700;
-    color: var(--masters-black);
-    opacity: 0.65;
+    color: var(--masters-green);
+    opacity: 0.6;
     margin-bottom: 12px;
 }
 
 .event-header__course-name {
     font-size: clamp(1.6rem, 3vw, 2.2rem);
-    color: var(--masters-dark-green);
-    font-weight: 700;
-    letter-spacing: 0.05em;
+    color: var(--masters-green);
+    font-weight: 800;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
+    border-left: 3px solid var(--masters-red);
+    padding-left: 16px;
 }
 
 .countdown {
@@ -2641,14 +2653,16 @@ RESULT:
 
 .countdown__number--seconds {
     color: var(--masters-red);
+    border-bottom: 2px solid var(--masters-red);
+    padding-bottom: 4px;
 }
 
 .countdown__label {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: var(--masters-black);
-    opacity: 0.6;
+    color: var(--masters-green);
+    opacity: 0.55;
 }
 
 .countdown__divider {
@@ -2656,7 +2670,7 @@ RESULT:
     color: var(--masters-dark-green);
     font-weight: 700;
     line-height: 1;
-    opacity: 0.6;
+    opacity: 0.75;
 }
 
 .countdown__divider--accent {
