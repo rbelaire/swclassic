@@ -105,8 +105,8 @@
         "bel"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 1,
+        "back9": 0
       },
       "status": "not_started"
     },
@@ -117,8 +117,8 @@
         "bruce"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 0.5,
+        "back9": 1
       },
       "status": "not_started"
     },
@@ -129,8 +129,8 @@
         "tyler"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 0.5,
+        "back9": 0.5
       },
       "status": "not_started"
     },
@@ -141,8 +141,8 @@
         "hunter"
       ],
       "points": {
-        "front9": null,
-        "back9": null
+        "front9": 0,
+        "back9": 0
       },
       "status": "not_started"
     },
@@ -196,7 +196,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-01-30T16:45:58.975Z",
+    "lastUpdated": "2026-01-30T19:20:36.640Z",
     "tournamentDate": "2026-08-29",
     "venue": "Farm D' Allie Golf Club"
   },
