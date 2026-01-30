@@ -22,7 +22,7 @@ if (sessionStorage.getItem("adminAuth") !== "true") {
  *************************/
 let data;
 
-fetch("./data.json")
+fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
   .then(res => res.json())
   .then(json => {
     data = json;
