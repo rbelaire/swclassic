@@ -16,13 +16,13 @@
       "name": "AK",
       "rank": 3,
       "pops": 4,
-      "team": "jared"
+      "team": "brock"
     },
     "bruce": {
       "name": "Bruce",
       "rank": 4,
       "pops": 6,
-      "team": "brock"
+      "team": "jared"
     },
     "tyler": {
       "name": "Tyler",
@@ -105,16 +105,16 @@
         "bel"
       ],
       "points": {
-        "front9": 1,
-        "back9": 0.5
+        "front9": null,
+        "back9": null
       },
       "status": "not_started"
     },
     {
       "id": 2,
       "playerIds": [
-        "bruce",
-        "ak"
+        "ak",
+        "bruce"
       ],
       "points": {
         "front9": null,
@@ -193,107 +193,179 @@
         "back9": null
       },
       "status": "not_started"
-    },
-    {
-      "id": 9,
-      "playerIds": [
-        null,
-        null
-      ],
-      "points": {
-        "front9": null,
-        "back9": null
-      },
-      "status": "not_started"
-    },
-    {
-      "id": 10,
-      "playerIds": [
-        null,
-        null
-      ],
-      "points": {
-        "front9": null,
-        "back9": null
-      },
-      "status": "not_started"
-    },
-    {
-      "id": 11,
-      "playerIds": [
-        null,
-        null
-      ],
-      "points": {
-        "front9": null,
-        "back9": null
-      },
-      "status": "not_started"
-    },
-    {
-      "id": 12,
-      "playerIds": [
-        null,
-        null
-      ],
-      "points": {
-        "front9": null,
-        "back9": null
-      },
-      "status": "not_started"
-    },
-    {
-      "id": 13,
-      "playerIds": [
-        null,
-        null
-      ],
-      "points": {
-        "front9": null,
-        "back9": null
-      },
-      "status": "not_started"
-    },
-    {
-      "id": 14,
-      "playerIds": [
-        null,
-        null
-      ],
-      "points": {
-        "front9": null,
-        "back9": null
-      },
-      "status": "not_started"
-    },
-    {
-      "id": 15,
-      "playerIds": [
-        null,
-        null
-      ],
-      "points": {
-        "front9": null,
-        "back9": null
-      },
-      "status": "not_started"
-    },
-    {
-      "id": 16,
-      "playerIds": [
-        null,
-        null
-      ],
-      "points": {
-        "front9": null,
-        "back9": null
-      },
-      "status": "not_started"
     }
   ],
   "meta": {
-    "lastUpdated": "2026-01-30T14:35:25.717Z",
+    "lastUpdated": "2026-01-30T14:51:15.166Z",
     "tournamentDate": "2026-08-29",
     "venue": "Farm D' Allie Golf Club"
+  },
+  "course": {
+    "front9": {
+      "1": {
+        "par": 5,
+        "handicap": 5,
+        "yardage": {
+          "black": 548,
+          "yellow": 530,
+          "silver": 513
+        }
+      },
+      "2": {
+        "par": 4,
+        "handicap": 9,
+        "yardage": {
+          "black": 388,
+          "yellow": 360,
+          "silver": 333
+        }
+      },
+      "3": {
+        "par": 3,
+        "handicap": 13,
+        "yardage": {
+          "black": 174,
+          "yellow": 150,
+          "silver": 132
+        }
+      },
+      "4": {
+        "par": 5,
+        "handicap": 15,
+        "yardage": {
+          "black": 530,
+          "yellow": 524,
+          "silver": 491
+        }
+      },
+      "5": {
+        "par": 4,
+        "handicap": 1,
+        "yardage": {
+          "black": 463,
+          "yellow": 441,
+          "silver": 419
+        }
+      },
+      "6": {
+        "par": 4,
+        "handicap": 7,
+        "yardage": {
+          "black": 369,
+          "yellow": 345,
+          "silver": 319
+        }
+      },
+      "7": {
+        "par": 3,
+        "handicap": 11,
+        "yardage": {
+          "black": 196,
+          "yellow": 166,
+          "silver": 165
+        }
+      },
+      "8": {
+        "par": 4,
+        "handicap": 17,
+        "yardage": {
+          "black": 379,
+          "yellow": 345,
+          "silver": 302
+        }
+      },
+      "9": {
+        "par": 4,
+        "handicap": 3,
+        "yardage": {
+          "black": 435,
+          "yellow": 411,
+          "silver": 385
+        }
+      }
+    },
+    "back9": {
+      "10": {
+        "par": 4,
+        "handicap": 18,
+        "yardage": {
+          "black": 353,
+          "yellow": 324,
+          "silver": 311
+        }
+      },
+      "11": {
+        "par": 5,
+        "handicap": 14,
+        "yardage": {
+          "black": 506,
+          "yellow": 482,
+          "silver": 450
+        }
+      },
+      "12": {
+        "par": 4,
+        "handicap": 16,
+        "yardage": {
+          "black": 367,
+          "yellow": 341,
+          "silver": 316
+        }
+      },
+      "13": {
+        "par": 3,
+        "handicap": 4,
+        "yardage": {
+          "black": 185,
+          "yellow": 153,
+          "silver": 147
+        }
+      },
+      "14": {
+        "par": 4,
+        "handicap": 12,
+        "yardage": {
+          "black": 376,
+          "yellow": 353,
+          "silver": 330
+        }
+      },
+      "15": {
+        "par": 4,
+        "handicap": 6,
+        "yardage": {
+          "black": 385,
+          "yellow": 365,
+          "silver": 332
+        }
+      },
+      "16": {
+        "par": 4,
+        "handicap": 2,
+        "yardage": {
+          "black": 450,
+          "yellow": 411,
+          "silver": 380
+        }
+      },
+      "17": {
+        "par": 3,
+        "handicap": 8,
+        "yardage": {
+          "black": 227,
+          "yellow": 211,
+          "silver": 182
+        }
+      },
+      "18": {
+        "par": 5,
+        "handicap": 10,
+        "yardage": {
+          "black": 584,
+          "yellow": 560,
+          "silver": 530
+        }
+      }
+    }
   }
 }
