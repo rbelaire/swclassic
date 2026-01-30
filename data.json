@@ -52,7 +52,7 @@
       "name": "Hunter",
       "rank": 9,
       "pops": 16,
-      "team": "jared"
+      "team": "brock"
     },
     "colby": {
       "name": "Colby",
@@ -70,7 +70,7 @@
       "name": "Lane",
       "rank": 12,
       "pops": 22,
-      "team": "TBD"
+      "team": "jared"
     },
     "ross": {
       "name": "Ross",
@@ -82,7 +82,7 @@
       "name": "Alex",
       "rank": 14,
       "pops": 24,
-      "team": "TBD"
+      "team": "jared"
     },
     "dex": {
       "name": "Dex",
@@ -149,11 +149,11 @@
     {
       "id": 5,
       "playerIds": [
-        null,
-        null
+        "jv",
+        "alex"
       ],
       "points": {
-        "front9": null,
+        "front9": 0.5,
         "back9": null
       },
       "status": "not_started"
@@ -161,11 +161,11 @@
     {
       "id": 6,
       "playerIds": [
-        null,
-        null
+        "hunter",
+        "lane"
       ],
       "points": {
-        "front9": null,
+        "front9": 0.5,
         "back9": null
       },
       "status": "not_started"
@@ -196,7 +196,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-01-30T20:21:11.184Z",
+    "lastUpdated": "2026-01-30T20:33:24.761Z",
     "tournamentDate": "2026-08-29",
     "venue": "Farm D' Allie Golf Club"
   },
