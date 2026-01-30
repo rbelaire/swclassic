@@ -2326,10 +2326,12 @@ RESULT:
     background: linear-gradient(135deg, rgba(0, 103, 71, 0.05) 0%, rgba(0, 103, 71, 0.02) 100%);
     border: 3px solid var(--masters-gold);
     border-radius: var(--radius-lg);
-    padding: clamp(25px, 4vw, 35px);
+    padding: clamp(20px, 3.2vw, 28px); /* reduce overall card padding */
     text-align: center;
     transition: all 0.3s ease;
     position: relative;
+    max-width: clamp(260px, 32vw, 320px); /* reduce overall card width slightly */
+    margin: 0 auto; /* keep narrower card centered in its grid column */
 }
 
 .captain-card:hover {
@@ -2339,15 +2341,15 @@ RESULT:
 }
 
 .captain-badge {
-    font-size: 3em;
-    margin-bottom: 15px;
+    font-size: 2.6em; /* reduce badge size slightly */
+    margin-bottom: 10px; /* tighten spacing below badge */
     filter: drop-shadow(0 4px 8px rgba(0, 103, 71, 0.2));
 }
 
 .captain-card h3 {
-    font-size: clamp(1.8em, 4vw, 2.5em);
+    font-size: clamp(1.6em, 3.4vw, 2.2em); /* reduce banner font size */
     color: var(--masters-green);
-    margin-bottom: 20px;
+    margin-bottom: 14px; /* reduce spacing below name */
     letter-spacing: 3px;
     font-weight: 700;
 }
@@ -2355,40 +2357,40 @@ RESULT:
 .captain-stats {
     display: flex;
     justify-content: center;
-    gap: clamp(15px, 3vw, 25px);
-    margin: 20px 0;
+    gap: clamp(12px, 2.4vw, 20px); /* reduce spacing between stat blocks */
+    margin: 16px 0; /* reduce spacing around stats group */
     flex-wrap: wrap;
 }
 
 .captain-stat {
     background: var(--color-card);
-    padding: clamp(12px, 2vw, 16px);
+    padding: clamp(10px, 1.6vw, 13px); /* reduce stat block padding */
     border-radius: var(--radius-md);
     border: 2px solid var(--masters-green);
-    min-width: clamp(70px, 15vw, 90px);
+    min-width: clamp(64px, 14vw, 84px); /* reduce stat block width slightly */
 }
 
 .captain-stat .stat-label {
-    font-size: clamp(0.75em, 1.8vw, 0.85em);
+    font-size: clamp(0.7em, 1.6vw, 0.8em); /* reduce label size slightly */
     color: var(--masters-green);
     opacity: 0.7;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 5px;
+    margin-bottom: 4px; /* tighten label spacing */
 }
 
 .captain-stat .stat-value {
-    font-size: clamp(1.4em, 3vw, 1.8em);
+    font-size: clamp(1.25em, 2.6vw, 1.6em); /* reduce stat value size slightly */
     color: var(--masters-green);
     font-weight: 700;
 }
 
 .captain-pick-order {
-    margin-top: 20px;
-    padding: 12px 20px;
+    margin-top: 14px; /* reduce spacing above banner */
+    padding: 9px 16px; /* reduce banner height */
     background: var(--color-bg);
     border-radius: var(--radius-md);
-    font-size: clamp(1em, 2.2vw, 1.1em);
+    font-size: clamp(0.95em, 2vw, 1.02em); /* reduce banner font size */
     color: var(--masters-green);
 }
 
