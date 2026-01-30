@@ -176,16 +176,17 @@ function renderMatches(data) {
   const foursomes = chunk(data.matches, 2);
 
   foursomes.forEach((group, index) => {
-    const wrapper = document.createElement("div");
+    const wrapper = document.createElement("section");
     wrapper.className = "foursome";
+    wrapper.setAttribute("aria-label", `Foursome ${index + 1}`);
 
-    const header = document.createElement("div");
+    const header = document.createElement("header");
     header.className = "foursome-header";
-    const title = document.createElement("div");
+    const title = document.createElement("h3");
     title.className = "foursome-title";
     title.textContent = `Foursome ${index + 1}`;
 
-    const status = document.createElement("div");
+    const status = document.createElement("span");
     const statusData = getFoursomeStatus(group);
     status.className = `foursome-status ${statusData.className}`;
     status.textContent = statusData.label;
@@ -203,31 +204,38 @@ function renderMatches(data) {
 }
 
 function buildMatch(match, data) {
-  const div = document.createElement("div");
+  const div = document.createElement("article");
   div.className = "matchup";
   div.style.cursor = "pointer";
   div.onclick = () => showMatchupModal(match, data);
 
-  const header = document.createElement("div");
+  const header = document.createElement("header");
   header.className = "matchup-header";
 
   const [p1, p2] = match.playerIds;
+
+  const names = document.createElement("div");
+  names.className = "matchup-names";
 
   const left = document.createElement("span");
   left.className = "player-name";
   left.textContent = p1 ? data.players[p1].name : "TBD";
 
   const vs = document.createElement("span");
-  vs.textContent = "VS";
+  vs.className = "matchup-vs";
+  vs.textContent = "vs";
 
   const right = document.createElement("span");
   right.className = "player-name";
   right.textContent = p2 ? data.players[p2].name : "TBD";
 
-  header.append(left, vs, right);
+  names.append(left, vs, right);
+  header.append(names);
 
   const scores = document.createElement("div");
   scores.className = "score-display";
+  scores.setAttribute("role", "group");
+  scores.setAttribute("aria-label", "Front 9 and Back 9 scores");
   scores.append(
     buildNine("Front 9", match.points.front9),
     buildNine("Back 9", match.points.back9)
@@ -243,6 +251,7 @@ function buildNine(label, val) {
 
   if (val === 1) div.classList.add("won");
   if (val === 0.5) div.classList.add("tied");
+  if (val === 0) div.classList.add("lost");
 
   div.innerHTML = `
     <div class="nine-label">${label}</div>
