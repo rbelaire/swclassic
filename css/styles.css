@@ -1528,7 +1528,32 @@ select:focus {
     font-size: 1.6em;
   }
 
-    .team-scores--sticky {
+    .team-scores {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .team-scores--sticky {
+    top: 70px;
+    padding: 8px;
+  }
+
+  .team-scores--sticky .team-card {
+    padding: 10px 8px;
+  }
+
+  .team-scores--sticky .team-card h2 {
+    font-size: clamp(0.95em, 3.5vw, 1.2em);
+    letter-spacing: 1px;
+  }
+
+  .team-scores--sticky .total-score {
+    font-size: clamp(1.4em, 5vw, 2em);
+  }
+
+  .team-scores--sticky .score-label {
+    font-size: 0.75em;
+    letter-spacing: 0.5px;
     top: 70px;
   }
   /* Info Grids */
