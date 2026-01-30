@@ -1,157 +1,120 @@
 {
-  "meta": {
-    "event": "The Classic",
-    "year": 2026,
-    "lastUpdated": "2026-01-30T14:03:04.944Z"
-  },
-  "teams": {
+  "players": {
+    "gavin": {
+      "name": "Gavin",
+      "rank": 1,
+      "pops": 0,
+      "team": "brock"
+    },
+    "bel": {
+      "name": "Bel",
+      "rank": 2,
+      "pops": 2,
+      "team": "jared"
+    },
+    "ak": {
+      "name": "AK",
+      "rank": 3,
+      "pops": 4,
+      "team": "jared"
+    },
+    "bruce": {
+      "name": "Bruce",
+      "rank": 4,
+      "pops": 6,
+      "team": "brock"
+    },
+    "tyler": {
+      "name": "Tyler",
+      "rank": 5,
+      "pops": 8,
+      "team": "brock"
+    },
     "brock": {
       "name": "Brock",
-      "color": "blue"
+      "rank": 6,
+      "pops": 10,
+      "team": "brock"
     },
     "jared": {
       "name": "Jared",
-      "color": "red"
-    }
-  },
-  "players": {
-    "brock1": {
-      "name": "Brock Player 1",
-      "team": "brock"
-    },
-    "brock2": {
-      "name": "Brock Player 2",
-      "team": "brock"
-    },
-    "brock3": {
-      "name": "Brock Player 3",
-      "team": "brock"
-    },
-    "brock4": {
-      "name": "Brock Player 4",
-      "team": "brock"
-    },
-    "brock5": {
-      "name": "Brock Player 5",
-      "team": "brock"
-    },
-    "brock6": {
-      "name": "Brock Player 6",
-      "team": "brock"
-    },
-    "brock7": {
-      "name": "Brock Player 7",
-      "team": "brock"
-    },
-    "brock8": {
-      "name": "Brock Player 8",
-      "team": "brock"
-    },
-    "brock9": {
-      "name": "Brock Player 9",
-      "team": "brock"
-    },
-    "brock10": {
-      "name": "Brock Player 10",
-      "team": "brock"
-    },
-    "brock11": {
-      "name": "Brock Player 11",
-      "team": "brock"
-    },
-    "brock12": {
-      "name": "Brock Player 12",
-      "team": "brock"
-    },
-    "brock13": {
-      "name": "Brock Player 13",
-      "team": "brock"
-    },
-    "brock14": {
-      "name": "Brock Player 14",
-      "team": "brock"
-    },
-    "brock15": {
-      "name": "Brock Player 15",
-      "team": "brock"
-    },
-    "brock16": {
-      "name": "Brock Player 16",
-      "team": "brock"
-    },
-    "jared1": {
-      "name": "Jared Player 1",
+      "rank": 7,
+      "pops": 12,
       "team": "jared"
     },
-    "jared2": {
-      "name": "Jared Player 2",
+    "veed": {
+      "name": "Veed",
+      "rank": 8,
+      "pops": 14,
       "team": "jared"
     },
-    "jared3": {
-      "name": "Jared Player 3",
+    "hunter": {
+      "name": "Hunter",
+      "rank": 9,
+      "pops": 16,
+      "team": "brock"
+    },
+    "colby": {
+      "name": "Colby",
+      "rank": 10,
+      "pops": 18,
+      "team": "brock"
+    },
+    "miles": {
+      "name": "Miles",
+      "rank": 11,
+      "pops": 20,
       "team": "jared"
     },
-    "jared4": {
-      "name": "Jared Player 4",
+    "lane": {
+      "name": "Lane",
+      "rank": 12,
+      "pops": 22,
       "team": "jared"
     },
-    "jared5": {
-      "name": "Jared Player 5",
+    "ross": {
+      "name": "Ross",
+      "rank": 13,
+      "pops": 24,
       "team": "jared"
     },
-    "jared6": {
-      "name": "Jared Player 6",
-      "team": "jared"
+    "alex": {
+      "name": "Alex",
+      "rank": 14,
+      "pops": 24,
+      "team": "brock"
     },
-    "jared7": {
-      "name": "Jared Player 7",
-      "team": "jared"
+    "dex": {
+      "name": "Dex",
+      "rank": 15,
+      "pops": 24,
+      "team": "brock"
     },
-    "jared8": {
-      "name": "Jared Player 8",
-      "team": "jared"
-    },
-    "jared9": {
-      "name": "Jared Player 9",
-      "team": "jared"
-    },
-    "jared10": {
-      "name": "Jared Player 10",
-      "team": "jared"
-    },
-    "jared11": {
-      "name": "Jared Player 11",
-      "team": "jared"
-    },
-    "jared12": {
-      "name": "Jared Player 12",
-      "team": "jared"
-    },
-    "jared13": {
-      "name": "Jared Player 13",
-      "team": "jared"
-    },
-    "jared14": {
-      "name": "Jared Player 14",
-      "team": "jared"
-    },
-    "jared15": {
-      "name": "Jared Player 15",
-      "team": "jared"
-    },
-    "jared16": {
-      "name": "Jared Player 16",
+    "jv": {
+      "name": "JV",
+      "rank": 16,
+      "pops": 24,
       "team": "jared"
     }
   },
   "matches": [
     {
-      "id": "1A",
-      "round": 1,
-      "course": "Front / Back",
+      "id": 1,
       "playerIds": [
-        "jared11",
-        "brock4"
+        "gavin",
+        "bel"
+      ],
+      "points": {
+        "front9": 1,
+        "back9": 0.5
+      },
+      "status": "not_started"
+    },
+    {
+      "id": 2,
+      "playerIds": [
+        "bruce",
+        "ak"
       ],
       "points": {
         "front9": null,
@@ -160,12 +123,10 @@
       "status": "not_started"
     },
     {
-      "id": "1B",
-      "round": 1,
-      "course": "Front / Back",
+      "id": 3,
       "playerIds": [
-        "brock12",
-        "jared3"
+        "alex",
+        "jv"
       ],
       "points": {
         "front9": null,
@@ -174,12 +135,10 @@
       "status": "not_started"
     },
     {
-      "id": "1C",
-      "round": 1,
-      "course": "Front / Back",
+      "id": 4,
       "playerIds": [
-        "brock7",
-        "jared14"
+        "tyler",
+        "veed"
       ],
       "points": {
         "front9": null,
@@ -188,12 +147,10 @@
       "status": "not_started"
     },
     {
-      "id": "1D",
-      "round": 1,
-      "course": "Front / Back",
+      "id": 5,
       "playerIds": [
-        "brock1",
-        "jared6"
+        "hunter",
+        "ross"
       ],
       "points": {
         "front9": null,
@@ -202,12 +159,10 @@
       "status": "not_started"
     },
     {
-      "id": "1E",
-      "round": 1,
-      "course": "Front / Back",
+      "id": 6,
       "playerIds": [
-        "brock9",
-        "jared1"
+        "colby",
+        "miles"
       ],
       "points": {
         "front9": null,
@@ -216,12 +171,10 @@
       "status": "not_started"
     },
     {
-      "id": "1F",
-      "round": 1,
-      "course": "Front / Back",
+      "id": 7,
       "playerIds": [
-        "brock15",
-        "jared8"
+        "dex",
+        "lane"
       ],
       "points": {
         "front9": null,
@@ -230,12 +183,10 @@
       "status": "not_started"
     },
     {
-      "id": "1G",
-      "round": 1,
-      "course": "Front / Back",
+      "id": 8,
       "playerIds": [
-        "brock3",
-        "jared16"
+        "brock",
+        "jared"
       ],
       "points": {
         "front9": null,
@@ -244,12 +195,10 @@
       "status": "not_started"
     },
     {
-      "id": "1H",
-      "round": 1,
-      "course": "Front / Back",
+      "id": 9,
       "playerIds": [
-        "brock6",
-        "jared10"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -258,12 +207,10 @@
       "status": "not_started"
     },
     {
-      "id": "1I",
-      "round": 1,
-      "course": "Front / Back",
+      "id": 10,
       "playerIds": [
-        "brock11",
-        "jared4"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -272,12 +219,10 @@
       "status": "not_started"
     },
     {
-      "id": "1J",
-      "round": 1,
-      "course": "Front / Back",
+      "id": 11,
       "playerIds": [
-        "brock14",
-        "jared12"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -286,12 +231,10 @@
       "status": "not_started"
     },
     {
-      "id": "1K",
-      "round": 1,
-      "course": "Front / Back",
+      "id": 12,
       "playerIds": [
-        "brock2",
-        "jared5"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -300,12 +243,10 @@
       "status": "not_started"
     },
     {
-      "id": "1L",
-      "round": 1,
-      "course": "Front / Back",
+      "id": 13,
       "playerIds": [
-        "brock10",
-        "jared9"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -314,12 +255,10 @@
       "status": "not_started"
     },
     {
-      "id": "1M",
-      "round": 1,
-      "course": "Front / Back",
+      "id": 14,
       "playerIds": [
-        "brock5",
-        "jared2"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -328,12 +267,10 @@
       "status": "not_started"
     },
     {
-      "id": "1N",
-      "round": 1,
-      "course": "Front / Back",
+      "id": 15,
       "playerIds": [
-        "brock16",
-        "jared7"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -342,26 +279,10 @@
       "status": "not_started"
     },
     {
-      "id": "1O",
-      "round": 1,
-      "course": "Front / Back",
+      "id": 16,
       "playerIds": [
-        "brock8",
-        "jared13"
-      ],
-      "points": {
-        "front9": null,
-        "back9": null
-      },
-      "status": "not_started"
-    },
-    {
-      "id": "1P",
-      "round": 1,
-      "course": "Front / Back",
-      "playerIds": [
-        "brock13",
-        "jared15"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -369,5 +290,10 @@
       },
       "status": "not_started"
     }
-  ]
+  ],
+  "meta": {
+    "lastUpdated": "2026-01-30T14:32:23.695Z",
+    "tournamentDate": "2026-08-29",
+    "venue": "Farm D' Allie Golf Club"
+  }
 }
