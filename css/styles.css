@@ -426,6 +426,10 @@ body {
   margin: 20px 0;
 }
 
+.notes-grid {
+  gap: var(--gap-card);
+}
+
 .info-item {
   background: var(--color-bg);
   padding: var(--gap-small);
