@@ -1554,7 +1554,6 @@ select:focus {
   .team-scores--sticky .score-label {
     font-size: 0.75em;
     letter-spacing: 0.5px;
-    top: 70px;
   }
   /* Info Grids */
   .info-grid {
