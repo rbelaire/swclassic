@@ -298,6 +298,32 @@ body {
   transition: all 0.3s ease;
 }
 
+/* Homepage hero spacing tightening */
+.homepage .hero {
+  padding: 56px 20px 42px;
+  margin-bottom: 36px;
+}
+
+.homepage .hero h1 {
+  margin-bottom: 10px;
+}
+
+.homepage .quick-stats {
+  gap: 28px;
+  margin-top: 28px;
+}
+
+.homepage .stat-box {
+  padding: 16px 28px;
+}
+
+.homepage .container {
+  padding-top: 28px;
+}
+
+.homepage .section-header {
+  margin: 36px 0 24px;
+}
 .stat-box:hover {
   border-color: var(--color-accent);
   transform: translateY(-5px);
