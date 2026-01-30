@@ -1,5 +1,5 @@
 /*************************
- * ENHANCED ADMIN INTERFACE
+ * IMPROVED ADMIN INTERFACE
  * The Classic 2026
  *************************/
 
@@ -38,7 +38,7 @@ fetch("./data.json")
 function render() {
   renderStats();
   renderTotals();
-  renderMatches();
+  renderFoursomes();
 }
 
 /*************************
@@ -116,111 +116,138 @@ function calculateTotals() {
 }
 
 /*************************
- * MATCHES
+ * FOURSOMES
  *************************/
-function renderMatches() {
-  const container = document.getElementById("matches");
+function renderFoursomes() {
+  const container = document.getElementById("foursomes");
   container.innerHTML = "";
 
-  data.matches.forEach((match, index) => {
-    const div = document.createElement("div");
-    div.className = "match";
-    div.id = `match-${index}`;
+  // Group matches into foursomes (2 matches per foursome)
+  const foursomes = [];
+  for (let i = 0; i < data.matches.length; i += 2) {
+    foursomes.push(data.matches.slice(i, i + 2));
+  }
 
-    // Determine status
-    const front = match.points.front9;
-    const back = match.points.back9;
-    let status = "not-started";
-    let statusText = "Not Started";
+  foursomes.forEach((matches, foursomeIndex) => {
+    const foursomeDiv = document.createElement("div");
+    foursomeDiv.className = "foursome-container";
 
-    if (front !== null && back !== null) {
-      status = "complete";
-      statusText = "Complete";
-      div.classList.add("complete");
-    } else if (front !== null || back !== null) {
-      status = "in-progress";
-      statusText = "In Progress";
-    }
+    const title = document.createElement("div");
+    title.className = "foursome-title";
+    title.textContent = `Foursome ${foursomeIndex + 1}`;
+    foursomeDiv.appendChild(title);
 
-    // Check validity
-    const valid = isValidMatchup(match);
-    if (!valid) {
-      div.classList.add("invalid");
-    }
+    matches.forEach((match, localIndex) => {
+      const matchIndex = foursomeIndex * 2 + localIndex;
+      foursomeDiv.appendChild(buildMatch(match, matchIndex));
+    });
 
-    // Match Header (always visible)
-    const [p1, p2] = match.playerIds;
-    const p1Name = p1 ? data.players[p1].name : "TBD";
-    const p2Name = p2 ? data.players[p2].name : "TBD";
-
-    const header = `
-      <div class="match-header" onclick="toggleMatch(${index})">
-        <div class="match-title">Match ${match.id}</div>
-        <div class="match-status-badge ${status}">${statusText}</div>
-      </div>
-      <div class="match-preview" onclick="toggleMatch(${index})">
-        <div><strong>${p1Name}</strong> vs <strong>${p2Name}</strong></div>
-        <div>
-          F9: ${front === null ? "-" : front} | 
-          B9: ${back === null ? "-" : back}
-        </div>
-      </div>
-    `;
-
-    // Match Details (collapsible)
-    const details = `
-      <div class="match-details">
-        ${!valid ? '<div style="color: #c62828; font-weight: bold; margin-bottom: 15px;">⚠️ Invalid matchup: Players must be from different teams</div>' : ''}
-        
-        <div class="players-grid">
-          <div class="player-select-wrap">
-            <label>Player 1</label>
-            ${buildPlayerSelect(match, 0, index)}
-          </div>
-          <div class="player-select-wrap">
-            <label>Player 2</label>
-            ${buildPlayerSelect(match, 1, index)}
-          </div>
-        </div>
-
-        <div class="scores-grid">
-          <div class="score-wrap">
-            <label>Front 9 (Player 1)</label>
-            ${buildScoreSelect(match, "front9", index, valid)}
-          </div>
-          <div class="score-wrap">
-            <label>Back 9 (Player 1)</label>
-            ${buildScoreSelect(match, "back9", index, valid)}
-          </div>
-        </div>
-
-        <div class="match-actions">
-          <button class="match-btn" onclick="swapPlayers(${index})">
-            🔄 Swap Players
-          </button>
-          <button class="match-btn" onclick="clearMatch(${index})">
-            ❌ Clear Scores
-          </button>
-        </div>
-      </div>
-    `;
-
-    div.innerHTML = header + details;
-    container.appendChild(div);
+    container.appendChild(foursomeDiv);
   });
 }
 
 /*************************
- * PLAYER SELECT
+ * BUILD MATCH
  *************************/
-function buildPlayerSelect(match, index, matchIndex) {
-  const selectId = `player-${matchIndex}-${index}`;
-  let html = `<select id="${selectId}" onchange="updatePlayer(${matchIndex}, ${index}, this.value)">`;
+function buildMatch(match, matchIndex) {
+  const div = document.createElement("div");
+  div.className = "match";
+  div.id = `match-${matchIndex}`;
+
+  // Determine status
+  const front = match.points.front9;
+  const back = match.points.back9;
+  let status = "not-started";
+  let statusText = "Not Started";
+
+  if (front !== null && back !== null) {
+    status = "complete";
+    statusText = "Complete";
+    div.classList.add("complete");
+  } else if (front !== null || back !== null) {
+    status = "in-progress";
+    statusText = "In Progress";
+  }
+
+  // Check validity
+  const valid = isValidMatchup(match);
+  if (!valid && (match.playerIds[0] || match.playerIds[1])) {
+    div.classList.add("invalid");
+  }
+
+  // Match Header
+  const [p1, p2] = match.playerIds;
+  const p1Name = p1 ? data.players[p1].name : "Not Selected";
+  const p2Name = p2 ? data.players[p2].name : "Not Selected";
+
+  const header = `
+    <div class="match-header" onclick="toggleMatch(${matchIndex})">
+      <div class="match-title">Match ${match.id}</div>
+      <div class="match-status-badge ${status}">${statusText}</div>
+    </div>
+    <div class="match-preview" onclick="toggleMatch(${matchIndex})">
+      <div><strong>${p1Name}</strong> vs <strong>${p2Name}</strong></div>
+      <div>
+        F9: ${front === null ? "-" : front} | 
+        B9: ${back === null ? "-" : back}
+      </div>
+    </div>
+  `;
+
+  // Match Details
+  const details = `
+    <div class="match-details">
+      ${!valid && (p1 || p2) ? '<div class="error-message">⚠️ Invalid matchup: Both players are from the same team. Choose opponents from different teams.</div>' : ''}
+      
+      <div class="teams-row">
+        <div class="team-select-box team-brock">
+          <label>Team Brock Player</label>
+          ${buildTeamSelect(match, 0, matchIndex, 'brock')}
+        </div>
+        <div class="vs-text">VS</div>
+        <div class="team-select-box team-jared">
+          <label>Team Jared Player</label>
+          ${buildTeamSelect(match, 1, matchIndex, 'jared')}
+        </div>
+      </div>
+
+      <div class="scores-grid">
+        <div class="score-wrap">
+          <label>Front 9 (Team Brock Player Points)</label>
+          ${buildScoreSelect(match, "front9", matchIndex, valid)}
+        </div>
+        <div class="score-wrap">
+          <label>Back 9 (Team Brock Player Points)</label>
+          ${buildScoreSelect(match, "back9", matchIndex, valid)}
+        </div>
+      </div>
+
+      <div class="match-actions">
+        <button class="match-btn" onclick="clearMatch(${matchIndex})">
+          ❌ Clear Scores
+        </button>
+      </div>
+    </div>
+  `;
+
+  div.innerHTML = header + details;
+  return div;
+}
+
+/*************************
+ * TEAM SELECT
+ *************************/
+function buildTeamSelect(match, playerIndex, matchIndex, team) {
+  const selectId = `player-${matchIndex}-${playerIndex}`;
+  let html = `<select id="${selectId}" onchange="updatePlayer(${matchIndex}, ${playerIndex}, this.value)">`;
   html += '<option value="">-- Select Player --</option>';
 
+  // Filter players by team
   Object.entries(data.players).forEach(([id, p]) => {
-    const selected = match.playerIds[index] === id ? 'selected' : '';
-    html += `<option value="${id}" ${selected}>${p.name} (${p.team})</option>`;
+    if (p.team === team) {
+      const selected = match.playerIds[playerIndex] === id ? 'selected' : '';
+      html += `<option value="${id}" ${selected}>${p.name} (${p.pops} pops)</option>`;
+    }
   });
 
   html += '</select>';
@@ -258,23 +285,12 @@ function isValidMatchup(match) {
  *************************/
 function updatePlayer(matchIndex, playerIndex, playerId) {
   data.matches[matchIndex].playerIds[playerIndex] = playerId || null;
-  data.matches[matchIndex].points.front9 = null;
-  data.matches[matchIndex].points.back9 = null;
   markUnsaved();
   render();
 }
 
 function updateScore(matchIndex, key, value) {
   data.matches[matchIndex].points[key] = value === "" ? null : Number(value);
-  markUnsaved();
-  render();
-}
-
-function swapPlayers(matchIndex) {
-  const match = data.matches[matchIndex];
-  [match.playerIds[0], match.playerIds[1]] = [match.playerIds[1], match.playerIds[0]];
-  match.points.front9 = null;
-  match.points.back9 = null;
   markUnsaved();
   render();
 }
@@ -294,38 +310,6 @@ function clearMatch(matchIndex) {
 function toggleMatch(index) {
   const match = document.getElementById(`match-${index}`);
   match.classList.toggle("expanded");
-}
-
-/*************************
- * QUICK ACTIONS
- *************************/
-function markAllNotStarted() {
-  if (!confirm("Reset all scores to Not Started?")) return;
-  data.matches.forEach(m => {
-    m.points.front9 = null;
-    m.points.back9 = null;
-  });
-  markUnsaved();
-  render();
-}
-
-function markAllInProgress() {
-  if (!confirm("Mark all matches as In Progress (Front 9 only)?")) return;
-  data.matches.forEach(m => {
-    if (isValidMatchup(m)) {
-      m.points.front9 = m.points.front9 === null ? 0 : m.points.front9;
-    }
-  });
-  markUnsaved();
-  render();
-}
-
-function expandAll() {
-  document.querySelectorAll('.match').forEach(m => m.classList.add('expanded'));
-}
-
-function collapseAll() {
-  document.querySelectorAll('.match').forEach(m => m.classList.remove('expanded'));
 }
 
 /*************************
