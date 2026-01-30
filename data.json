@@ -16,13 +16,13 @@
       "name": "AK",
       "rank": 3,
       "pops": 4,
-      "team": "TBD"
+      "team": "brock"
     },
     "bruce": {
       "name": "Bruce",
       "rank": 4,
       "pops": 6,
-      "team": "brock"
+      "team": "jared"
     },
     "tyler": {
       "name": "Tyler",
@@ -34,7 +34,7 @@
       "name": "Brock",
       "rank": 6,
       "pops": 10,
-      "team": "jared"
+      "team": "TBD"
     },
     "jared": {
       "name": "Jared",
@@ -113,8 +113,8 @@
     {
       "id": 2,
       "playerIds": [
-        "bruce",
-        "brock"
+        "ak",
+        "bruce"
       ],
       "points": {
         "front9": null,
@@ -196,7 +196,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-01-30T15:14:37.632Z",
+    "lastUpdated": "2026-01-30T15:30:33.059Z",
     "tournamentDate": "2026-08-29",
     "venue": "Farm D' Allie Golf Club"
   },
