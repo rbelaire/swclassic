@@ -21,17 +21,55 @@ if (sessionStorage.getItem("adminAuth") !== "true") {
  * LOAD DATA
  *************************/
 let data;
+const DATA_CACHE_KEY = "classicAdminData";
 
-fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
-  .then(res => res.json())
-  .then(json => {
-    data = json;
+function getCachedData() {
+  try {
+    const cached = localStorage.getItem(DATA_CACHE_KEY);
+    return cached ? JSON.parse(cached) : null;
+  } catch (error) {
+    console.warn("Unable to read cached data.", error);
+    return null;
+  }
+}
+
+function saveCachedData(updatedData) {
+  try {
+    localStorage.setItem(DATA_CACHE_KEY, JSON.stringify(updatedData));
+  } catch (error) {
+    console.warn("Unable to cache data.", error);
+  }
+}
+
+function isNewerData(nextData, currentData) {
+  if (!currentData?.meta?.lastUpdated) return true;
+  if (!nextData?.meta?.lastUpdated) return false;
+  return Date.parse(nextData.meta.lastUpdated) >= Date.parse(currentData.meta.lastUpdated);
+}
+
+function loadData() {
+  const cached = getCachedData();
+  if (cached) {
+    data = cached;
     render();
-  })
-  .catch(err => {
-    alert("Error loading tournament data. Please refresh.");
-    console.error(err);
-  });
+  }
+
+  fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
+    .then(res => res.json())
+    .then(json => {
+      if (!data || isNewerData(json, data)) {
+        data = json;
+        render();
+        saveCachedData(json);
+      }
+    })
+    .catch(err => {
+      alert("Error loading tournament data. Please refresh.");
+      console.error(err);
+    });
+}
+
+loadData();
 
 /*************************
  * RENDER
@@ -399,6 +437,8 @@ function saveToGitHub() {
     .then(resp => {
       if (resp.content) {
         markSaved();
+        saveCachedData(data);
+        loadData();
         alert("✅ Scores saved successfully!\n\nThe leaderboard will update automatically within 30 seconds.");
         saveBtn.textContent = originalText;
         saveBtn.disabled = false;
