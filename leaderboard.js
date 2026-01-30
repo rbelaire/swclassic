@@ -91,6 +91,19 @@ function loadData() {
       setTimeout(loadData, 5000);
     });
 }
+window.addEventListener("storage", event => {
+  if (event.key !== DATA_CACHE_KEY || !event.newValue) return;
+  try {
+    const nextData = JSON.parse(event.newValue);
+    if (!data || isNewerData(nextData, data)) {
+      data = nextData;
+      render();
+      updateRefreshIndicator();
+    }
+  } catch (error) {
+    console.warn("Unable to read updated leaderboard data.", error);
+  }
+});
 
 /*************************
  * RENDER
