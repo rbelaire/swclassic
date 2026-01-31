@@ -2715,11 +2715,32 @@ RESULT:
         height: 2px;
     }
 
+    .event-header__countdown,
+    .event-header__course {
+        align-items: center;
+        text-align: center;
+        min-height: unset;
+        width: 100%;
+    }
+
+    .event-header__label {
+        text-align: center;
+    }
+
+    .event-header__course-name {
+        border-left: none;
+        border-top: 3px solid var(--masters-red);
+        padding-left: 0;
+        padding-top: 16px;
+    }
+
     .countdown {
         grid-auto-flow: row;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         row-gap: 16px;
-        justify-items: start;
+        justify-items: center;
+        justify-content: center;
+        width: 100%;
     }
 
     .countdown__divider {
