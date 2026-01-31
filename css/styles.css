@@ -2033,6 +2033,16 @@ select:focus {
   color: var(--masters-gold);
 }
 
+.player-card.captain .stat {
+  border: 2px solid var(--masters-gold);
+  background: #fffef7;
+}
+
+.player-card.captain .stat-label {
+  color: var(--masters-gold);
+  opacity: 0.8;
+}
+
 .badge {
   display: inline-block;
   padding: 5px 15px;
