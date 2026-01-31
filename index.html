@@ -42,7 +42,7 @@
 
 <section class="event-header" aria-labelledby="event-header-title">
     <div class="event-header__inner">
-        <div class="event-header__countdown">
+        <div class="event-header__countdown" aria-labelledby="event-header-title">
             <p class="event-header__label" id="event-header-title">Countdown</p>
             <div class="countdown" id="countdown" role="timer" aria-live="polite" aria-label="Countdown to event">
                 <div class="countdown__unit">
@@ -67,9 +67,9 @@
             </div>
         </div>
         <div class="event-header__divider" aria-hidden="true"></div>
-        <div class="event-header__course">
-            <p class="event-header__label">Course</p>
-            <p class="event-header__course-name">Farm D' Allie Golf Club</p>
+        <div class="event-header__course" aria-labelledby="event-header-course">
+            <p class="event-header__label" id="event-header-course">Course</p>
+            <h2 class="event-header__course-name">Farm D' Allie Golf Club</h2>
         </div>
     </div>
 </section>
