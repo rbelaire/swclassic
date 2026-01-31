@@ -543,8 +543,8 @@ body {
 /* Team Scores */
 .team-scores {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-  gap: var(--gap-card);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: clamp(16px, 3vw, 24px);
   margin-bottom: var(--gap-section);
 }
 
@@ -553,76 +553,93 @@ body {
   top: 75px;
   z-index: 900;
   background: var(--color-card);
-  padding: clamp(10px, 2vw, 12px);
-  border: 2px solid var(--masters-green);
+  padding: clamp(14px, 2.5vw, 20px);
+  border: 3px solid var(--masters-green);
   border-radius: var(--radius-lg);
-  box-shadow: 0 6px 18px rgba(0, 103, 71, 0.12);
+  box-shadow: 0 6px 20px rgba(0, 103, 71, 0.15);
 }
 
 .team-scores--sticky .team-card {
-  padding: clamp(12px, 2vw, 16px);
+  padding: clamp(16px, 3vw, 24px);
   border: none;
   box-shadow: none;
 }
 
 .team-scores--sticky .team-card h2 {
-  font-size: clamp(1.1em, 3.5vw, 1.6em);
-  margin-bottom: clamp(6px, 1.5vw, 8px);
+  font-size: clamp(1.2em, 3.8vw, 1.8em);
+  margin-bottom: clamp(8px, 1.8vw, 12px);
   letter-spacing: 2px;
+  font-weight: 700;
 }
 
 .team-scores--sticky .total-score {
-  font-size: clamp(1.8em, 5vw, 2.6em);
-  margin: clamp(4px, 1vw, 6px) 0;
+  font-size: clamp(2.2em, 6vw, 3.2em);
+  margin: clamp(8px, 1.5vw, 12px) 0;
+  font-weight: 800;
 }
 
 .team-scores--sticky .score-label {
-  font-size: clamp(0.75em, 2vw, 0.85em);
-  letter-spacing: 1px;
+  font-size: clamp(0.8em, 2.2vw, 0.95em);
+  letter-spacing: 1.5px;
+  opacity: 0.8;
+  font-weight: 600;
 }
 
 .team-card {
   text-align: center;
-  padding: clamp(25px, 4vw, 40px);
-  background: rgba(0, 103, 71, 0.04);
-  border: 1px solid rgba(0, 77, 53, 0.25);
-  box-shadow: none;
+  padding: clamp(20px, 4vw, 32px);
+  background: rgba(0, 103, 71, 0.03);
+  border: 2px solid rgba(0, 103, 71, 0.2);
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
 }
 
 .team-card.winning {
-  border-color: rgba(0, 77, 53, 0.45);
-  background: rgba(0, 103, 71, 0.08);
+  border: 3px solid var(--masters-gold);
+  background: linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(212,175,55,0.06) 100%);
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.25);
 }
 
 .team-card h2 {
-  font-size: clamp(1.4em, 4vw, 2.5em);
-  margin-bottom: clamp(15px, 3vw, 20px);
-  color: var(--masters-dark-green);
+  font-size: clamp(1.3em, 4.2vw, 2.2em);
+  margin-bottom: clamp(12px, 3vw, 18px);
+  color: var(--masters-green);
   text-transform: uppercase;
-  letter-spacing: 4px;
+  letter-spacing: 3px;
+  font-weight: 700;
 }
 
 .team-card.winning h2 {
-  color: var(--masters-green);
+  color: var(--masters-gold);
+  text-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);
 }
 
 /* MASTERS RED NUMBERS FOR WINNING TEAM */
 .total-score {
-  font-size: clamp(2.5em, 7vw, 5em);
-  font-weight: bold;
-  color: var(--masters-dark-green);
-  margin: clamp(15px, 3vw, 20px) 0;
+  font-size: clamp(2.8em, 8vw, 5.5em);
+  font-weight: 800;
+  color: var(--masters-green);
+  margin: clamp(12px, 3vw, 20px) 0;
+  line-height: 1;
 }
 
 .team-card.winning .total-score {
-  color: var(--masters-green);
+  color: var(--masters-red);
+  text-shadow: 0 3px 6px rgba(200, 16, 46, 0.25);
 }
 
 .score-label {
-  font-size: clamp(1em, 2.5vw, 1.2em);
-  opacity: 0.7;
+  font-size: clamp(0.9em, 2.5vw, 1.1em);
+  opacity: 0.75;
   text-transform: uppercase;
   letter-spacing: 2px;
+  color: var(--masters-green);
+  font-weight: 600;
+}
+
+.team-card.winning .score-label {
+  opacity: 0.85;
 }
 
 /* Matches Grid */
@@ -2258,11 +2275,38 @@ select:focus {
   }
 
   .team-scores {
-    gap: clamp(10px, 3vw, 12px);
+    grid-template-columns: 1fr;
+    gap: clamp(12px, 3vw, 16px);
   }
 
   .team-scores--sticky {
     top: 65px;
+    padding: clamp(12px, 2vw, 16px);
+  }
+
+  .team-scores--sticky .team-card {
+    padding: clamp(14px, 2.5vw, 20px);
+  }
+
+  .team-scores--sticky .total-score {
+    font-size: clamp(2.4em, 7vw, 3.5em);
+  }
+
+  .team-card {
+    padding: clamp(18px, 4vw, 28px);
+  }
+
+  .team-card h2 {
+    font-size: clamp(1.4em, 5vw, 2em);
+    margin-bottom: clamp(10px, 2.5vw, 14px);
+  }
+
+  .total-score {
+    font-size: clamp(3em, 9vw, 4.5em);
+  }
+
+  .team-card.winning {
+    transform: scale(1.01);
   }
 
   .modal-matchup {
