@@ -1951,27 +1951,27 @@ select:focus {
 }
 
 .player-card.elite::before {
-  background: var(--masters-gold);
+  background: var(--masters-green);
 }
 
 .player-card.captain {
-  border: 3px solid var(--masters-gold);
-  background: #fffef7;
+  border: 2px solid var(--masters-green);
+  background: var(--color-card);
 }
 
 .player-card.captain::before {
-  background: var(--masters-gold);
-  height: 6px;
+  background: var(--masters-green);
+  height: 5px;
 }
 
 .player-card.new-player {
-  border: 3px solid var(--masters-green);
-  background: var(--color-bg);
+  border: 2px solid var(--masters-green);
+  background: var(--color-card);
 }
 
 .player-card.new-player::before {
   background: var(--masters-green);
-  height: 6px;
+  height: 5px;
 }
 
 .rank-badge {
@@ -1992,12 +1992,14 @@ select:focus {
 }
 
 .player-card.elite .rank-badge {
-  background: var(--masters-gold);
-  color: var(--masters-green);
+  background: var(--masters-green);
+  color: var(--color-bg);
 }
 
 .player-card.captain .rank-badge {
-  background: var(--masters-gold);
+  background: var(--masters-green);
+  color: var(--color-bg);
+};
   color: var(--masters-green);
 }
 
@@ -2052,7 +2054,7 @@ select:focus {
 
 .player-card.captain .stat {
   border: 2px solid var(--masters-gold);
-  background: #fffef7;
+  background: var(--color-card);
 }
 
 .player-card.captain .stat-label {
@@ -2062,28 +2064,27 @@ select:focus {
 
 .badge {
   display: inline-block;
-  padding: 5px 15px;
-  border-radius: 6px;
-  font-size: clamp(0.8em, 2vw, 0.9em);
-  font-weight: bold;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: clamp(0.85em, 2vw, 1em);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   margin-top: 15px;
 }
 
 .badge.captain-badge {
   background: var(--masters-gold);
   color: var(--masters-green);
+  display: inline-block;
 }
 
 .badge.new-badge {
-  background: var(--masters-green);
-  color: var(--color-bg);
+  display: none;
 }
 
 .badge.elite-badge {
-  background: var(--masters-gold);
-  color: var(--masters-green);
+  display: none;
 }
 
 .draft-info {
