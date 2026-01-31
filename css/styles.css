@@ -2587,20 +2587,21 @@ RESULT:
 
 /* Event Header */
 .event-header {
-    background: var(--masters-black);
+    background: var(--color-card);
     border-radius: var(--radius-lg);
-    padding: clamp(28px, 4vw, 40px);
+    padding: clamp(24px, 4vw, 36px);
     border: 2px solid var(--masters-green);
     margin: 0 auto var(--gap-section);
-    max-width: 1120px;
-    width: min(100%, 1120px);
+    max-width: 1200px;
+    width: min(100%, 1200px);
+    box-shadow: var(--shadow-sm);
 }
 
 .event-header__inner {
     display: grid;
-    grid-template-columns: minmax(0, 1.6fr) auto minmax(0, 1fr);
-    align-items: stretch;
-    gap: clamp(24px, 5vw, 40px);
+    grid-template-columns: minmax(0, 1.8fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(28px, 5vw, 48px);
 }
 
 .event-header__countdown,
@@ -2608,43 +2609,45 @@ RESULT:
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 10px;
-    padding: clamp(10px, 2vw, 16px) 0;
+    gap: 12px;
+    padding: clamp(8px, 2vw, 12px) 0;
 }
 
 .event-header__divider {
     width: 2px;
-    height: 100%;
-    background: var(--masters-red);
-    opacity: 0.75;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--masters-green), transparent);
+    opacity: 0.4;
     align-self: center;
 }
 
 .event-header__label {
-    font-size: 0.72rem;
+    font-size: clamp(0.7rem, 1.6vw, 0.8rem);
     letter-spacing: 0.28em;
     text-transform: uppercase;
     font-weight: 700;
     color: var(--masters-green);
-    opacity: 0.6;
-    margin-bottom: 12px;
+    opacity: 0.7;
+    margin-bottom: 8px;
 }
 
 .event-header__course-name {
-    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-size: clamp(1.4rem, 3.2vw, 2rem);
     color: var(--masters-green);
     font-weight: 800;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    border-left: 3px solid var(--masters-red);
+    border-left: 4px solid var(--masters-gold);
     padding-left: 16px;
+    line-height: 1.2;
 }
 
 .countdown {
     display: grid;
     grid-auto-flow: column;
     align-items: center;
-    gap: clamp(12px, 2vw, 18px);
+    gap: clamp(10px, 2vw, 16px);
+    justify-content: flex-start;
 }
 
 .countdown__unit {
@@ -2655,37 +2658,39 @@ RESULT:
 }
 
 .countdown__number {
-    font-size: clamp(2.4rem, 5.2vw, 3.6rem);
+    font-size: clamp(2rem, 4.8vw, 3.2rem);
     font-weight: 800;
     color: var(--masters-green);
     letter-spacing: 0.04em;
+    line-height: 1;
 }
 
 .countdown__number--seconds {
     color: var(--masters-red);
-    border-bottom: 2px solid var(--masters-red);
+    border-bottom: 3px solid var(--masters-red);
     padding-bottom: 4px;
 }
 
 .countdown__label {
-    font-size: 0.75rem;
+    font-size: clamp(0.65rem, 1.4vw, 0.75rem);
     text-transform: uppercase;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.18em;
     color: var(--masters-green);
-    opacity: 0.55;
+    opacity: 0.6;
+    font-weight: 600;
 }
 
 .countdown__divider {
-    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
-    color: var(--masters-dark-green);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    color: var(--masters-green);
     font-weight: 700;
     line-height: 1;
-    opacity: 0.75;
+    opacity: 0.4;
 }
 
 .countdown__divider--accent {
     color: var(--masters-red);
-    opacity: 0.75;
+    opacity: 0.6;
 }
 
 .countdown__number--pulse {
@@ -2704,40 +2709,64 @@ RESULT:
     }
 }
 
+/* Tablet Responsive */
+@media (max-width: 900px) {
+    .event-header {
+        padding: clamp(20px, 3vw, 28px);
+    }
+
+    .event-header__inner {
+        gap: clamp(20px, 4vw, 32px);
+    }
+
+    .countdown {
+        gap: clamp(8px, 1.5vw, 12px);
+    }
+}
+
 /* Mobile Responsive */
-@media (max-width: 800px) {
+@media (max-width: 700px) {
+    .event-header {
+        padding: clamp(20px, 4vw, 24px);
+    }
+
     .event-header__inner {
         grid-template-columns: 1fr;
+        gap: 24px;
     }
 
     .event-header__divider {
         width: 100%;
         height: 2px;
+        background: linear-gradient(to right, transparent, var(--masters-green), transparent);
+        margin: 4px 0;
     }
 
     .event-header__countdown,
     .event-header__course {
         align-items: center;
         text-align: center;
-        min-height: unset;
-        width: 100%;
+        padding: 8px 0;
     }
 
     .event-header__label {
         text-align: center;
+        margin-bottom: 12px;
     }
 
     .event-header__course-name {
         border-left: none;
-        border-top: 3px solid var(--masters-red);
+        border-top: 4px solid var(--masters-gold);
         padding-left: 0;
-        padding-top: 16px;
+        padding-top: 12px;
+        text-align: center;
     }
 
     .countdown {
         grid-auto-flow: row;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        row-gap: 16px;
+        grid-template-columns: repeat(2, 1fr);
+        row-gap: 20px;
+        column-gap: 16px;
         justify-items: center;
         justify-content: center;
         width: 100%;
@@ -2746,15 +2775,28 @@ RESULT:
     .countdown__divider {
         display: none;
     }
+
+    .countdown__unit {
+        width: 100%;
+        max-width: 140px;
+    }
 }
 
+/* Extra Small Mobile */
 @media (max-width: 480px) {
     .event-header {
-        padding: 22px;
+        padding: 18px;
+        margin-bottom: clamp(24px, 6vw, 32px);
+    }
+
+    .event-header__inner {
+        gap: 20px;
     }
 
     .countdown {
         grid-template-columns: 1fr 1fr;
+        row-gap: 16px;
+        column-gap: 12px;
     }
 
     .countdown__number {
