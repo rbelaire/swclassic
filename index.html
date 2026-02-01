@@ -72,7 +72,408 @@
             <h2 class="event-header__course-name">Farm D' Allie Golf Club</h2>
         </div>
     </div>
+<!-- ========================================
+     WEATHER WIDGET - PASTE THIS INTO index.html
+     (After countdown section, before container)
+     ======================================== -->
 
+<style>
+/* Weather Widget Styles */
+.weather-card {
+    background: linear-gradient(135deg, #004d35 0%, #006747 100%);
+    border-radius: 14px;
+    padding: clamp(24px, 4vw, 32px);
+    border: 3px solid #d4af37;
+    box-shadow: 0 12px 28px rgba(0, 103, 71, 0.25);
+    max-width: 520px;
+    margin: 30px auto;
+    color: #f5f3e8;
+    font-family: 'Copperplate', Georgia, serif;
+    animation: weatherFadeIn 0.6s ease-out;
+}
+
+@keyframes weatherFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.weather-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.weather-title {
+    font-size: clamp(1.3em, 3.2vw, 1.6em);
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #d4af37;
+    text-transform: uppercase;
+}
+
+.weather-time {
+    font-size: 0.8em;
+    opacity: 0.75;
+    font-style: italic;
+    color: #f5f3e8;
+}
+
+.weather-primary {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 28px;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.weather-icon {
+    font-size: 5em;
+    line-height: 1;
+    text-align: center;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.weather-temp-main {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.temp-display {
+    font-size: clamp(3.5em, 9vw, 5em);
+    font-weight: 800;
+    line-height: 0.9;
+    color: #f5f3e8;
+    letter-spacing: -2px;
+}
+
+.temp-desc {
+    font-size: clamp(1.1em, 2.8vw, 1.4em);
+    text-transform: capitalize;
+    opacity: 0.95;
+    font-weight: 600;
+    color: #f5f3e8;
+}
+
+.temp-feels {
+    font-size: 0.95em;
+    opacity: 0.75;
+    margin-top: 4px;
+    color: #d4af37;
+}
+
+.weather-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 24px 0;
+    padding: 20px 0;
+    border-top: 1px solid rgba(212, 175, 55, 0.25);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    background: rgba(0, 0, 0, 0.35);
+    border-color: rgba(212, 175, 55, 0.4);
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    font-size: 1.8em;
+    line-height: 1;
+}
+
+.stat-value {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: #d4af37;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.75;
+    font-weight: 600;
+}
+
+.conditions-indicator {
+    text-align: center;
+    padding: 14px 24px;
+    border-radius: 25px;
+    font-size: clamp(0.9em, 2.2vw, 1.05em);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 20px;
+    border: 2px solid;
+}
+
+.conditions-indicator.ideal {
+    background: rgba(76, 175, 80, 0.2);
+    border-color: #4caf50;
+    color: #4caf50;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.conditions-indicator.good {
+    background: rgba(255, 193, 7, 0.2);
+    border-color: #ffc107;
+    color: #ffc107;
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+.conditions-indicator.fair {
+    background: rgba(255, 152, 0, 0.2);
+    border-color: #ff9800;
+    color: #ff9800;
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.conditions-indicator.poor {
+    background: rgba(244, 67, 54, 0.2);
+    border-color: #f44336;
+    color: #f44336;
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+
+.weather-error {
+    text-align: center;
+    padding: 48px 24px;
+    color: #f5f3e8;
+}
+
+.error-icon {
+    font-size: 3em;
+    margin-bottom: 16px;
+}
+
+.error-text {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+#weatherWidget:empty::before {
+    content: '⛳ Loading conditions...';
+    display: block;
+    text-align: center;
+    padding: 48px 24px;
+    font-size: 1.2em;
+    color: #f5f3e8;
+    opacity: 0.7;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+}
+
+@media (max-width: 650px) {
+    .weather-card {
+        padding: clamp(20px, 5vw, 24px);
+        margin: 20px 16px;
+    }
+    .weather-primary {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 20px;
+    }
+    .weather-temp-main {
+        align-items: center;
+    }
+    .weather-stats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+    .stat-item {
+        padding: 10px;
+    }
+    .stat-icon {
+        font-size: 1.5em;
+    }
+    .stat-value {
+        font-size: 1.2em;
+    }
+}
+
+@media (max-width: 400px) {
+    .weather-stats {
+        grid-template-columns: 1fr;
+    }
+    .stat-item {
+        flex-direction: row;
+        justify-content: center;
+        gap: 12px;
+    }
+}
+</style>
+
+<div id="weatherWidget"></div>
+
+<script>
+(function() {
+    'use strict';
+
+    const CONFIG = {
+        apiKey: '0738abc13b25a77a98a176a225b1a9b7',
+        location: 'Carencro,LA,US',
+        units: 'imperial',
+        updateInterval: 600000
+    };
+
+    const ICONS = {
+        '01d': '☀️', '01n': '🌙', '02d': '⛅', '02n': '☁️',
+        '03d': '☁️', '03n': '☁️', '04d': '☁️', '04n': '☁️',
+        '09d': '🌧️', '09n': '🌧️', '10d': '🌦️', '10n': '🌧️',
+        '11d': '⛈️', '11n': '⛈️', '13d': '🌨️', '13n': '🌨️',
+        '50d': '🌫️', '50n': '🌫️'
+    };
+
+    class WeatherWidget {
+        constructor(elementId) {
+            this.element = document.getElementById(elementId);
+            if (!this.element) return;
+            this.init();
+        }
+
+        async init() {
+            try {
+                await this.loadWeatherData();
+                this.startAutoRefresh();
+            } catch (error) {
+                this.showError(error.message);
+            }
+        }
+
+        async loadWeatherData() {
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${CONFIG.location}&units=${CONFIG.units}&appid=${CONFIG.apiKey}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Weather service unavailable');
+            const data = await response.json();
+            this.render(data);
+        }
+
+        render(data) {
+            const weather = this.parseWeatherData(data);
+            const conditions = this.assessConditions(weather);
+            
+            this.element.innerHTML = `
+                <div class="weather-card">
+                    <div class="weather-header-row">
+                        <div class="weather-title">Course Conditions</div>
+                        <div class="weather-time">${weather.updateTime}</div>
+                    </div>
+                    <div class="weather-primary">
+                        <div class="weather-icon">${weather.icon}</div>
+                        <div class="weather-temp-main">
+                            <div class="temp-display">${weather.temp}°F</div>
+                            <div class="temp-desc">${weather.description}</div>
+                            <div class="temp-feels">Feels ${weather.feelsLike}°</div>
+                        </div>
+                    </div>
+                    <div class="weather-stats">
+                        <div class="stat-item">
+                            <span class="stat-icon">💨</span>
+                            <span class="stat-value">${weather.wind} mph</span>
+                            <span class="stat-label">Wind</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">💧</span>
+                            <span class="stat-value">${weather.humidity}%</span>
+                            <span class="stat-label">Humidity</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">👁️</span>
+                            <span class="stat-value">${weather.visibility} mi</span>
+                            <span class="stat-label">Visibility</span>
+                        </div>
+                    </div>
+                    <div class="conditions-indicator ${conditions.level}">
+                        ${conditions.icon} ${conditions.text}
+                    </div>
+                </div>
+            `;
+        }
+
+        parseWeatherData(data) {
+            return {
+                temp: Math.round(data.main.temp),
+                feelsLike: Math.round(data.main.feels_like),
+                description: data.weather[0].description,
+                humidity: data.main.humidity,
+                wind: Math.round(data.wind.speed),
+                visibility: Math.round(data.visibility / 1609.34),
+                icon: ICONS[data.weather[0].icon] || '🌤️',
+                condition: data.weather[0].main,
+                updateTime: new Date().toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                })
+            };
+        }
+
+        assessConditions(weather) {
+            let score = 0;
+            if (weather.temp >= 60 && weather.temp <= 80) score += 3;
+            else if (weather.temp >= 50 && weather.temp < 90) score += 2;
+            else if (weather.temp >= 40 && weather.temp < 95) score += 1;
+            
+            if (weather.wind <= 10) score += 3;
+            else if (weather.wind <= 15) score += 2;
+            else if (weather.wind <= 20) score += 1;
+            
+            if (['Clear', 'Clouds'].includes(weather.condition)) score += 2;
+            else if (weather.condition === 'Drizzle') score += 1;
+            
+            if (weather.humidity >= 40 && weather.humidity <= 60) score += 2;
+            else if (weather.humidity >= 30 && weather.humidity <= 70) score += 1;
+            
+            if (score >= 9) return { level: 'ideal', icon: '⛳', text: 'Ideal Conditions' };
+            if (score >= 6) return { level: 'good', icon: '✓', text: 'Good Conditions' };
+            if (score >= 4) return { level: 'fair', icon: '⚠️', text: 'Challenging' };
+            return { level: 'poor', icon: '🌪️', text: 'Difficult' };
+        }
+
+        showError(message) {
+            this.element.innerHTML = `
+                <div class="weather-error">
+                    <div class="error-icon">⚠️</div>
+                    <div class="error-text">Weather temporarily unavailable</div>
+                </div>
+            `;
+        }
+
+        startAutoRefresh() {
+            setInterval(() => this.loadWeatherData(), CONFIG.updateInterval);
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => new WeatherWidget('weatherWidget'));
+    } else {
+        new WeatherWidget('weatherWidget');
+    }
+})();
+</script>
 <div class="container">
     <div class="section-header">
         <h2>How The Event Works</h2>
