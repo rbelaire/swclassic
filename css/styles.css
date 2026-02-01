@@ -362,11 +362,22 @@ body {
 .highlight-box {
   background: var(--color-bg);
   color: var(--masters-black);
-  padding: clamp(15px, 3vw, 20px);
+  padding: clamp(12px, 2.5vw, 16px);
   border-radius: var(--radius-md);
-  margin: 15px 0;
+  margin: 10px 0;
   font-weight: 500;
   border: 2px solid var(--masters-green);
+  line-height: 1.5;
+}
+
+.highlight-box ul {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.highlight-box li {
+  margin-bottom: 6px;
+  line-height: 1.4;
 }
 
 .tip-box {
@@ -1901,14 +1912,14 @@ select:focus {
 .rankings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-  gap: clamp(20px, 4vw, 25px);
+  gap: clamp(16px, 3.5vw, 20px);
   margin: var(--gap-section) 0;
 }
 
 .player-card {
   background: var(--color-card);
   border-radius: var(--radius-lg);
-  padding: clamp(20px, 4vw, 30px);
+  padding: clamp(16px, 3vw, 24px);
   border: 2px solid var(--masters-green);
   transition: all 0.4s ease;
   position: relative;
@@ -2643,8 +2654,8 @@ RESULT:
 /* Event Header */
 .event-header {
     background: var(--color-card);
-    border-radius: var(--radius-lg);
-    padding: clamp(24px, 4vw, 36px);
+    border-radius: var(--radius-md);
+    padding: clamp(16px, 3vw, 20px);
     border: 2px solid var(--masters-green);
     margin: 0 auto var(--gap-section);
     max-width: 1200px;
@@ -2654,9 +2665,9 @@ RESULT:
 
 .event-header__inner {
     display: grid;
-    grid-template-columns: minmax(0, 1.8fr) auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.5fr) auto minmax(0, 1fr);
     align-items: center;
-    gap: clamp(28px, 5vw, 48px);
+    gap: clamp(20px, 4vw, 32px);
 }
 
 .event-header__countdown,
@@ -2664,44 +2675,44 @@ RESULT:
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 12px;
-    padding: clamp(8px, 2vw, 12px) 0;
+    gap: 6px;
+    padding: clamp(4px, 1vw, 8px) 0;
 }
 
 .event-header__divider {
     width: 2px;
-    height: 80px;
+    height: 50px;
     background: linear-gradient(to bottom, transparent, var(--masters-green), transparent);
     opacity: 0.4;
     align-self: center;
 }
 
 .event-header__label {
-    font-size: clamp(0.7rem, 1.6vw, 0.8rem);
-    letter-spacing: 0.28em;
+    font-size: clamp(0.65rem, 1.4vw, 0.75rem);
+    letter-spacing: 0.25em;
     text-transform: uppercase;
     font-weight: 700;
     color: var(--masters-green);
     opacity: 0.7;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .event-header__course-name {
-    font-size: clamp(1.4rem, 3.2vw, 2rem);
+    font-size: clamp(1.1rem, 2.6vw, 1.5rem);
     color: var(--masters-green);
     font-weight: 800;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    border-left: 4px solid var(--masters-gold);
-    padding-left: 16px;
-    line-height: 1.2;
+    border-left: 3px solid var(--masters-gold);
+    padding-left: 12px;
+    line-height: 1.1;
 }
 
 .countdown {
     display: grid;
     grid-auto-flow: column;
     align-items: center;
-    gap: clamp(10px, 2vw, 16px);
+    gap: clamp(8px, 1.5vw, 12px);
     justify-content: flex-start;
 }
 
@@ -2709,11 +2720,11 @@ RESULT:
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 3px;
 }
 
 .countdown__number {
-    font-size: clamp(2rem, 4.8vw, 3.2rem);
+    font-size: clamp(1.5rem, 3.5vw, 2.2rem);
     font-weight: 800;
     color: var(--masters-green);
     letter-spacing: 0.04em;
@@ -2722,21 +2733,21 @@ RESULT:
 
 .countdown__number--seconds {
     color: var(--masters-red);
-    border-bottom: 3px solid var(--masters-red);
-    padding-bottom: 4px;
+    border-bottom: 2px solid var(--masters-red);
+    padding-bottom: 2px;
 }
 
 .countdown__label {
-    font-size: clamp(0.65rem, 1.4vw, 0.75rem);
+    font-size: clamp(0.6rem, 1.2vw, 0.7rem);
     text-transform: uppercase;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.15em;
     color: var(--masters-green);
     opacity: 0.6;
     font-weight: 600;
 }
 
 .countdown__divider {
-    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
     color: var(--masters-green);
     font-weight: 700;
     line-height: 1;
@@ -2767,61 +2778,62 @@ RESULT:
 /* Tablet Responsive */
 @media (max-width: 900px) {
     .event-header {
-        padding: clamp(20px, 3vw, 28px);
+        padding: clamp(14px, 2.5vw, 18px);
     }
 
     .event-header__inner {
-        gap: clamp(20px, 4vw, 32px);
+        gap: clamp(16px, 3vw, 24px);
     }
 
     .countdown {
-        gap: clamp(8px, 1.5vw, 12px);
+        gap: clamp(6px, 1.2vw, 10px);
     }
 }
 
 /* Mobile Responsive */
 @media (max-width: 700px) {
     .event-header {
-        padding: clamp(20px, 4vw, 24px);
+        padding: clamp(14px, 3vw, 18px);
     }
 
     .event-header__inner {
         grid-template-columns: 1fr;
-        gap: 24px;
+        gap: 16px;
     }
 
     .event-header__divider {
         width: 100%;
-        height: 2px;
+        height: 1px;
         background: linear-gradient(to right, transparent, var(--masters-green), transparent);
-        margin: 4px 0;
+        margin: 0;
     }
 
     .event-header__countdown,
     .event-header__course {
         align-items: center;
         text-align: center;
-        padding: 8px 0;
+        padding: 6px 0;
     }
 
     .event-header__label {
         text-align: center;
-        margin-bottom: 12px;
+        margin-bottom: 8px;
     }
 
     .event-header__course-name {
         border-left: none;
-        border-top: 4px solid var(--masters-gold);
+        border-top: 3px solid var(--masters-gold);
         padding-left: 0;
-        padding-top: 12px;
+        padding-top: 8px;
         text-align: center;
+        font-size: clamp(1rem, 2.4vw, 1.3rem);
     }
 
     .countdown {
         grid-auto-flow: row;
         grid-template-columns: repeat(2, 1fr);
-        row-gap: 20px;
-        column-gap: 16px;
+        row-gap: 12px;
+        column-gap: 12px;
         justify-items: center;
         justify-content: center;
         width: 100%;
@@ -2833,19 +2845,19 @@ RESULT:
 
     .countdown__unit {
         width: 100%;
-        max-width: 140px;
+        max-width: 120px;
     }
 }
 
 /* Extra Small Mobile */
 @media (max-width: 480px) {
     .event-header {
-        padding: 18px;
-        margin-bottom: clamp(24px, 6vw, 32px);
+        padding: 12px;
+        margin-bottom: clamp(20px, 5vw, 28px);
     }
 
     .event-header__inner {
-        gap: 20px;
+        gap: 14px;
     }
 
     .countdown {
@@ -3016,187 +3028,5 @@ RESULT:
 
     .captain-stat {
         min-width: clamp(65px, 20vw, 80px);
-    }
-}
-/* =====================================================
-   WEATHER WIDGET
-   ===================================================== */
-.weather-widget {
-    background: linear-gradient(135deg, #004d35 0%, #006747 100%);
-    border-radius: 14px;
-    padding: clamp(20px, 4vw, 28px);
-    border: 2px solid #d4af37;
-    box-shadow: 0 8px 20px rgba(0, 103, 71, 0.2);
-    max-width: 500px;
-    margin: 20px auto;
-    color: #f5f3e8;
-    font-family: 'Copperplate', 'Copperplate Gothic', Georgia, serif;
-}
-
-.weather-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid rgba(212, 175, 55, 0.3);
-}
-
-.weather-location {
-    font-size: clamp(1.2em, 3vw, 1.5em);
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: #d4af37;
-}
-
-.weather-update-time {
-    font-size: 0.75em;
-    opacity: 0.7;
-    font-style: italic;
-}
-
-.weather-main {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 25px;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.weather-icon-large {
-    font-size: 4em;
-    text-align: center;
-}
-
-.weather-temp-section {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.weather-temp {
-    font-size: clamp(3em, 8vw, 4.5em);
-    font-weight: 800;
-    line-height: 1;
-    color: #f5f3e8;
-}
-
-.weather-description {
-    font-size: clamp(1em, 2.5vw, 1.2em);
-    text-transform: capitalize;
-    opacity: 0.9;
-    font-weight: 600;
-}
-
-.weather-feels-like {
-    font-size: 0.9em;
-    opacity: 0.7;
-    margin-top: 5px;
-}
-
-.weather-details {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(212, 175, 55, 0.2);
-}
-
-.weather-detail-item {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    text-align: center;
-    padding: 12px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-    border: 1px solid rgba(212, 175, 55, 0.2);
-}
-
-.weather-detail-label {
-    font-size: 0.75em;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    opacity: 0.7;
-    font-weight: 600;
-}
-
-.weather-detail-value {
-    font-size: 1.3em;
-    font-weight: 700;
-    color: #d4af37;
-}
-
-.weather-conditions-badge {
-    display: inline-block;
-    padding: 8px 16px;
-    background: rgba(212, 175, 55, 0.2);
-    border: 1px solid #d4af37;
-    border-radius: 20px;
-    font-size: 0.85em;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 15px;
-}
-
-.conditions-ideal { 
-    background: rgba(76, 175, 80, 0.2); 
-    border-color: #4caf50; 
-    color: #4caf50; 
-}
-
-.conditions-good { 
-    background: rgba(255, 193, 7, 0.2); 
-    border-color: #ffc107; 
-    color: #ffc107; 
-}
-
-.conditions-challenging { 
-    background: rgba(255, 152, 0, 0.2); 
-    border-color: #ff9800; 
-    color: #ff9800; 
-}
-
-.conditions-difficult { 
-    background: rgba(244, 67, 54, 0.2); 
-    border-color: #f44336; 
-    color: #f44336; 
-}
-
-.weather-loading {
-    text-align: center;
-    padding: 40px;
-    font-size: 1.2em;
-    opacity: 0.7;
-}
-
-.weather-error {
-    text-align: center;
-    padding: 40px;
-    color: #ff9800;
-    font-size: 1em;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.weather-widget.loaded {
-    animation: fadeIn 0.5s ease-out;
-}
-
-/* Mobile responsive */
-@media (max-width: 600px) {
-    .weather-main {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 15px;
-    }
-
-    .weather-details {
-        grid-template-columns: repeat(2, 1fr);
     }
 }
