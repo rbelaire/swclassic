@@ -2933,7 +2933,7 @@ RESULT:
 }
 
 .captain-badge {
-    font-size: 2.6em; /* reduce badge size slightly */
+    font-size: 1.5em; /* reduce badge size slightly */
     margin-bottom: 10px; /* tighten spacing below badge */
     filter: drop-shadow(0 4px 8px rgba(0, 103, 71, 0.2));
 }
