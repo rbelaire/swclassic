@@ -283,6 +283,8 @@
 </head>
 <body>
 
+<div class="data-status" id="data-status" role="status" aria-live="polite"></div>
+
 <div id="totals">
     <h2>TEAM TOTALS</h2>
     <div class="team-totals">
@@ -330,6 +332,41 @@ const foursomes = [
         ]
     }
 ];
+
+let hasUnsavedChanges = false;
+let lastUpdatedTimestamp = null;
+
+function updateDataStatus() {
+    const status = document.getElementById('data-status');
+    if (!status) return;
+
+    if (hasUnsavedChanges) {
+        status.textContent = 'Local changes not saved';
+        status.classList.add('data-status--warning');
+        return;
+    }
+
+    status.classList.remove('data-status--warning');
+    if (lastUpdatedTimestamp) {
+        const timestamp = new Date(lastUpdatedTimestamp).toLocaleString();
+        status.textContent = `Live from GitHub — Last saved at ${timestamp}`;
+    } else {
+        status.textContent = 'Live from GitHub — Last saved time unavailable';
+    }
+}
+
+function loadMeta() {
+    fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
+        .then(res => res.json())
+        .then(json => {
+            lastUpdatedTimestamp = json?.meta?.lastUpdated || null;
+            updateDataStatus();
+        })
+        .catch(err => {
+            console.warn('Unable to load last updated timestamp.', err);
+            updateDataStatus();
+        });
+}
 
 function calculateFoursomeStatus(foursome) {
     const match1 = foursome.matches[0];
@@ -479,6 +516,8 @@ function renderFoursomes() {
 
 function updateScore(fIndex, mIndex, nine, winner) {
     foursomes[fIndex].matches[mIndex][nine] = winner || null;
+    hasUnsavedChanges = true;
+    updateDataStatus();
     saveData();
     renderFoursomes();
 }
@@ -486,6 +525,8 @@ function updateScore(fIndex, mIndex, nine, winner) {
 function clearMatch(fIndex, mIndex) {
     foursomes[fIndex].matches[mIndex].f9 = null;
     foursomes[fIndex].matches[mIndex].b9 = null;
+    hasUnsavedChanges = true;
+    updateDataStatus();
     saveData();
     renderFoursomes();
 }
@@ -534,6 +575,7 @@ function updateTotals() {
 
 function saveData() {
     localStorage.setItem('tournamentData', JSON.stringify(foursomes));
+    updateDataStatus();
 }
 
 function loadData() {
@@ -547,11 +589,15 @@ function loadData() {
             });
         });
     }
+    hasUnsavedChanges = false;
+    updateDataStatus();
 }
 
 // Initialize
 loadData();
 renderFoursomes();
+loadMeta();
+setInterval(loadMeta, 30000);
 </script>
 
 </body>
