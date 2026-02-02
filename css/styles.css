@@ -938,6 +938,30 @@ body {
   font-size: clamp(0.9em, 2vw, 1em);
 }
 
+/* Data Status Indicator */
+.data-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 14px;
+  margin: 0 auto var(--gap-section);
+  width: fit-content;
+  background: rgba(0, 103, 71, 0.06);
+  border: 1px solid rgba(0, 77, 53, 0.25);
+  border-radius: 999px;
+  font-size: 0.85em;
+  color: var(--masters-dark-green);
+  letter-spacing: 0.2px;
+  text-align: center;
+}
+
+.data-status--warning {
+  background: rgba(245, 124, 0, 0.12);
+  border-color: rgba(245, 124, 0, 0.35);
+  color: #b45f06;
+}
+
 /* ======================
    AUTO-REFRESH CONTROLS
    ====================== */
