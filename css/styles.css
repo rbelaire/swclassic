@@ -220,6 +220,61 @@ body {
 }
 
 /* =====================
+   TODAY'S RULES STRIP
+   ===================== */
+.rules-strip {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: clamp(10px, 2vw, 16px);
+  padding: clamp(10px, 2vw, 14px) clamp(12px, 3vw, 18px);
+  margin-bottom: clamp(18px, 3vw, 26px);
+  background: var(--color-card);
+  border: 1px solid var(--masters-gold);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.rules-strip__title {
+  font-size: clamp(0.85em, 2.4vw, 1em);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--masters-green);
+  flex: 0 0 auto;
+}
+
+.rules-strip__list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(6px, 2vw, 12px);
+  margin: 0;
+  padding: 0;
+  font-size: clamp(0.9em, 2.8vw, 1.05em);
+  font-weight: 600;
+  color: var(--masters-black);
+}
+
+.rules-strip__list li {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--color-bg);
+  border: 1px solid var(--masters-green);
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .rules-strip {
+    align-items: flex-start;
+  }
+
+  .rules-strip__list li {
+    white-space: normal;
+  }
+}
+
+/* =====================
    SECTION HEADERS
    ===================== */
 .section-header {
@@ -1863,37 +1918,6 @@ button:active {
 }
 
 
-.players {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.scores {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.score.disabled {
-  opacity: 0.5;
-}
-
-.actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.actions button {
-  flex: 1;
-  min-width: clamp(120px, 30%, 160px);
-  padding: 10px 14px;
-  font-size: clamp(0.9em, 2vw, 1em);
-}
 
 select {
   padding: clamp(8px, 2vw, 10px);

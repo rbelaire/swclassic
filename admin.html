@@ -1,604 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Score Entry</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <style>
-        body {
-            padding: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .foursome {
-            background: white;
-            border: 3px solid var(--masters-green);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 30px;
-        }
-
-        .foursome-header {
-            text-align: center;
-            font-size: 1.8em;
-            font-weight: bold;
-            color: var(--masters-green);
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        /* FOURSOME STATUS - Single status for entire foursome */
-        .foursome-status {
-            text-align: center;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            font-size: 1.1em;
-            letter-spacing: 1px;
-        }
-
-        .foursome-status.not-started {
-            background: #f5f5f5;
-            color: #666;
-            border: 2px solid #ddd;
-        }
-
-        .foursome-status.front-complete {
-            background: #fff8e1;
-            color: #f57c00;
-            border: 2px solid #ffa726;
-        }
-
-        .foursome-status.in-progress {
-            background: #fff3e0;
-            color: #ff6f00;
-            border: 2px solid #ff9800;
-        }
-
-        .foursome-status.complete {
-            background: #e8f5e9;
-            color: #2e7d32;
-            border: 2px solid #4caf50;
-        }
-
-        /* Foursome Score Tally */
-        .foursome-score-tally {
-            text-align: center;
-            font-size: 1.3em;
-            font-weight: 700;
-            color: var(--masters-green);
-            margin-bottom: 25px;
-            padding: 15px;
-            background: var(--color-bg);
-            border-radius: 8px;
-            border: 2px solid var(--masters-green);
-        }
-
-        .foursome-score-tally span {
-            margin: 0 15px;
-            font-size: 1.1em;
-        }
-
-        .match {
-            background: var(--color-bg);
-            border: 2px solid var(--masters-green);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .match-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .match-title {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: var(--masters-green);
-        }
-
-        .players {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 20px;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .player-select {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            border: 2px solid var(--masters-green);
-        }
-
-        .player-label {
-            font-size: 0.9em;
-            font-weight: 600;
-            color: var(--masters-green);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        select {
-            width: 100%;
-            padding: 10px;
-            font-size: 1.1em;
-            border: 2px solid var(--masters-green);
-            border-radius: 6px;
-            background: white;
-            font-family: 'Copperplate', Georgia, serif;
-        }
-
-        .vs {
-            font-size: 2em;
-            font-weight: bold;
-            color: var(--masters-green);
-            text-align: center;
-        }
-
-        .scores {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .score-box {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            border: 2px solid var(--masters-green);
-        }
-
-        .score-label {
-            font-size: 0.9em;
-            font-weight: 600;
-            color: var(--masters-green);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-        }
-
-        button {
-            padding: 12px 24px;
-            font-size: 1em;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-family: 'Copperplate', Georgia, serif;
-            letter-spacing: 1px;
-        }
-
-        .btn-clear {
-            background: #f44336;
-            color: white;
-        }
-
-        .btn-clear:hover {
-            background: #d32f2f;
-            transform: translateY(-2px);
-        }
-
-        #totals {
-            position: sticky;
-            top: 20px;
-            background: white;
-            border: 3px solid var(--masters-green);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 30px;
-            text-align: center;
-            font-size: 1.2em;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            z-index: 100;
-        }
-
-        #totals h2 {
-            color: var(--masters-green);
-            font-size: 2em;
-            margin-bottom: 20px;
-            letter-spacing: 3px;
-        }
-
-        .team-totals {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-top: 20px;
-        }
-
-        .team-total {
-            padding: 20px;
-            border-radius: 10px;
-            border: 3px solid var(--masters-green);
-        }
-
-        .team-total.leading {
-            background: linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(212,175,55,0.08) 100%);
-            border-color: var(--masters-gold);
-        }
-
-        .team-name {
-            font-size: 1.6em;
-            font-weight: bold;
-            color: var(--masters-green);
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-        }
-
-        .team-total.leading .team-name {
-            color: var(--masters-gold);
-        }
-
-        .team-score {
-            font-size: 3em;
-            font-weight: bold;
-            color: var(--masters-green);
-        }
-
-        .team-total.leading .team-score {
-            color: var(--masters-red);
-            text-shadow: 0 2px 4px rgba(200, 16, 46, 0.2);
-        }
-
-        @media (max-width: 768px) {
-            .players {
-                grid-template-columns: 1fr;
-            }
-
-            .vs {
-                transform: rotate(90deg);
-                margin: 10px 0;
-            }
-
-            .scores {
-                grid-template-columns: 1fr;
-            }
-
-            .team-totals {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - The Classic 2026</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="/favicon.ico">
 </head>
 <body>
-
-<div class="data-status" id="data-status" role="status" aria-live="polite"></div>
-
-<div id="totals">
-    <h2>TEAM TOTALS</h2>
-    <div class="team-totals">
-        <div class="team-total" id="brock-total">
-            <div class="team-name">TEAM BROCK</div>
-            <div class="team-score">0</div>
-        </div>
-        <div class="team-total" id="jared-total">
-            <div class="team-name">TEAM JARED</div>
-            <div class="team-score">0</div>
-        </div>
+  <nav class="navbar">
+    <input type="checkbox" id="nav-toggle" class="nav-toggle">
+    <label for="nav-toggle" class="nav-toggle-label">Menu</label>
+    <div class="nav-container">
+      <a href="index.html" class="nav-link">Tournament Format</a>
+      <a href="draft.html" class="nav-link">Official Rankings</a>
+      <a href="rule.html" class="nav-link">The Draft</a>
+      <a href="leaderboard.html" class="nav-link">Live Leaderboard</a>
+      <a href="admin.html" class="nav-link admin-link active">🔐 Admin</a>
     </div>
-</div>
+  </nav>
 
-<div id="foursomes"></div>
+  <main class="admin-page">
+    <header class="admin-header">
+      <div>
+        <div class="admin-eyebrow">Admin Console</div>
+        <h1>Score Entry</h1>
+        <p class="admin-subtitle">Update matchups and scores, then save to publish results.</p>
+      </div>
+      <div class="admin-actions">
+        <button class="btn-primary" type="button" onclick="saveToGitHub()">💾 Save Scores</button>
+        <div class="save-reminder" id="save-reminder">Unsaved changes</div>
+      </div>
+    </header>
 
-<script>
-// Tournament data structure
-const teamBrock = ["Gavin", "AK", "Tyler", "Jared", "Hunter", "Miles", "Alex", "JV"];
-const teamJared = ["Bel", "Bruce", "Brock", "Veed", "Colby", "Lane", "Ross", "Dex"];
+    <section class="admin-stats" aria-label="Match status">
+      <div class="stat-card">
+        <div class="stat-label">Complete</div>
+        <div class="stat-value" id="stat-complete">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">In Progress</div>
+        <div class="stat-value" id="stat-in-progress">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Not Started</div>
+        <div class="stat-value" id="stat-not-started">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Progress</div>
+        <div class="stat-value" id="stat-progress">0%</div>
+      </div>
+    </section>
 
-const foursomes = [
-    {
-        matches: [
-            { brock: "Gavin", jared: "Bel", f9: null, b9: null },
-            { brock: "AK", jared: "Bruce", f9: null, b9: null }
-        ]
-    },
-    {
-        matches: [
-            { brock: "Tyler", jared: "Brock", f9: null, b9: null },
-            { brock: "Jared", jared: "Veed", f9: null, b9: null }
-        ]
-    },
-    {
-        matches: [
-            { brock: "Hunter", jared: "Colby", f9: null, b9: null },
-            { brock: "Miles", jared: "Lane", f9: null, b9: null }
-        ]
-    },
-    {
-        matches: [
-            { brock: "Alex", jared: "Ross", f9: null, b9: null },
-            { brock: "JV", jared: "Dex", f9: null, b9: null }
-        ]
-    }
-];
+    <section class="totals-panel" aria-label="Team totals">
+      <div class="totals-heading">
+        <h2>Team Totals</h2>
+        <p>Auto-calculated from current match scores.</p>
+      </div>
+      <div class="totals-grid">
+        <div class="total-card brock">
+          <span class="total-team">Team Brock</span>
+          <span class="total-score" id="total-brock">0.0</span>
+        </div>
+        <div class="total-card jared">
+          <span class="total-team">Team Jared</span>
+          <span class="total-score" id="total-jared">0.0</span>
+        </div>
+      </div>
+    </section>
 
-let hasUnsavedChanges = false;
-let lastUpdatedTimestamp = null;
+    <section class="foursomes" id="foursomes" aria-live="polite"></section>
+  </main>
 
-function updateDataStatus() {
-    const status = document.getElementById('data-status');
-    if (!status) return;
-
-    if (hasUnsavedChanges) {
-        status.textContent = 'Local changes not saved';
-        status.classList.add('data-status--warning');
-        return;
-    }
-
-    status.classList.remove('data-status--warning');
-    if (lastUpdatedTimestamp) {
-        const timestamp = new Date(lastUpdatedTimestamp).toLocaleString();
-        status.textContent = `Live from GitHub — Last saved at ${timestamp}`;
-    } else {
-        status.textContent = 'Live from GitHub — Last saved time unavailable';
-    }
-}
-
-function loadMeta() {
-    fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
-        .then(res => res.json())
-        .then(json => {
-            lastUpdatedTimestamp = json?.meta?.lastUpdated || null;
-            updateDataStatus();
-        })
-        .catch(err => {
-            console.warn('Unable to load last updated timestamp.', err);
-            updateDataStatus();
-        });
-}
-
-function calculateFoursomeStatus(foursome) {
-    const match1 = foursome.matches[0];
-    const match2 = foursome.matches[1];
-    
-    const match1F9 = match1.f9 !== null;
-    const match1B9 = match1.b9 !== null;
-    const match2F9 = match2.f9 !== null;
-    const match2B9 = match2.b9 !== null;
-    
-    const allF9Complete = match1F9 && match2F9;
-    const allB9Complete = match1B9 && match2B9;
-    const allComplete = allF9Complete && allB9Complete;
-    const anyStarted = match1F9 || match1B9 || match2F9 || match2B9;
-    
-    if (allComplete) {
-        return { status: 'complete', text: '✓ COMPLETE' };
-    } else if (allF9Complete && !allB9Complete) {
-        return { status: 'in-progress', text: '⛳ IN PROGRESS (Back 9)' };
-    } else if (allF9Complete && allB9Complete) {
-        return { status: 'complete', text: '✓ COMPLETE' };
-    } else if (anyStarted) {
-        return { status: 'front-complete', text: '⏳ Front 9 In Progress' };
-    } else {
-        return { status: 'not-started', text: '⏸ Not Started' };
-    }
-}
-
-function calculateFoursomeScore(foursome) {
-    let brockPoints = { f9: 0, b9: 0 };
-    let jaredPoints = { f9: 0, b9: 0 };
-    
-    foursome.matches.forEach(match => {
-        // Front 9
-        if (match.f9 === 'brock') {
-            brockPoints.f9 += 1;
-        } else if (match.f9 === 'jared') {
-            jaredPoints.f9 += 1;
-        } else if (match.f9 === 'tie') {
-            brockPoints.f9 += 0.5;
-            jaredPoints.f9 += 0.5;
-        }
-        
-        // Back 9
-        if (match.b9 === 'brock') {
-            brockPoints.b9 += 1;
-        } else if (match.b9 === 'jared') {
-            jaredPoints.b9 += 1;
-        } else if (match.b9 === 'tie') {
-            brockPoints.b9 += 0.5;
-            jaredPoints.b9 += 0.5;
-        }
-    });
-    
-    return { brock: brockPoints, jared: jaredPoints };
-}
-
-function renderFoursomes() {
-    const container = document.getElementById('foursomes');
-    container.innerHTML = '';
-    
-    foursomes.forEach((foursome, fIndex) => {
-        const foursomeDiv = document.createElement('div');
-        foursomeDiv.className = 'foursome';
-        
-        // Calculate foursome-level status
-        const statusInfo = calculateFoursomeStatus(foursome);
-        
-        // Calculate scores for this foursome
-        const scores = calculateFoursomeScore(foursome);
-        
-        foursomeDiv.innerHTML = `
-            <div class="foursome-header">Foursome ${fIndex + 1}</div>
-            
-            <!-- SINGLE STATUS FOR ENTIRE FOURSOME -->
-            <div class="foursome-status ${statusInfo.status}">
-                ${statusInfo.text}
-            </div>
-            
-            <!-- SCORE TALLY FOR THIS FOURSOME -->
-            <div class="foursome-score-tally">
-                <strong>Team Brock:</strong>
-                <span>F9: ${scores.brock.f9}</span> | <span>B9: ${scores.brock.b9}</span>
-                &nbsp;&nbsp;•&nbsp;&nbsp;
-                <strong>Team Jared:</strong>
-                <span>F9: ${scores.jared.f9}</span> | <span>B9: ${scores.jared.b9}</span>
-            </div>
-            
-            ${foursome.matches.map((match, mIndex) => `
-                <div class="match">
-                    <div class="match-header">
-                        <div class="match-title">Match ${mIndex + 1}</div>
-                    </div>
-                    
-                    <div class="players">
-                        <div class="player-select">
-                            <div class="player-label">Team Brock Player</div>
-                            <select disabled>
-                                <option>${match.brock} (Team Brock)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="vs">VS</div>
-                        
-                        <div class="player-select">
-                            <div class="player-label">Team Jared Player</div>
-                            <select disabled>
-                                <option>${match.jared} (Team Jared)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="scores">
-                        <div class="score-box">
-                            <div class="score-label">Front 9 Winner</div>
-                            <select id="f${fIndex}-m${mIndex}-f9" onchange="updateScore(${fIndex}, ${mIndex}, 'f9', this.value)">
-                                <option value="">-- Select Winner --</option>
-                                <option value="brock" ${match.f9 === 'brock' ? 'selected' : ''}>${match.brock} Wins</option>
-                                <option value="jared" ${match.f9 === 'jared' ? 'selected' : ''}>${match.jared} Wins</option>
-                                <option value="tie" ${match.f9 === 'tie' ? 'selected' : ''}>Tie</option>
-                            </select>
-                        </div>
-                        
-                        <div class="score-box">
-                            <div class="score-label">Back 9 Winner</div>
-                            <select id="f${fIndex}-m${mIndex}-b9" onchange="updateScore(${fIndex}, ${mIndex}, 'b9', this.value)">
-                                <option value="">-- Select Winner --</option>
-                                <option value="brock" ${match.b9 === 'brock' ? 'selected' : ''}>${match.brock} Wins</option>
-                                <option value="jared" ${match.b9 === 'jared' ? 'selected' : ''}>${match.jared} Wins</option>
-                                <option value="tie" ${match.b9 === 'tie' ? 'selected' : ''}>Tie</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="actions">
-                        <button class="btn-clear" onclick="clearMatch(${fIndex}, ${mIndex})">✕ Clear Scores</button>
-                    </div>
-                </div>
-            `).join('')}
-        `;
-        
-        container.appendChild(foursomeDiv);
-    });
-    
-    updateTotals();
-}
-
-function updateScore(fIndex, mIndex, nine, winner) {
-    foursomes[fIndex].matches[mIndex][nine] = winner || null;
-    hasUnsavedChanges = true;
-    updateDataStatus();
-    saveData();
-    renderFoursomes();
-}
-
-function clearMatch(fIndex, mIndex) {
-    foursomes[fIndex].matches[mIndex].f9 = null;
-    foursomes[fIndex].matches[mIndex].b9 = null;
-    hasUnsavedChanges = true;
-    updateDataStatus();
-    saveData();
-    renderFoursomes();
-}
-
-function updateTotals() {
-    let brockTotal = 0;
-    let jaredTotal = 0;
-    
-    foursomes.forEach(foursome => {
-        foursome.matches.forEach(match => {
-            // Front 9
-            if (match.f9 === 'brock') brockTotal += 1;
-            else if (match.f9 === 'jared') jaredTotal += 1;
-            else if (match.f9 === 'tie') {
-                brockTotal += 0.5;
-                jaredTotal += 0.5;
-            }
-            
-            // Back 9
-            if (match.b9 === 'brock') brockTotal += 1;
-            else if (match.b9 === 'jared') jaredTotal += 1;
-            else if (match.b9 === 'tie') {
-                brockTotal += 0.5;
-                jaredTotal += 0.5;
-            }
-        });
-    });
-    
-    // Update display
-    document.querySelector('#brock-total .team-score').textContent = brockTotal.toFixed(1);
-    document.querySelector('#jared-total .team-score').textContent = jaredTotal.toFixed(1);
-    
-    // Highlight leader
-    const brockDiv = document.getElementById('brock-total');
-    const jaredDiv = document.getElementById('jared-total');
-    
-    brockDiv.classList.remove('leading');
-    jaredDiv.classList.remove('leading');
-    
-    if (brockTotal > jaredTotal) {
-        brockDiv.classList.add('leading');
-    } else if (jaredTotal > brockTotal) {
-        jaredDiv.classList.add('leading');
-    }
-}
-
-function saveData() {
-    localStorage.setItem('tournamentData', JSON.stringify(foursomes));
-    updateDataStatus();
-}
-
-function loadData() {
-    const saved = localStorage.getItem('tournamentData');
-    if (saved) {
-        const loaded = JSON.parse(saved);
-        foursomes.forEach((foursome, fIndex) => {
-            foursome.matches.forEach((match, mIndex) => {
-                match.f9 = loaded[fIndex].matches[mIndex].f9;
-                match.b9 = loaded[fIndex].matches[mIndex].b9;
-            });
-        });
-    }
-    hasUnsavedChanges = false;
-    updateDataStatus();
-}
-
-// Initialize
-loadData();
-renderFoursomes();
-loadMeta();
-setInterval(loadMeta, 30000);
-</script>
-
+  <script src="admin.js"></script>
 </body>
 </html>
