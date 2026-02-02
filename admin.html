@@ -91,6 +91,25 @@
             margin-bottom: 20px;
         }
 
+        .match.next-incomplete {
+            border-color: var(--masters-gold);
+            background: #fff8e1;
+            box-shadow: 0 0 0 3px rgba(212,175,55,0.25);
+        }
+
+        .match.next-incomplete .match-title::after {
+            content: "Next to enter";
+            display: inline-block;
+            margin-left: 12px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: var(--masters-gold);
+            color: #2b2b2b;
+            font-size: 0.7em;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
         .match-header {
             display: flex;
             justify-content: space-between;
@@ -220,6 +239,35 @@
             letter-spacing: 3px;
         }
 
+        .save-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 0.95em;
+            font-weight: 600;
+            border: 2px solid transparent;
+            margin-bottom: 15px;
+        }
+
+        .save-status span {
+            font-size: 1.1em;
+        }
+
+        .save-status.saved {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-color: #4caf50;
+        }
+
+        .save-status.unsaved {
+            background: #fff3e0;
+            color: #c62828;
+            border-color: #ff9800;
+            box-shadow: 0 0 0 3px rgba(255,152,0,0.2);
+        }
+
         .team-totals {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -285,6 +333,9 @@
 
 <div id="totals">
     <h2>TEAM TOTALS</h2>
+    <div id="save-status" class="save-status saved" role="status" aria-live="polite">
+        <span>●</span> All changes saved
+    </div>
     <div class="team-totals">
         <div class="team-total" id="brock-total">
             <div class="team-name">TEAM BROCK</div>
@@ -303,6 +354,8 @@
 // Tournament data structure
 const teamBrock = ["Gavin", "AK", "Tyler", "Jared", "Hunter", "Miles", "Alex", "JV"];
 const teamJared = ["Bel", "Bruce", "Brock", "Veed", "Colby", "Lane", "Ross", "Dex"];
+let hasUnsavedChanges = false;
+let saveTimeout = null;
 
 const foursomes = [
     {
@@ -387,9 +440,23 @@ function calculateFoursomeScore(foursome) {
     return { brock: brockPoints, jared: jaredPoints };
 }
 
+function getNextIncompleteMatch() {
+    for (let fIndex = 0; fIndex < foursomes.length; fIndex += 1) {
+        const foursome = foursomes[fIndex];
+        for (let mIndex = 0; mIndex < foursome.matches.length; mIndex += 1) {
+            const match = foursome.matches[mIndex];
+            if (match.f9 === null || match.b9 === null) {
+                return { fIndex, mIndex };
+            }
+        }
+    }
+    return null;
+}
+
 function renderFoursomes() {
     const container = document.getElementById('foursomes');
     container.innerHTML = '';
+    const nextIncomplete = getNextIncompleteMatch();
     
     foursomes.forEach((foursome, fIndex) => {
         const foursomeDiv = document.createElement('div');
@@ -419,7 +486,7 @@ function renderFoursomes() {
             </div>
             
             ${foursome.matches.map((match, mIndex) => `
-                <div class="match">
+                <div class="match ${nextIncomplete && nextIncomplete.fIndex === fIndex && nextIncomplete.mIndex === mIndex ? 'next-incomplete' : ''}">
                     <div class="match-header">
                         <div class="match-title">Match ${mIndex + 1}</div>
                     </div>
@@ -479,14 +546,14 @@ function renderFoursomes() {
 
 function updateScore(fIndex, mIndex, nine, winner) {
     foursomes[fIndex].matches[mIndex][nine] = winner || null;
-    saveData();
+    markDirty();
     renderFoursomes();
 }
 
 function clearMatch(fIndex, mIndex) {
     foursomes[fIndex].matches[mIndex].f9 = null;
     foursomes[fIndex].matches[mIndex].b9 = null;
-    saveData();
+    markDirty();
     renderFoursomes();
 }
 
@@ -536,6 +603,40 @@ function saveData() {
     localStorage.setItem('tournamentData', JSON.stringify(foursomes));
 }
 
+function scheduleSave() {
+    if (saveTimeout) {
+        window.clearTimeout(saveTimeout);
+    }
+    saveTimeout = window.setTimeout(() => {
+        saveData();
+        setUnsavedState(false);
+    }, 500);
+}
+
+function setUnsavedState(isUnsaved) {
+    hasUnsavedChanges = isUnsaved;
+    const status = document.getElementById('save-status');
+    if (!status) {
+        return;
+    }
+    if (hasUnsavedChanges) {
+        status.classList.add('unsaved');
+        status.classList.remove('saved');
+        status.innerHTML = '<span>●</span> Unsaved changes';
+    } else {
+        status.classList.add('saved');
+        status.classList.remove('unsaved');
+        status.innerHTML = '<span>●</span> All changes saved';
+    }
+}
+
+function markDirty() {
+    if (!hasUnsavedChanges) {
+        setUnsavedState(true);
+    }
+    scheduleSave();
+}
+
 function loadData() {
     const saved = localStorage.getItem('tournamentData');
     if (saved) {
@@ -547,7 +648,27 @@ function loadData() {
             });
         });
     }
+    setUnsavedState(false);
 }
+
+window.addEventListener('beforeunload', (event) => {
+    if (!hasUnsavedChanges) {
+        return;
+    }
+    event.preventDefault();
+    event.returnValue = '';
+});
+
+document.addEventListener('click', (event) => {
+    const link = event.target.closest('a');
+    if (!link || !hasUnsavedChanges) {
+        return;
+    }
+    const confirmLeave = window.confirm('You have unsaved changes. Leave this page?');
+    if (!confirmLeave) {
+        event.preventDefault();
+    }
+});
 
 // Initialize
 loadData();
