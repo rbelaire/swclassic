@@ -5,7 +5,7 @@
 
 const ADMIN_PASSWORD = "classic2026";
 let hasUnsavedChanges = false;
-let expandedMatches = new Set(); // Track which matches are expanded
+let expandedMatchIndex = null; // Track which match is expanded
 
 // Password check
 if (sessionStorage.getItem("adminAuth") !== "true") {
@@ -204,7 +204,7 @@ function buildMatch(match, matchIndex) {
   div.id = `match-${matchIndex}`;
 
   // Restore expanded state if it was expanded before
-  if (expandedMatches.has(matchIndex)) {
+  if (expandedMatchIndex === matchIndex) {
     div.classList.add("expanded");
   }
 
@@ -374,14 +374,23 @@ function clearMatch(matchIndex) {
  *************************/
 function toggleMatch(index) {
   const match = document.getElementById(`match-${index}`);
-  match.classList.toggle("expanded");
+  if (!match) return;
 
-  // Track expanded state
-  if (match.classList.contains("expanded")) {
-    expandedMatches.add(index);
-  } else {
-    expandedMatches.delete(index);
+  if (expandedMatchIndex === index) {
+    match.classList.remove("expanded");
+    expandedMatchIndex = null;
+    return;
   }
+
+  if (expandedMatchIndex !== null) {
+    const previous = document.getElementById(`match-${expandedMatchIndex}`);
+    if (previous) {
+      previous.classList.remove("expanded");
+    }
+  }
+
+  match.classList.add("expanded");
+  expandedMatchIndex = index;
 }
 
 /*************************
