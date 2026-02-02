@@ -1839,37 +1839,6 @@ button:active {
 }
 
 
-.players {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.scores {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.score.disabled {
-  opacity: 0.5;
-}
-
-.actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.actions button {
-  flex: 1;
-  min-width: clamp(120px, 30%, 160px);
-  padding: 10px 14px;
-  font-size: clamp(0.9em, 2vw, 1em);
-}
 
 select {
   padding: clamp(8px, 2vw, 10px);
