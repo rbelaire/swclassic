@@ -144,6 +144,130 @@
       margin-top: 16px;
       font-size: 0.95em;
     }
+
+    /* Classic History (Winners Record) */
+    .classic-history {
+      margin-top: var(--gap-section);
+    }
+
+    .classic-history-intro {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto clamp(30px, 5vw, 50px);
+      font-size: clamp(1em, 2.2vw, 1.15em);
+      line-height: 1.7;
+      color: var(--masters-black);
+      opacity: 0.8;
+    }
+
+    .record-card {
+      background: var(--color-card);
+      border: 2px solid var(--masters-green);
+      border-radius: var(--radius-lg);
+      padding: 0;
+      margin-bottom: clamp(20px, 3vw, 28px);
+      overflow: hidden;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .record-card:hover {
+      border-color: var(--masters-gold);
+      box-shadow: 0 8px 24px rgba(0, 103, 71, 0.12);
+    }
+
+    .record-card--rained {
+      border-style: dashed;
+      border-color: rgba(0, 103, 71, 0.35);
+    }
+
+    .record-card--rained:hover {
+      border-color: rgba(0, 103, 71, 0.55);
+      box-shadow: none;
+    }
+
+    .record-year-bar {
+      background: linear-gradient(135deg, var(--masters-dark-green) 0%, var(--masters-green) 100%);
+      padding: clamp(14px, 2.5vw, 18px) clamp(20px, 3vw, 28px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .record-year {
+      font-size: clamp(1.6em, 3.5vw, 2.2em);
+      font-weight: 800;
+      color: var(--color-card);
+      letter-spacing: 3px;
+    }
+
+    .record-venue {
+      font-size: clamp(0.8em, 1.8vw, 0.95em);
+      color: var(--color-card);
+      opacity: 0.75;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .record-body {
+      padding: clamp(18px, 3vw, 26px) clamp(20px, 3vw, 28px);
+    }
+
+    .record-winners-label {
+      font-size: clamp(0.75em, 1.6vw, 0.85em);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--masters-green);
+      opacity: 0.7;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .record-winners {
+      font-size: clamp(1.05em, 2.4vw, 1.25em);
+      font-weight: 700;
+      color: var(--masters-green);
+      line-height: 1.8;
+      letter-spacing: 0.5px;
+    }
+
+    .record-winners span {
+      display: inline;
+      white-space: nowrap;
+    }
+
+    .record-winners .name-separator {
+      color: var(--masters-gold);
+      margin: 0 2px;
+      font-weight: 400;
+    }
+
+    .record-rained {
+      text-align: center;
+      padding: clamp(24px, 4vw, 36px) clamp(20px, 3vw, 28px);
+    }
+
+    .record-rained-text {
+      font-size: clamp(1.1em, 2.5vw, 1.3em);
+      font-weight: 700;
+      color: var(--masters-green);
+      opacity: 0.6;
+      letter-spacing: 1px;
+    }
+
+    .record-rained-sub {
+      font-size: 0.9em;
+      color: var(--masters-black);
+      opacity: 0.45;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    /* Rained-out year bar is muted */
+    .record-card--rained .record-year-bar {
+      background: linear-gradient(135deg, rgba(0, 77, 53, 0.6) 0%, rgba(0, 103, 71, 0.6) 100%);
+    }
   </style>
 </head>
 <body>
@@ -167,6 +291,113 @@
 
 <div class="container" id="history-container">
   <p style="text-align: center; opacity: 0.7;">Loading tournament history...</p>
+</div>
+
+<!-- Classic History: The Official Record -->
+<div class="container classic-history">
+  <div class="section-header">
+    <h2>Classic History</h2>
+  </div>
+  <p class="classic-history-intro">
+    The official record of every Classic. Winners listed are the members of the winning team for that year.
+  </p>
+
+  <!-- 2025 -->
+  <div class="record-card">
+    <div class="record-year-bar">
+      <div class="record-year">2025</div>
+      <div class="record-venue">The Wetlands</div>
+    </div>
+    <div class="record-body">
+      <div class="record-winners-label">Winners</div>
+      <div class="record-winners">
+        <span>Gavin</span><span class="name-separator"> &middot; </span><span>Brock</span><span class="name-separator"> &middot; </span><span>Jared</span><span class="name-separator"> &middot; </span><span>Dexter</span><span class="name-separator"> &middot; </span><span>Lane</span><span class="name-separator"> &middot; </span><span>Austin</span><span class="name-separator"> &middot; </span><span>Slowby</span><span class="name-separator"> &middot; </span><span>Jordan</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2024 -->
+  <div class="record-card record-card--rained">
+    <div class="record-year-bar">
+      <div class="record-year">2024</div>
+      <div class="record-venue">Farm D'Allie</div>
+    </div>
+    <div class="record-rained">
+      <div class="record-rained-text">Rained Out</div>
+      <div class="record-rained-sub">No contest held</div>
+    </div>
+  </div>
+
+  <!-- 2023 -->
+  <div class="record-card">
+    <div class="record-year-bar">
+      <div class="record-year">2023</div>
+      <div class="record-venue">The Wetlands</div>
+    </div>
+    <div class="record-body">
+      <div class="record-winners-label">Winners</div>
+      <div class="record-winners">
+        <span>Hunter</span><span class="name-separator"> &middot; </span><span>Brock</span><span class="name-separator"> &middot; </span><span>Dexter</span><span class="name-separator"> &middot; </span><span>Jordan</span><span class="name-separator"> &middot; </span><span>Austin</span><span class="name-separator"> &middot; </span><span>Colby</span><span class="name-separator"> &middot; </span><span>Gavin</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2022 -->
+  <div class="record-card">
+    <div class="record-year-bar">
+      <div class="record-year">2022</div>
+      <div class="record-venue">Farm D'Allie</div>
+    </div>
+    <div class="record-body">
+      <div class="record-winners-label">Winners</div>
+      <div class="record-winners">
+        <span>Bel</span><span class="name-separator"> &middot; </span><span>Hunter</span><span class="name-separator"> &middot; </span><span>Austin</span><span class="name-separator"> &middot; </span><span>Colby</span><span class="name-separator"> &middot; </span><span>Alex</span><span class="name-separator"> &middot; </span><span>Bruce</span><span class="name-separator"> &middot; </span><span>Nick</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2021 -->
+  <div class="record-card">
+    <div class="record-year-bar">
+      <div class="record-year">2021</div>
+      <div class="record-venue">Bayou Bend Country Club</div>
+    </div>
+    <div class="record-body">
+      <div class="record-winners-label">Winners</div>
+      <div class="record-winners">
+        <span>Jordan</span><span class="name-separator"> &middot; </span><span>Steve</span><span class="name-separator"> &middot; </span><span>Alex</span><span class="name-separator"> &middot; </span><span>Jared</span><span class="name-separator"> &middot; </span><span>Austin</span><span class="name-separator"> &middot; </span><span>Colby</span><span class="name-separator"> &middot; </span><span>Gavin</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2020 -->
+  <div class="record-card">
+    <div class="record-year-bar">
+      <div class="record-year">2020</div>
+      <div class="record-venue">Muni of Lafayette</div>
+    </div>
+    <div class="record-body">
+      <div class="record-winners-label">Winners</div>
+      <div class="record-winners">
+        <span>Gavin</span><span class="name-separator"> &middot; </span><span>Colby</span><span class="name-separator"> &middot; </span><span>Dexter</span><span class="name-separator"> &middot; </span><span>Brock</span><span class="name-separator"> &middot; </span><span>Bruce</span><span class="name-separator"> &middot; </span><span>Jared</span><span class="name-separator"> &middot; </span><span>Hunter</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2019 -->
+  <div class="record-card">
+    <div class="record-year-bar">
+      <div class="record-year">2019</div>
+      <div class="record-venue">Muni of Lafayette</div>
+    </div>
+    <div class="record-body">
+      <div class="record-winners-label">Winners</div>
+      <div class="record-winners">
+        <span>Gavin</span><span class="name-separator"> &middot; </span><span>Brock</span><span class="name-separator"> &middot; </span><span>Al</span><span class="name-separator"> &middot; </span><span>Steve</span><span class="name-separator"> &middot; </span><span>Slowb</span>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script src="history.js"></script>
