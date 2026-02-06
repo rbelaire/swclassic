@@ -268,6 +268,74 @@
     .record-card--rained .record-year-bar {
       background: linear-gradient(135deg, rgba(0, 77, 53, 0.6) 0%, rgba(0, 103, 71, 0.6) 100%);
     }
+
+    /* ---- Mobile Responsive ---- */
+    @media (max-width: 768px) {
+      .record-year-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: clamp(12px, 2vw, 16px) clamp(16px, 3vw, 20px);
+      }
+
+      .record-year {
+        font-size: clamp(1.4em, 6vw, 1.8em);
+        letter-spacing: 2px;
+      }
+
+      .record-venue {
+        font-size: clamp(0.7em, 2.5vw, 0.85em);
+      }
+
+      .record-body {
+        padding: clamp(14px, 3vw, 20px) clamp(16px, 3vw, 20px);
+      }
+
+      .record-winners {
+        font-size: clamp(0.95em, 3.5vw, 1.1em);
+        line-height: 2;
+      }
+
+      .record-card {
+        margin-bottom: clamp(16px, 3vw, 22px);
+      }
+
+      .classic-history-intro {
+        font-size: 0.95em;
+        padding: 0 8px;
+      }
+
+      .history-match {
+        grid-template-columns: 1fr;
+        gap: 4px;
+        text-align: center;
+        padding: 12px 14px;
+      }
+
+      .history-match .h-player:first-child,
+      .history-match .h-player:last-child {
+        text-align: center;
+      }
+
+      .upcoming-banner {
+        padding: 24px 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .record-winners {
+        font-size: 0.95em;
+        line-height: 2.1;
+      }
+
+      .record-winners .name-separator {
+        margin: 0 1px;
+      }
+
+      .record-rained {
+        padding: 20px 16px;
+      }
+    }
   </style>
 </head>
 <body>

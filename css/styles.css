@@ -22,6 +22,10 @@
   --masters-red: #c8102e;
   --masters-black: #1a1a1a;
   
+  /* Text Colors */
+  --color-text: #1a1a1a;
+  --color-muted: #6b6b6b;
+
   /* Utility Colors */
   --color-warning: #c62828;
   --color-success: #2e7d32;
@@ -3168,8 +3172,9 @@ RESULT:
   box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
 }
 .draft-slot--empty {
-  background: rgba(0, 0, 0, 0.03);
-  border: 2px dashed #ccc;
+  background: linear-gradient(135deg, rgba(0, 103, 71, 0.03) 0%, rgba(0, 103, 71, 0.01) 100%);
+  border: 2px dashed rgba(0, 103, 71, 0.25);
+  min-height: 50px;
 }
 .draft-slot__rank {
   font-weight: 700;
@@ -3187,11 +3192,15 @@ RESULT:
 .draft-slot__pops {
   font-size: 0.85em;
   opacity: 0.7;
+  color: var(--color-muted);
 }
 .draft-slot__placeholder {
-  color: #bbb;
+  color: rgba(0, 103, 71, 0.35);
   font-style: italic;
   font-size: 0.95em;
+  font-family: 'Copperplate', Georgia, serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 @keyframes slot-fill-in {
@@ -3375,4 +3384,79 @@ RESULT:
   font-weight: 700;
   color: var(--masters-green);
   text-align: center;
+}
+
+/* =====================================================
+   DRAFT SLOTS & ADMIN - MOBILE RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 768px) {
+  .draft-slot {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .draft-slot__name {
+    font-size: 1em;
+  }
+
+  .draft-slot__rank {
+    font-size: 0.85em;
+    min-width: 26px;
+  }
+
+  .draft-slot__pops {
+    font-size: 0.8em;
+  }
+
+  .draft-slot--empty {
+    min-height: 44px;
+  }
+
+  .draft-slot__placeholder {
+    font-size: 0.85em;
+  }
+
+  /* Admin tabs stack on small screens */
+  .admin-tabs {
+    flex-direction: column;
+    border-bottom: none;
+    gap: 4px;
+  }
+
+  .admin-tab {
+    border-radius: var(--radius-md);
+    border: 2px solid var(--masters-green);
+  }
+
+  /* Admin draft pool - 2-column on tablet, 1-column on phone */
+  .draft-pool-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+  }
+
+  .draft-pool-card {
+    padding: 12px;
+  }
+
+  .draft-pool-card .pool-actions {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .draft-pool-card .pool-actions button {
+    width: 100%;
+    padding: 8px 12px;
+  }
+
+  /* Matchup builder stacks on mobile */
+  .matchup-builder-match {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .matchup-builder-vs {
+    font-size: 0.9em;
+  }
 }
