@@ -88,43 +88,79 @@
   "matches": [
     {
       "id": 1,
-      "playerIds": [null, null],
-      "points": { "front9": null, "back9": null },
+      "playerIds": [
+        null,
+        null
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
       "status": "not_started"
     },
     {
       "id": 2,
-      "playerIds": [null, null],
-      "points": { "front9": null, "back9": null },
+      "playerIds": [
+        null,
+        null
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
       "status": "not_started"
     },
     {
       "id": 3,
-      "playerIds": [null, null],
-      "points": { "front9": null, "back9": null },
+      "playerIds": [
+        null,
+        null
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
       "status": "not_started"
     },
     {
       "id": 4,
-      "playerIds": [null, null],
-      "points": { "front9": null, "back9": null },
+      "playerIds": [
+        null,
+        null
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
       "status": "not_started"
     },
     {
       "id": 5,
-      "playerIds": [null, null],
-      "points": { "front9": null, "back9": null },
+      "playerIds": [
+        null,
+        null
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
       "status": "not_started"
     },
     {
       "id": 6,
-      "playerIds": [null, null],
-      "points": { "front9": null, "back9": null },
+      "playerIds": [
+        null,
+        null
+      ],
+      "points": {
+        "front9": null,
+        "back9": null
+      },
       "status": "not_started"
     }
   ],
   "meta": {
-    "lastUpdated": "2026-02-02T22:18:18.197Z",
+    "lastUpdated": "2026-02-06T22:12:57.844Z",
     "tournamentDate": "2026-08-29",
     "venue": "Farm D' Allie Golf Club"
   },
