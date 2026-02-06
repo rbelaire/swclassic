@@ -110,6 +110,30 @@
       to { opacity: 1; transform: translateX(0); }
     }
 
+    /* Draft order note */
+    .draft-order-note {
+      text-align: center;
+      padding: 16px 24px;
+      margin-top: 20px;
+      background: linear-gradient(135deg, rgba(0, 103, 71, 0.06) 0%, rgba(0, 103, 71, 0.02) 100%);
+      border: 2px solid var(--masters-gold);
+      border-radius: 8px;
+      font-family: 'Copperplate', Georgia, serif;
+      font-size: 0.95em;
+      line-height: 1.6;
+      color: var(--color-text);
+    }
+    .draft-order-note strong {
+      color: var(--masters-green);
+    }
+    .draft-order-guesses {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 10px;
+      font-weight: 700;
+    }
+
     /* Pool cards fade in */
     #pool-grid .player-card {
       animation: card-appear 0.3s ease-out both;
@@ -149,6 +173,13 @@
   <div class="captains-section">
     <h2 class="section-title">The Captains</h2>
     <div class="captains-grid" id="captains-area"></div>
+    <div class="draft-order-note">
+      <strong>Draft order</strong> goes to the captain whose Super Bowl total score guess is closest.
+      <div class="draft-order-guesses">
+        <span>Jared: 44 pts</span>
+        <span>Brock: 47 pts</span>
+      </div>
+    </div>
   </div>
 
   <!-- Team Rosters -->
