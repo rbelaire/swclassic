@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Classic - Tournament History</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="/favicon.ico">
+
+  <style>
+    .year-section {
+      margin-bottom: 60px;
+    }
+
+    .year-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .result-banner {
+      text-align: center;
+      padding: 24px 20px;
+      border-radius: var(--radius-lg);
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+      border: 3px solid var(--masters-gold);
+    }
+
+    .result-banner h3 {
+      font-size: clamp(1.4em, 3.5vw, 2em);
+      color: var(--masters-green);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .result-banner .final-score {
+      font-size: clamp(2em, 5vw, 3em);
+      font-weight: 800;
+      color: var(--masters-green);
+      margin: 10px 0;
+    }
+
+    .result-banner .final-score .winner-score {
+      color: var(--masters-red);
+    }
+
+    .upcoming-banner {
+      text-align: center;
+      padding: 30px 20px;
+      border-radius: var(--radius-lg);
+      background: rgba(158, 158, 158, 0.1);
+      border: 2px dashed #ccc;
+    }
+
+    .upcoming-banner h3 {
+      font-size: clamp(1.2em, 3vw, 1.6em);
+      color: var(--masters-green);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .upcoming-banner p {
+      color: #999;
+      font-size: 1em;
+    }
+
+    .mvp-card {
+      text-align: center;
+      padding: 20px;
+      margin-top: 20px;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(212, 175, 55, 0.04) 100%);
+      border: 2px solid var(--masters-gold);
+      border-radius: var(--radius-md);
+    }
+
+    .mvp-card .mvp-label {
+      font-size: 0.85em;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--masters-gold);
+      margin-bottom: 6px;
+    }
+
+    .mvp-card .mvp-name {
+      font-size: clamp(1.4em, 3vw, 1.8em);
+      font-weight: 700;
+      color: var(--masters-green);
+    }
+
+    .history-match {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 18px;
+      background: var(--color-card);
+      border: 1px solid rgba(0, 103, 71, 0.15);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+    }
+
+    .history-match .h-player {
+      font-weight: 700;
+      color: var(--masters-green);
+    }
+
+    .history-match .h-player:first-child {
+      text-align: right;
+    }
+
+    .history-match .h-player:last-child {
+      text-align: left;
+    }
+
+    .history-match .h-player.h-winner {
+      color: var(--masters-red);
+    }
+
+    .history-match .h-vs {
+      font-size: 0.8em;
+      opacity: 0.5;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .history-match .h-score {
+      font-size: 0.85em;
+      opacity: 0.7;
+    }
+
+    .tournament-meta {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1em;
+      color: var(--masters-green);
+      opacity: 0.8;
+    }
+
+    .tournament-notes {
+      text-align: center;
+      font-style: italic;
+      opacity: 0.7;
+      margin-top: 16px;
+      font-size: 0.95em;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <input type="checkbox" id="nav-toggle" class="nav-toggle">
+  <label for="nav-toggle" class="nav-toggle-label">Menu</label>
+  <div class="nav-container">
+    <a href="index.html" class="nav-link">Tournament Format</a>
+    <a href="draft.html" class="nav-link">Draft Board</a>
+    <a href="leaderboard.html" class="nav-link">Live Leaderboard</a>
+    <a href="history.html" class="nav-link active">History</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>TOURNAMENT HISTORY</h1>
+  <div class="subtitle">The Classic</div>
+  <div class="date">Year-by-Year Results</div>
+</div>
+
+<div class="container" id="history-container">
+  <p style="text-align: center; opacity: 0.7;">Loading tournament history...</p>
+</div>
+
+<script src="history.js"></script>
+</body>
+</html>

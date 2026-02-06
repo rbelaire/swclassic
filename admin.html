@@ -15,7 +15,8 @@
       <a href="index.html" class="nav-link">Tournament Format</a>
       <a href="draft.html" class="nav-link">Draft Board</a>
       <a href="leaderboard.html" class="nav-link">Live Leaderboard</a>
-      <a href="admin.html" class="nav-link admin-link active">🔐 Admin</a>
+      <a href="history.html" class="nav-link">History</a>
+      <a href="admin.html" class="nav-link admin-link active">Admin</a>
     </div>
   </nav>
 
@@ -23,52 +24,94 @@
     <header class="admin-header">
       <div>
         <div class="admin-eyebrow">Admin Console</div>
-        <h1>Score Entry</h1>
-        <p class="admin-subtitle">Update matchups and scores, then save to publish results.</p>
+        <h1>Admin Console</h1>
+        <p class="admin-subtitle">Draft players, build matchups, and enter scores.</p>
       </div>
       <div class="admin-actions">
-        <button class="btn-primary" type="button" onclick="saveToGitHub()">💾 Save Scores</button>
+        <button class="btn-primary" type="button" onclick="saveToGitHub()">Save to GitHub</button>
         <div class="save-reminder" id="save-reminder">Unsaved changes</div>
       </div>
     </header>
 
-    <section class="admin-stats" aria-label="Match status">
-      <div class="stat-card">
-        <div class="stat-label">Complete</div>
-        <div class="stat-value" id="stat-complete">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">In Progress</div>
-        <div class="stat-value" id="stat-in-progress">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Not Started</div>
-        <div class="stat-value" id="stat-not-started">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Progress</div>
-        <div class="stat-value" id="stat-progress">0%</div>
-      </div>
-    </section>
+    <!-- Tab Bar -->
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchTab('draft')" id="tab-btn-draft">Draft</button>
+      <button class="admin-tab" onclick="switchTab('matchups')" id="tab-btn-matchups">Matchups</button>
+      <button class="admin-tab" onclick="switchTab('scores')" id="tab-btn-scores">Score Entry</button>
+    </div>
 
-    <section class="totals-panel" aria-label="Team totals">
-      <div class="totals-heading">
-        <h2>Team Totals</h2>
-        <p>Auto-calculated from current match scores.</p>
+    <!-- TAB: Draft -->
+    <div class="tab-content active" id="tab-draft">
+      <div class="draft-status draft-status--waiting" id="admin-draft-status">
+        Loading draft data...
       </div>
-      <div class="totals-grid">
-        <div class="total-card brock">
-          <span class="total-team">Team Brock</span>
-          <span class="total-score" id="total-brock">0.0</span>
+
+      <div class="captains-grid">
+        <div>
+          <div class="team-column-header">Team Brock</div>
+          <div class="draft-slots" id="admin-team-brock-slots"></div>
         </div>
-        <div class="total-card jared">
-          <span class="total-team">Team Jared</span>
-          <span class="total-score" id="total-jared">0.0</span>
+        <div class="captains-vs">VS</div>
+        <div>
+          <div class="team-column-header">Team Jared</div>
+          <div class="draft-slots" id="admin-team-jared-slots"></div>
         </div>
       </div>
-    </section>
 
-    <section class="foursomes" id="foursomes" aria-live="polite"></section>
+      <div class="section-header" id="admin-pool-header" style="margin-top: 30px;">
+        <h2>Available Players</h2>
+      </div>
+      <div class="draft-pool-grid" id="admin-pool-grid"></div>
+    </div>
+
+    <!-- TAB: Matchups -->
+    <div class="tab-content" id="tab-matchups">
+      <div class="draft-status" id="matchup-status" style="margin-bottom: 20px;">
+        Assign players to match slots below.
+      </div>
+      <div id="matchup-builder-container"></div>
+    </div>
+
+    <!-- TAB: Score Entry -->
+    <div class="tab-content" id="tab-scores">
+      <section class="admin-stats" aria-label="Match status">
+        <div class="stat-card">
+          <div class="stat-label">Complete</div>
+          <div class="stat-value" id="stat-complete">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">In Progress</div>
+          <div class="stat-value" id="stat-in-progress">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Not Started</div>
+          <div class="stat-value" id="stat-not-started">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Progress</div>
+          <div class="stat-value" id="stat-progress">0%</div>
+        </div>
+      </section>
+
+      <section class="totals-panel" aria-label="Team totals">
+        <div class="totals-heading">
+          <h2>Team Totals</h2>
+          <p>Auto-calculated from current match scores.</p>
+        </div>
+        <div class="totals-grid">
+          <div class="total-card brock">
+            <span class="total-team">Team Brock</span>
+            <span class="total-score" id="total-brock">0.0</span>
+          </div>
+          <div class="total-card jared">
+            <span class="total-team">Team Jared</span>
+            <span class="total-score" id="total-jared">0.0</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="foursomes" id="foursomes" aria-live="polite"></section>
+    </div>
   </main>
 
   <script src="admin.js"></script>
