@@ -27,19 +27,19 @@
     "brock": {
       "name": "Brock",
       "rank": 5,
-      "pops": 10,
+      "pops": 8,
       "team": "coach"
     },
     "jared": {
       "name": "Jared",
       "rank": 6,
-      "pops": 12,
+      "pops": 10,
       "team": "coach"
     },
     "steve": {
       "name": "Steve",
       "rank": 7,
-      "pops": 12.71,
+      "pops": 12,
       "team": null
     },
     "veed": {
@@ -63,7 +63,7 @@
     "lane": {
       "name": "Lane",
       "rank": 11,
-      "pops": 22,
+      "pops": 20,
       "team": null
     },
     "alex": {
