@@ -88,74 +88,38 @@
   "matches": [
     {
       "id": 1,
-      "playerIds": [
-        "gavin",
-        "bel"
-      ],
-      "points": {
-        "front9": null,
-        "back9": null
-      },
+      "playerIds": [null, null],
+      "points": { "front9": null, "back9": null },
       "status": "not_started"
     },
     {
       "id": 2,
-      "playerIds": [
-        "ak",
-        "bruce"
-      ],
-      "points": {
-        "front9": null,
-        "back9": null
-      },
+      "playerIds": [null, null],
+      "points": { "front9": null, "back9": null },
       "status": "not_started"
     },
     {
       "id": 3,
-      "playerIds": [
-        "jv",
-        "steve"
-      ],
-      "points": {
-        "front9": null,
-        "back9": null
-      },
+      "playerIds": [null, null],
+      "points": { "front9": null, "back9": null },
       "status": "not_started"
     },
     {
       "id": 4,
-      "playerIds": [
-        "dex",
-        "colby"
-      ],
-      "points": {
-        "front9": null,
-        "back9": null
-      },
+      "playerIds": [null, null],
+      "points": { "front9": null, "back9": null },
       "status": "not_started"
     },
     {
       "id": 5,
-      "playerIds": [
-        "veed",
-        "alex"
-      ],
-      "points": {
-        "front9": null,
-        "back9": null
-      },
+      "playerIds": [null, null],
+      "points": { "front9": null, "back9": null },
       "status": "not_started"
     },
     {
       "id": 6,
-      "playerIds": [
-        "hunter",
-        "lane"
-      ],
-      "points": {
-        "front9": null,
-        "back9": null
-      },
+      "playerIds": [null, null],
+      "points": { "front9": null, "back9": null },
       "status": "not_started"
     }
   ],
