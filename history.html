@@ -166,7 +166,6 @@
       border-radius: var(--radius-lg);
       padding: 0;
       margin-bottom: clamp(20px, 3vw, 28px);
-      overflow: hidden;
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
@@ -193,6 +192,7 @@
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
+      border-radius: 12px 12px 0 0;
     }
 
     .record-year {
@@ -234,7 +234,6 @@
 
     .record-winners span {
       display: inline;
-      white-space: nowrap;
     }
 
     .record-winners .name-separator {
@@ -324,16 +323,25 @@
 
     @media (max-width: 480px) {
       .record-winners {
-        font-size: 0.95em;
-        line-height: 2.1;
+        font-size: 0.9em;
+        line-height: 2.2;
+        word-spacing: 2px;
       }
 
       .record-winners .name-separator {
         margin: 0 1px;
       }
 
+      .record-body {
+        padding: 14px 14px;
+      }
+
       .record-rained {
-        padding: 20px 16px;
+        padding: 20px 14px;
+      }
+
+      .record-year-bar {
+        padding: 12px 14px;
       }
     }
   </style>
