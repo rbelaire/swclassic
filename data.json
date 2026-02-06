@@ -34,19 +34,19 @@
       "name": "Brock",
       "rank": 6,
       "pops": 10,
-      "team": "TBD"
+      "team": "coach"
     },
     "jared": {
       "name": "Jared",
       "rank": 7,
       "pops": 12,
-      "team": "TBD"
+      "team": "coach"
     },
     "veed": {
       "name": "Veed",
       "rank": 8,
       "pops": 14,
-      "team": "TBD"
+      "team": "brock"
     },
     "hunter": {
       "name": "Hunter",
@@ -58,25 +58,13 @@
       "name": "Colby",
       "rank": 10,
       "pops": 18,
-      "team": "TBD"
-    },
-    "miles": {
-      "name": "Miles",
-      "rank": 11,
-      "pops": 20,
-      "team": "TBD"
+      "team": "jared"
     },
     "lane": {
       "name": "Lane",
       "rank": 12,
       "pops": 22,
       "team": "jared"
-    },
-    "ross": {
-      "name": "Ross",
-      "rank": 13,
-      "pops": 24,
-      "team": "TBD"
     },
     "alex": {
       "name": "Alex",
@@ -138,7 +126,7 @@
       "id": 4,
       "playerIds": [
         "dex",
-        "hunter"
+        "colby"
       ],
       "points": {
         "front9": null,
@@ -149,7 +137,7 @@
     {
       "id": 5,
       "playerIds": [
-        "jv",
+        "veed",
         "alex"
       ],
       "points": {

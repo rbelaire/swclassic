@@ -128,6 +128,7 @@ function calculateTotals(data) {
 
     const t1 = data.players[p1].team;
     const t2 = data.players[p2].team;
+    if (t1 === 'coach' || t2 === 'coach') return;
 
     ["front9", "back9"].forEach(key => {
       const v = match.points[key];

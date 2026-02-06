@@ -152,6 +152,7 @@ function calculateTotals() {
 
     const t1 = data.players[p1].team;
     const t2 = data.players[p2].team;
+    if (t1 === 'coach' || t2 === 'coach') return;
 
     ["front9", "back9"].forEach(key => {
       const v = match.points[key];
@@ -231,8 +232,8 @@ function buildMatch(match, matchIndex) {
 
   // Match Header
   const [p1, p2] = match.playerIds;
-  const p1Name = p1 ? data.players[p1].name : "Not Selected";
-  const p2Name = p2 ? data.players[p2].name : "Not Selected";
+  const p1Name = p1 ? data.players[p1].name + (data.players[p1].team === 'coach' ? ' (Coach - non-playing)' : '') : "Not Selected";
+  const p2Name = p2 ? data.players[p2].name + (data.players[p2].team === 'coach' ? ' (Coach - non-playing)' : '') : "Not Selected";
 
   const header = `
     <div class="match-header" onclick="toggleMatch(${matchIndex})">
@@ -251,7 +252,7 @@ function buildMatch(match, matchIndex) {
   // Match Details
   const details = `
     <div class="match-details">
-      ${!valid && (p1 || p2) ? '<div class="error-message">⚠️ Invalid matchup: Both players are from the same team. Choose opponents from different teams.</div>' : ''}
+      ${!valid && (p1 || p2) ? '<div class="error-message">⚠️ Invalid matchup: ' + ((p1 && data.players[p1].team === 'coach') || (p2 && data.players[p2].team === 'coach') ? 'A coach (non-playing) cannot be assigned to a match.' : 'Both players are from the same team. Choose opponents from different teams.') + '</div>' : ''}
       
       <div class="teams-row">
         <div class="team-select-box team-brock">
@@ -296,12 +297,14 @@ function buildTeamSelect(match, playerIndex, matchIndex, team) {
   let html = `<select id="${selectId}" onchange="updatePlayer(${matchIndex}, ${playerIndex}, this.value, '${team}')">`;
   html += '<option value="">-- Select Player --</option>';
 
-  // Show ALL players, sorted by rank
-  const sortedPlayers = Object.entries(data.players).sort((a, b) => a[1].rank - b[1].rank);
+  // Show only active players (exclude coaches), sorted by rank
+  const sortedPlayers = Object.entries(data.players)
+    .filter(([, p]) => p.team !== 'coach')
+    .sort((a, b) => a[1].rank - b[1].rank);
 
   sortedPlayers.forEach(([id, p]) => {
     const selected = match.playerIds[playerIndex] === id ? 'selected' : '';
-    const teamLabel = p.team !== 'TBD' ? ` [${p.team === 'brock' ? 'Team Brock' : 'Team Jared'}]` : '';
+    const teamLabel = p.team === 'brock' ? ' [Team Brock]' : p.team === 'jared' ? ' [Team Jared]' : '';
     html += `<option value="${id}" ${selected}>${p.name} (${p.pops} pops)${teamLabel}</option>`;
   });
 
@@ -336,6 +339,7 @@ function buildScoreSelect(match, key, matchIndex, valid) {
 function isValidMatchup(match) {
   const [p1, p2] = match.playerIds;
   if (!p1 || !p2) return false;
+  if (data.players[p1].team === 'coach' || data.players[p2].team === 'coach') return false;
   return data.players[p1].team !== data.players[p2].team;
 }
 
@@ -345,8 +349,8 @@ function isValidMatchup(match) {
 function updatePlayer(matchIndex, playerIndex, playerId, team) {
   data.matches[matchIndex].playerIds[playerIndex] = playerId || null;
 
-  // Auto-assign team when player is selected
-  if (playerId && data.players[playerId]) {
+  // Auto-assign team when player is selected (never overwrite coaches)
+  if (playerId && data.players[playerId] && data.players[playerId].team !== 'coach') {
     data.players[playerId].team = team;
   }
 
@@ -418,6 +422,16 @@ window.addEventListener('beforeunload', (e) => {
  * SAVE TO GITHUB
  *************************/
 function saveToGitHub() {
+  // Guard: prevent saving if any match contains a coach
+  const coachInMatch = data.matches.some(match => {
+    const [p1, p2] = match.playerIds;
+    return (p1 && data.players[p1].team === 'coach') || (p2 && data.players[p2].team === 'coach');
+  });
+  if (coachInMatch) {
+    alert("❌ Cannot save: One or more matches contain a coach (non-playing). Remove coaches from all matches before saving.");
+    return;
+  }
+
   const token = prompt("GitHub Personal Access Token:");
   if (!token) return;
 
