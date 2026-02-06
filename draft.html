@@ -1,272 +1,196 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Classic 2026 - Official Rankings</title>
-    <link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Classic 2026 - Draft Board</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="/favicon.ico">
 
+  <style>
+    /* Draft Status Banner */
+    .draft-status {
+      text-align: center;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-family: 'Copperplate', Georgia, serif;
+      font-weight: 700;
+      font-size: 1.1em;
+      letter-spacing: 1px;
+      margin-bottom: 30px;
+    }
+    .draft-status--waiting {
+      background: rgba(158, 158, 158, 0.15);
+      color: #9e9e9e;
+      border: 2px solid #9e9e9e;
+    }
+    .draft-status--live {
+      background: rgba(76, 175, 80, 0.15);
+      color: #4caf50;
+      border: 2px solid #4caf50;
+      animation: pulse-border 2s ease-in-out infinite;
+    }
+    .draft-status--complete {
+      background: rgba(212, 175, 55, 0.15);
+      color: #d4af37;
+      border: 2px solid #d4af37;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { border-color: #4caf50; }
+      50% { border-color: rgba(76, 175, 80, 0.4); }
+    }
+
+    /* Team columns */
+    .draft-teams {
+      margin-bottom: 40px;
+    }
+    .team-column-header {
+      text-align: center;
+      font-family: 'Copperplate', Georgia, serif;
+      font-size: clamp(1.2em, 2.5vw, 1.6em);
+      font-weight: 700;
+      color: var(--masters-green);
+      margin-bottom: 16px;
+      letter-spacing: 1px;
+    }
+
+    /* Draft slots */
+    .draft-slots {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .draft-slot {
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .draft-slot--filled {
+      background: linear-gradient(135deg, rgba(0, 103, 71, 0.08) 0%, rgba(0, 103, 71, 0.03) 100%);
+      border: 2px solid var(--masters-gold);
+      animation: slot-fill-in 0.4s ease-out both;
+    }
+    .draft-slot--filled:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+    }
+    .draft-slot--empty {
+      background: rgba(0, 0, 0, 0.03);
+      border: 2px dashed #ccc;
+    }
+    .draft-slot__rank {
+      font-weight: 700;
+      color: var(--masters-green);
+      font-size: 0.9em;
+      min-width: 30px;
+    }
+    .draft-slot__name {
+      font-family: 'Copperplate', Georgia, serif;
+      font-size: 1.1em;
+      font-weight: 700;
+      color: var(--color-text);
+      flex: 1;
+    }
+    .draft-slot__pops {
+      font-size: 0.85em;
+      opacity: 0.7;
+    }
+    .draft-slot__placeholder {
+      color: #bbb;
+      font-style: italic;
+      font-size: 0.95em;
+    }
+
+    @keyframes slot-fill-in {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Pool cards fade in */
+    #pool-grid .player-card {
+      animation: card-appear 0.3s ease-out both;
+    }
+    @keyframes card-appear {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-    <nav class="navbar">
-        <input type="checkbox" id="nav-toggle" class="nav-toggle">
-        <label for="nav-toggle" class="nav-toggle-label">Menu</label>
-        <div class="nav-container">
-            <a href="index.html" class="nav-link">Tournament Format</a>
-            <a href="draft.html" class="nav-link active">Official Rankings</a>
-            <a href="rule.html" class="nav-link">The Draft</a>
-            <a href="leaderboard.html" class="nav-link">Live Leaderboard</a>
-        </div>
-    </nav>
 
-    <div class="hero">
-        <h1>OFFICIAL RANKINGS</h1>
-        <div class="subtitle">The Classic 2026</div>
-        <div class="date">August 29, 2026 | Farm D' Allie Golf Club</div>
-        <p style="font-size: 1em; margin-top: 25px; opacity: 0.7; max-width: 600px; margin-left: auto; margin-right: auto;">
-            Rankings determined by peer evaluation and consensus voting.
-        </p>
+<nav class="navbar">
+  <input type="checkbox" id="nav-toggle" class="nav-toggle">
+  <label for="nav-toggle" class="nav-toggle-label">Menu</label>
+  <div class="nav-container">
+    <a href="index.html" class="nav-link">Tournament Format</a>
+    <a href="draft.html" class="nav-link active">Draft Board</a>
+    <a href="leaderboard.html" class="nav-link">Live Leaderboard</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>DRAFT BOARD</h1>
+  <div class="subtitle">The Classic 2026</div>
+  <div class="date">August 29, 2026 | Farm D' Allie Golf Club</div>
+</div>
+
+<div class="container">
+
+  <!-- Status Banner -->
+  <div class="draft-status draft-status--waiting" id="draft-status">
+    Loading draft data...
+  </div>
+
+  <!-- Captains -->
+  <div class="captains-section">
+    <h2 class="section-title">The Captains</h2>
+    <div class="captains-grid" id="captains-area"></div>
+  </div>
+
+  <!-- Team Rosters -->
+  <div class="draft-teams">
+    <div class="captains-grid">
+      <div>
+        <div class="team-column-header">Team Brock</div>
+        <div class="draft-slots" id="team-brock-slots"></div>
+      </div>
+      <div class="captains-vs">VS</div>
+      <div>
+        <div class="team-column-header">Team Jared</div>
+        <div class="draft-slots" id="team-jared-slots"></div>
+      </div>
     </div>
+  </div>
 
-    <div class="container">
-        <div class="section-header">
-            <h2>Official Field Rankings</h2>
-        </div>
-
-        <div class="rankings-grid">
-            <!-- Rank 1 -->
-            <div class="player-card elite">
-                <div class="rank-badge">1</div>
-                <div class="player-name">Gavin</div>
-                <div class="badge elite-badge">Elite Tier</div>
-                <div class="player-stats">
-                    <div class="stat">
-                        <div class="stat-label">Pops</div>
-                        <div class="stat-value">0</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Avg Rank</div>
-                        <div class="stat-value">1.86</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rank 2 -->
-            <div class="player-card elite">
-                <div class="rank-badge">2</div>
-                <div class="player-name">Bel</div>
-                <div class="badge elite-badge">Elite Tier</div>
-                <div class="player-stats">
-                    <div class="stat">
-                        <div class="stat-label">Pops</div>
-                        <div class="stat-value">2</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Avg Rank</div>
-                        <div class="stat-value">2.07</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rank 3 -->
-            <div class="player-card elite">
-                <div class="rank-badge">3</div>
-                <div class="player-name">AK</div>
-                <div class="badge elite-badge">Elite Tier</div>
-                <div class="player-stats">
-                    <div class="stat">
-                        <div class="stat-label">Pops</div>
-                        <div class="stat-value">4</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Avg Rank</div>
-                        <div class="stat-value">2.86</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rank 4 -->
-            <div class="player-card">
-                <div class="rank-badge">4</div>
-                <div class="player-name">Bruce</div>
-                <div class="player-stats">
-                    <div class="stat">
-                        <div class="stat-label">Pops</div>
-                        <div class="stat-value">6</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Avg Rank</div>
-                        <div class="stat-value">4.86</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rank 5 -->
-            <div class="player-card">
-                <div class="rank-badge">5</div>
-                <div class="player-name">Tyler</div>
-                <div class="player-stats">
-                    <div class="stat">
-                        <div class="stat-label">Pops</div>
-                        <div class="stat-value">8</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Avg Rank</div>
-                        <div class="stat-value">4.79</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rank 6 - Brock (CAPTAIN / COACH) -->
-            <div class="player-card captain">
-                <div class="rank-badge">6</div>
-                <div class="player-name">Brock</div>
-                <div class="badge captain-badge">Captain / Coach</div>
-                <div class="player-stats">
-                    <div class="stat">
-                        <div class="stat-label">Pops</div>
-                        <div class="stat-value">10</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Avg Rank</div>
-                        <div class="stat-value">6.25</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rank 7 - Jared (CAPTAIN / COACH) -->
-            <div class="player-card captain">
-                <div class="rank-badge">7</div>
-                <div class="player-name">Jared</div>
-                <div class="badge captain-badge">Captain / Coach</div>
-                <div class="player-stats">
-                    <div class="stat">
-                        <div class="stat-label">Pops</div>
-                        <div class="stat-value">12</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Avg Rank</div>
-                        <div class="stat-value">6.36</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rank 8 - Veed (NEW) -->
-            <div class="player-card new-player">
-                <div class="rank-badge">8</div>
-                <div class="player-name">Veed</div>
-                <div class="badge new-badge">New Player</div>
-                <div class="player-stats">
-                    <div class="stat">
-                        <div class="stat-label">Pops</div>
-                        <div class="stat-value">14</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Avg Rank</div>
-                        <div class="stat-value">7.70</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rank 9 - Hunter -->
-            <div class="player-card">
-                <div class="rank-badge">9</div>
-                <div class="player-name">Hunter</div>
-                <div class="player-stats">
-                    <div class="stat">
-                        <div class="stat-label">Pops</div>
-                        <div class="stat-value">16</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Avg Rank</div>
-                        <div class="stat-value">8.29</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rank 10 - Colby -->
-            <div class="player-card">
-                <div class="rank-badge">10</div>
-                <div class="player-name">Colby</div>
-                <div class="player-stats">
-                    <div class="stat">
-                        <div class="stat-label">Pops</div>
-                        <div class="stat-value">18</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Avg Rank</div>
-                        <div class="stat-value">9.07</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rank 11 - Lane -->
-            <div class="player-card">
-                <div class="rank-badge">11</div>
-                <div class="player-name">Lane</div>
-                <div class="player-stats">
-                    <div class="stat">
-                        <div class="stat-label">Pops</div>
-                        <div class="stat-value">22</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Avg Rank</div>
-                        <div class="stat-value">11.29</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rank 12 - Alex -->
-            <div class="player-card">
-                <div class="rank-badge">12</div>
-                <div class="player-name">Alex</div>
-                <div class="player-stats">
-                    <div class="stat">
-                        <div class="stat-label">Pops</div>
-                        <div class="stat-value">24</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Avg Rank</div>
-                        <div class="stat-value">12.79</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rank 13 - Dex -->
-            <div class="player-card">
-                <div class="rank-badge">13</div>
-                <div class="player-name">Dex</div>
-                <div class="player-stats">
-                    <div class="stat">
-                        <div class="stat-label">Pops</div>
-                        <div class="stat-value">24</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Avg Rank</div>
-                        <div class="stat-value">12.57</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rank 14 - JV -->
-            <div class="player-card">
-                <div class="rank-badge">14</div>
-                <div class="player-name">JV</div>
-                <div class="player-stats">
-                    <div class="stat">
-                        <div class="stat-label">Pops</div>
-                        <div class="stat-value">24</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Avg Rank</div>
-                        <div class="stat-value">13.27</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+  <!-- Player Pool -->
+  <div id="pool-section">
+    <div class="section-header">
+      <h2>Available Players</h2>
     </div>
+    <div class="rankings-grid" id="pool-grid"></div>
+  </div>
 
+  <!-- Refresh Controls -->
+  <div class="refresh-controls">
+    <div class="refresh-indicator" id="refresh-indicator">
+      Loading...
+    </div>
+    <div class="refresh-buttons">
+      <button id="manual-refresh-btn" onclick="manualRefresh()" class="refresh-btn">
+        ⟳ Refresh Now
+      </button>
+      <button id="toggle-refresh-btn" onclick="toggleAutoRefresh()" class="refresh-btn">
+        ⏸ Pause Updates
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script src="draft.js"></script>
 </body>
 </html>

@@ -24,23 +24,23 @@
       "pops": 6,
       "team": "jared"
     },
-    "tyler": {
-      "name": "Tyler",
-      "rank": 5,
-      "pops": 8,
-      "team": "jared"
-    },
     "brock": {
       "name": "Brock",
-      "rank": 6,
+      "rank": 5,
       "pops": 10,
       "team": "coach"
     },
     "jared": {
       "name": "Jared",
-      "rank": 7,
+      "rank": 6,
       "pops": 12,
       "team": "coach"
+    },
+    "steve": {
+      "name": "Steve",
+      "rank": 7,
+      "pops": 12.71,
+      "team": "jared"
     },
     "veed": {
       "name": "Veed",
@@ -62,25 +62,25 @@
     },
     "lane": {
       "name": "Lane",
-      "rank": 12,
+      "rank": 11,
       "pops": 22,
       "team": "jared"
     },
     "alex": {
       "name": "Alex",
-      "rank": 14,
+      "rank": 12,
       "pops": 24,
       "team": "jared"
     },
     "dex": {
       "name": "Dex",
-      "rank": 15,
+      "rank": 13,
       "pops": 24,
       "team": "brock"
     },
     "jv": {
       "name": "JV",
-      "rank": 16,
+      "rank": 14,
       "pops": 24,
       "team": "brock"
     }
@@ -114,7 +114,7 @@
       "id": 3,
       "playerIds": [
         "jv",
-        "tyler"
+        "steve"
       ],
       "points": {
         "front9": null,
