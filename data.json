@@ -36,32 +36,32 @@
       "pops": 10,
       "team": "coach"
     },
-    "steve": {
-      "name": "Steve",
+    "veed": {
+      "name": "Veed",
       "rank": 7,
       "pops": 12,
       "team": null
     },
-    "veed": {
-      "name": "Veed",
+    "hunter": {
+      "name": "Hunter",
       "rank": 8,
       "pops": 14,
       "team": null
     },
-    "hunter": {
-      "name": "Hunter",
+    "colby": {
+      "name": "Colby",
       "rank": 9,
       "pops": 16,
       "team": null
     },
-    "colby": {
-      "name": "Colby",
+    "lane": {
+      "name": "Lane",
       "rank": 10,
       "pops": 18,
       "team": null
     },
-    "lane": {
-      "name": "Lane",
+    "steve": {
+      "name": "Steve",
       "rank": 11,
       "pops": 20,
       "team": null
@@ -69,7 +69,7 @@
     "alex": {
       "name": "Alex",
       "rank": 12,
-      "pops": 24,
+      "pops": 22,
       "team": null
     },
     "dex": {
