@@ -3141,11 +3141,14 @@ RESULT:
 .team-column-header {
   text-align: center;
   font-family: 'Copperplate', Georgia, serif;
-  font-size: clamp(1.2em, 2.5vw, 1.6em);
+  font-size: clamp(1.3em, 2.8vw, 1.7em);
   font-weight: 700;
   color: var(--masters-green);
-  margin-bottom: 16px;
-  letter-spacing: 1px;
+  margin-bottom: 18px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--masters-gold);
 }
 
 /* Draft slots */
@@ -3172,9 +3175,10 @@ RESULT:
   box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
 }
 .draft-slot--empty {
-  background: linear-gradient(135deg, rgba(0, 103, 71, 0.03) 0%, rgba(0, 103, 71, 0.01) 100%);
-  border: 2px dashed rgba(0, 103, 71, 0.25);
-  min-height: 50px;
+  background: linear-gradient(135deg, rgba(0, 103, 71, 0.06) 0%, rgba(0, 103, 71, 0.02) 100%);
+  border: 2px dashed rgba(0, 103, 71, 0.35);
+  min-height: 52px;
+  justify-content: center;
 }
 .draft-slot__rank {
   font-weight: 700;
@@ -3195,11 +3199,11 @@ RESULT:
   color: var(--color-muted);
 }
 .draft-slot__placeholder {
-  color: rgba(0, 103, 71, 0.35);
+  color: rgba(0, 103, 71, 0.5);
   font-style: italic;
   font-size: 0.95em;
   font-family: 'Copperplate', Georgia, serif;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   text-transform: uppercase;
 }
 
