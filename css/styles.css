@@ -3221,6 +3221,118 @@ RESULT:
 }
 
 /* =====================================================
+   ADMIN LOGIN OVERLAY
+   ===================================================== */
+
+.admin-login-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: linear-gradient(160deg, #004d35 0%, #006747 40%, #00854d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.admin-login-overlay.hidden {
+  display: none;
+}
+
+.admin-login-card {
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  padding: clamp(32px, 6vw, 48px);
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.admin-login-header {
+  font-family: 'Copperplate', Georgia, serif;
+  font-size: clamp(1.8em, 5vw, 2.4em);
+  font-weight: 700;
+  color: var(--masters-green);
+  letter-spacing: 6px;
+  margin-bottom: 4px;
+}
+
+.admin-login-subtitle {
+  font-family: 'Copperplate', Georgia, serif;
+  font-size: 0.85em;
+  color: var(--color-muted);
+  letter-spacing: 2px;
+  margin-bottom: 28px;
+}
+
+.admin-login-field {
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.admin-login-field label {
+  display: block;
+  font-family: 'Copperplate', Georgia, serif;
+  font-size: 0.78em;
+  color: var(--masters-green);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.admin-login-field input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid rgba(0, 103, 71, 0.25);
+  border-radius: 8px;
+  font-family: 'Copperplate', Georgia, serif;
+  font-size: 1em;
+  color: var(--color-text);
+  background: var(--color-bg);
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.admin-login-field input:focus {
+  outline: none;
+  border-color: var(--masters-green);
+  box-shadow: 0 0 0 3px rgba(0, 103, 71, 0.1);
+}
+
+.admin-login-error {
+  color: var(--color-warning);
+  font-size: 0.85em;
+  min-height: 20px;
+  margin-bottom: 8px;
+}
+
+.admin-login-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--masters-green);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 8px;
+  font-family: 'Copperplate', Georgia, serif;
+  font-size: 1em;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.admin-login-btn:hover {
+  background: var(--masters-dark-green);
+  transform: translateY(-1px);
+}
+
+.admin-login-btn:active {
+  transform: translateY(0);
+}
+
+/* =====================================================
    ADMIN TAB STYLES
    ===================================================== */
 

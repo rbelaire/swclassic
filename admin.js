@@ -8,15 +8,38 @@ const ADMIN_PASSWORD = "classic2026";
 let hasUnsavedChanges = false;
 let expandedMatchIndex = null;
 let activeTab = "draft";
+let adminUser = "";
 
-// Password check
-if (sessionStorage.getItem("adminAuth") !== "true") {
-  const entered = prompt("Enter admin password:");
-  if (entered !== ADMIN_PASSWORD) {
-    alert("Access denied");
-    window.location.href = "index.html";
+// Login handling
+function handleLogin(e) {
+  e.preventDefault();
+  const user = document.getElementById("login-user").value.trim();
+  const pass = document.getElementById("login-pass").value;
+  const errorEl = document.getElementById("login-error");
+
+  if (pass !== ADMIN_PASSWORD) {
+    errorEl.textContent = "Invalid password";
+    document.getElementById("login-pass").value = "";
+    document.getElementById("login-pass").focus();
+    return;
   }
+
+  adminUser = user;
   sessionStorage.setItem("adminAuth", "true");
+  sessionStorage.setItem("adminUser", user);
+  showAdmin();
+}
+
+function showAdmin() {
+  document.getElementById("login-overlay").classList.add("hidden");
+  document.getElementById("admin-app").style.display = "";
+  loadData();
+}
+
+// Check session on load
+if (sessionStorage.getItem("adminAuth") === "true") {
+  adminUser = sessionStorage.getItem("adminUser") || "";
+  showAdmin();
 }
 
 /*************************
@@ -80,8 +103,6 @@ function loadData() {
       console.error(err);
     });
 }
-
-loadData();
 
 /*************************
  * TAB SWITCHING
@@ -672,9 +693,9 @@ window.addEventListener('beforeunload', (e) => {
 });
 
 /*************************
- * SAVE TO GITHUB
+ * SAVE DATA
  *************************/
-function saveToGitHub() {
+function saveData() {
   const coachInMatch = data.matches.some(match => {
     const [p1, p2] = match.playerIds;
     return (p1 && data.players[p1].team === 'coach') || (p2 && data.players[p2].team === 'coach');
@@ -684,9 +705,6 @@ function saveToGitHub() {
     return;
   }
 
-  const token = prompt("GitHub Personal Access Token:");
-  if (!token) return;
-
   const saveBtn = document.querySelector('.btn-primary');
   const originalText = saveBtn.textContent;
   saveBtn.textContent = "Saving...";
@@ -694,45 +712,30 @@ function saveToGitHub() {
 
   data.meta.lastUpdated = new Date().toISOString();
 
-  fetch("https://api.github.com/repos/rbelaire/swclassic/contents/data.json", {
-    headers: {
-      Authorization: `token ${token}`
-    }
+  fetch("/api/save", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      password: ADMIN_PASSWORD,
+      data: data
+    })
   })
     .then(res => res.json())
-    .then(file => {
-      const sha = file.sha;
-
-      return fetch("https://api.github.com/repos/rbelaire/swclassic/contents/data.json", {
-        method: "PUT",
-        headers: {
-          Authorization: `token ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: "Update tournament data",
-          content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))),
-          sha: sha
-        })
-      });
-    })
-    .then(res => res.json())
     .then(resp => {
-      if (resp.content) {
+      if (resp.success) {
         markSaved();
         saveCachedData(data);
         saveLeaderboardCache(data);
-        loadData();
-        alert("Saved successfully! Pages will update automatically within 30 seconds.");
-        saveBtn.textContent = originalText;
-        saveBtn.disabled = false;
+        alert("Saved successfully!");
       } else {
-        throw new Error("Save failed");
+        throw new Error(resp.error || "Save failed");
       }
+      saveBtn.textContent = originalText;
+      saveBtn.disabled = false;
     })
     .catch(err => {
       console.error(err);
-      alert("Save failed. Check your token and try again.");
+      alert("Save failed: " + err.message);
       saveBtn.textContent = originalText;
       saveBtn.disabled = false;
     });

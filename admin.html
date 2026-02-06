@@ -8,6 +8,28 @@
   <link rel="icon" href="/favicon.ico">
 </head>
 <body>
+
+  <!-- Login Overlay -->
+  <div class="admin-login-overlay" id="login-overlay">
+    <div class="admin-login-card">
+      <div class="admin-login-header">ADMIN</div>
+      <div class="admin-login-subtitle">The Classic 2026</div>
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="admin-login-field">
+          <label for="login-user">Username</label>
+          <input type="text" id="login-user" autocomplete="username" required>
+        </div>
+        <div class="admin-login-field">
+          <label for="login-pass">Password</label>
+          <input type="password" id="login-pass" autocomplete="current-password" required>
+        </div>
+        <div class="admin-login-error" id="login-error"></div>
+        <button type="submit" class="admin-login-btn">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="admin-app" style="display:none;">
   <nav class="navbar">
     <input type="checkbox" id="nav-toggle" class="nav-toggle">
     <label for="nav-toggle" class="nav-toggle-label">Menu</label>
@@ -28,7 +50,7 @@
         <p class="admin-subtitle">Draft players, build matchups, and enter scores.</p>
       </div>
       <div class="admin-actions">
-        <button class="btn-primary" type="button" onclick="saveToGitHub()">Save to GitHub</button>
+        <button class="btn-primary" type="button" onclick="saveData()">Save</button>
         <div class="save-reminder" id="save-reminder">Unsaved changes</div>
       </div>
     </header>
@@ -113,6 +135,7 @@
       <section class="foursomes" id="foursomes" aria-live="polite"></section>
     </div>
   </main>
+  </div><!-- end #admin-app -->
 
   <script src="admin.js"></script>
 </body>
