@@ -126,6 +126,8 @@ function showMatchupModal(match, data) {
               </div>
             </div>
           </div>
+
+          ${buildModalScorecard(match, p1, p2)}
         </div>
       </div>
     </div>
@@ -154,4 +156,112 @@ function getStrokeHoles(numStrokes) {
 
   // Return the N hardest holes
   return sortedByDifficulty.slice(0, numStrokes);
+}
+
+/*************************
+ * HOLE-BY-HOLE SCORECARD IN MODAL
+ *************************/
+
+function buildModalScorecard(match, p1, p2) {
+  const holes = match.points.holes;
+  if (!holes) return '';
+
+  // Check if any holes have been played
+  const anyPlayed = Object.values(holes).some(v => v !== null && v !== undefined);
+  if (!anyPlayed) return '';
+
+  // Find current hole (first null = on course)
+  let currentHole = null;
+  let totalPlayed = 0;
+  for (let h = 1; h <= 18; h++) {
+    if (holes[h] !== null && holes[h] !== undefined) {
+      totalPlayed++;
+    } else if (currentHole === null) {
+      currentHole = h;
+    }
+  }
+
+  const progressText = totalPlayed >= 18 ? 'Complete' : currentHole ? `Through ${totalPlayed}` : `Through ${totalPlayed}`;
+
+  // Build scorecard
+  let html = `<div class="modal-section">
+    <h3>Hole-by-Hole Scorecard</h3>
+    <div class="modal-scorecard-progress">${progressText}</div>
+    <div class="modal-scorecard">`;
+
+  // Front 9
+  html += buildScorecardNine(holes, 1, 9, p1, p2, currentHole, 'Front 9');
+
+  // Back 9
+  html += buildScorecardNine(holes, 10, 18, p1, p2, currentHole, 'Back 9');
+
+  html += `</div></div>`;
+  return html;
+}
+
+function buildScorecardNine(holes, startHole, endHole, p1, p2, currentHole, label) {
+  let p1Wins = 0;
+  let p2Wins = 0;
+  let played = 0;
+
+  let html = `<table class="scorecard-table">
+    <thead>
+      <tr>
+        <th class="scorecard-label" colspan="2">${label}</th>`;
+  for (let h = startHole; h <= endHole; h++) {
+    html += `<th class="scorecard-hole-num ${h === currentHole ? 'current-hole' : ''}">${h}</th>`;
+  }
+  html += `<th class="scorecard-tally">Result</th></tr>
+    <tr class="scorecard-par-row">
+      <td colspan="2" class="scorecard-par-label">Par</td>`;
+  for (let h = startHole; h <= endHole; h++) {
+    const holeData = h <= 9 ? SCORECARD.front9[h - 1] : SCORECARD.back9[h - 10];
+    html += `<td class="scorecard-par">${holeData.par}</td>`;
+  }
+  html += `<td></td></tr></thead><tbody><tr>
+    <td colspan="2" class="scorecard-winner-label">Winner</td>`;
+
+  for (let h = startHole; h <= endHole; h++) {
+    const v = holes[h];
+    let cellClass = 'scorecard-cell';
+    let cellContent = '';
+
+    if (h === currentHole) cellClass += ' current-hole';
+
+    if (v === 1) {
+      cellClass += ' scorecard-p1';
+      cellContent = p1.name.substring(0, 3);
+      p1Wins++;
+      played++;
+    } else if (v === 0) {
+      cellClass += ' scorecard-p2';
+      cellContent = p2.name.substring(0, 3);
+      p2Wins++;
+      played++;
+    } else if (v === 0.5) {
+      cellClass += ' scorecard-halved';
+      cellContent = '-';
+      played++;
+    } else {
+      cellClass += ' scorecard-empty';
+    }
+
+    html += `<td class="${cellClass}">${cellContent}</td>`;
+  }
+
+  // Tally
+  let tallyText = '';
+  if (played === 0) {
+    tallyText = '-';
+  } else if (p1Wins > p2Wins) {
+    tallyText = `${p1.name.substring(0, 3)} ${p1Wins}-${p2Wins}`;
+  } else if (p2Wins > p1Wins) {
+    tallyText = `${p2.name.substring(0, 3)} ${p2Wins}-${p1Wins}`;
+  } else {
+    tallyText = `${p1Wins}-${p2Wins}`;
+  }
+
+  html += `<td class="scorecard-tally-cell">${tallyText}</td>`;
+  html += `</tr></tbody></table>`;
+  return html;
 }

@@ -5,10 +5,13 @@
  *************************/
 
 const ADMIN_PASSWORD = "classic2026";
+const VALID_USERS = ["admin", "foursome1", "foursome2", "foursome3"];
 let hasUnsavedChanges = false;
 let expandedMatchIndex = null;
 let activeTab = "draft";
 let adminUser = "";
+let userRole = "admin"; // "admin" or "foursome"
+let userFoursome = null; // 0, 1, 2 (index)
 
 // Login handling
 function handleLogin(e) {
@@ -17,28 +20,80 @@ function handleLogin(e) {
   const pass = document.getElementById("login-pass").value;
   const errorEl = document.getElementById("login-error");
 
-  if (pass !== ADMIN_PASSWORD) {
-    errorEl.textContent = "Invalid password";
+  const userLower = user.toLowerCase();
+  if (pass !== ADMIN_PASSWORD || !VALID_USERS.includes(userLower)) {
+    errorEl.textContent = !VALID_USERS.includes(userLower) ? "Invalid username" : "Invalid password";
     document.getElementById("login-pass").value = "";
     document.getElementById("login-pass").focus();
     return;
   }
 
-  adminUser = user;
-  sessionStorage.setItem("adminAuth", "true");
-  sessionStorage.setItem("adminUser", user);
+  adminUser = userLower;
+  localStorage.setItem("adminAuth", "true");
+  localStorage.setItem("adminUser", userLower);
+  applyRole();
   showAdmin();
+}
+
+function applyRole() {
+  const match = adminUser.match(/^foursome(\d)$/);
+  if (match) {
+    userRole = "foursome";
+    userFoursome = parseInt(match[1]) - 1; // 0-indexed
+  } else {
+    userRole = "admin";
+    userFoursome = null;
+  }
+}
+
+function isFoursomeUser() {
+  return userRole === "foursome";
 }
 
 function showAdmin() {
   document.getElementById("login-overlay").classList.add("hidden");
   document.getElementById("admin-app").style.display = "";
+
+  // Hide tabs + admin-only buttons for foursome users
+  const tabBar = document.querySelector(".admin-tabs");
+  const clearBtn = document.querySelector(".btn-danger");
+  const eyebrow = document.getElementById("admin-eyebrow");
+  const title = document.getElementById("admin-title");
+  const subtitle = document.getElementById("admin-subtitle");
+
+  if (isFoursomeUser()) {
+    if (tabBar) tabBar.style.display = "none";
+    if (clearBtn) clearBtn.style.display = "none";
+    if (eyebrow) eyebrow.textContent = `Foursome ${userFoursome + 1} Scorer`;
+    if (title) title.textContent = `Foursome ${userFoursome + 1}`;
+    if (subtitle) subtitle.textContent = "Enter hole-by-hole scores for your matches.";
+  } else {
+    if (tabBar) tabBar.style.display = "";
+    if (clearBtn) clearBtn.style.display = "";
+    if (eyebrow) eyebrow.textContent = "Admin Console";
+    if (title) title.textContent = "Admin Console";
+    if (subtitle) subtitle.textContent = "Draft players, build matchups, and enter scores.";
+  }
+
   loadData();
 }
 
+function logout() {
+  if (hasUnsavedChanges && !confirm("You have unsaved changes. Log out anyway?")) return;
+  localStorage.removeItem("adminAuth");
+  localStorage.removeItem("adminUser");
+  adminUser = "";
+  hasUnsavedChanges = false;
+  document.getElementById("admin-app").style.display = "none";
+  document.getElementById("login-overlay").classList.remove("hidden");
+  document.getElementById("login-form").reset();
+  document.getElementById("login-error").textContent = "";
+}
+
 // Check session on load
-if (sessionStorage.getItem("adminAuth") === "true") {
-  adminUser = sessionStorage.getItem("adminUser") || "";
+if (localStorage.getItem("adminAuth") === "true") {
+  adminUser = localStorage.getItem("adminUser") || "";
+  applyRole();
   showAdmin();
 }
 
@@ -146,6 +201,19 @@ function detectDefaultTab() {
  * RENDER DISPATCH
  *************************/
 function render() {
+  if (isFoursomeUser()) {
+    // Foursome users: always scores tab, only their foursome
+    activeTab = "scores";
+    document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+    const scoresTab = document.getElementById("tab-scores");
+    if (scoresTab) scoresTab.classList.add("active");
+
+    renderStats();
+    renderTotals();
+    renderFoursomes();
+    return;
+  }
+
   // Auto-detect tab on first load
   if (!render._initialized) {
     render._initialized = true;
@@ -399,6 +467,17 @@ function updateMatchupPlayer(matchIndex, playerIndex, playerId) {
  * SCORE ENTRY TAB
  *************************/
 function renderStats() {
+  // Hide stats and totals for foursome users
+  const statsSection = document.querySelector(".admin-stats");
+  const totalsSection = document.querySelector(".totals-panel");
+  if (isFoursomeUser()) {
+    if (statsSection) statsSection.style.display = "none";
+    if (totalsSection) totalsSection.style.display = "none";
+    return;
+  }
+  if (statsSection) statsSection.style.display = "";
+  if (totalsSection) totalsSection.style.display = "";
+
   let complete = 0;
   let inProgress = 0;
   let notStarted = 0;
@@ -476,6 +555,9 @@ function renderFoursomes() {
   }
 
   foursomes.forEach((matches, foursomeIndex) => {
+    // Foursome users only see their own foursome
+    if (isFoursomeUser() && foursomeIndex !== userFoursome) return;
+
     const foursomeDiv = document.createElement("div");
     foursomeDiv.className = "foursome-container";
 
@@ -555,16 +637,7 @@ function buildMatch(match, matchIndex) {
         </div>
       </div>
 
-      <div class="scores-grid">
-        <div class="score-wrap">
-          <label>Front 9 Winner</label>
-          ${buildScoreSelect(match, "front9", matchIndex, valid)}
-        </div>
-        <div class="score-wrap">
-          <label>Back 9 Winner</label>
-          ${buildScoreSelect(match, "back9", matchIndex, valid)}
-        </div>
-      </div>
+      ${valid ? buildHoleByHoleGrid(match, matchIndex) : ''}
 
       <div class="match-actions">
         <button class="match-btn" onclick="clearMatch(${matchIndex})">
@@ -615,6 +688,141 @@ function buildScoreSelect(match, key, matchIndex, valid) {
   return html;
 }
 
+/*************************
+ * HOLE-BY-HOLE SCORING
+ *************************/
+
+// Course par data for quick lookup
+const COURSE_PARS = {
+  1: 5, 2: 4, 3: 3, 4: 5, 5: 4, 6: 4, 7: 3, 8: 4, 9: 4,
+  10: 4, 11: 5, 12: 4, 13: 3, 14: 4, 15: 4, 16: 4, 17: 3, 18: 5
+};
+
+function buildHoleByHoleGrid(match, matchIndex) {
+  const [p1Id, p2Id] = match.playerIds;
+  const p1Name = p1Id ? data.players[p1Id].name : "P1";
+  const p2Name = p2Id ? data.players[p2Id].name : "P2";
+  const holes = match.points.holes || {};
+
+  // Calculate nine results for display
+  const front9Result = calculateNineFromHoles(holes, 1, 9);
+  const back9Result = calculateNineFromHoles(holes, 10, 18);
+
+  // Count holes played per nine
+  const front9Played = countHolesPlayed(holes, 1, 9);
+  const back9Played = countHolesPlayed(holes, 10, 18);
+
+  let html = `<div class="hole-scoring-section">`;
+
+  // Nine result summary bar
+  html += `<div class="nine-results-bar">
+    <div class="nine-result-item">
+      <span class="nine-result-label">Front 9</span>
+      <span class="nine-result-value ${front9Result === null ? 'pending' : ''}">${formatNineResult(front9Result, p1Name, p2Name, front9Played)}</span>
+    </div>
+    <div class="nine-result-item">
+      <span class="nine-result-label">Back 9</span>
+      <span class="nine-result-value ${back9Result === null ? 'pending' : ''}">${formatNineResult(back9Result, p1Name, p2Name, back9Played)}</span>
+    </div>
+  </div>`;
+
+  // Front 9 grid
+  html += `<div class="hole-grid-section">
+    <div class="hole-grid-label">Front 9</div>
+    <div class="hole-grid">`;
+  for (let h = 1; h <= 9; h++) {
+    html += buildHoleRow(h, holes[h], p1Name, p2Name, matchIndex);
+  }
+  html += `</div></div>`;
+
+  // Back 9 grid
+  html += `<div class="hole-grid-section">
+    <div class="hole-grid-label">Back 9</div>
+    <div class="hole-grid">`;
+  for (let h = 10; h <= 18; h++) {
+    html += buildHoleRow(h, holes[h], p1Name, p2Name, matchIndex);
+  }
+  html += `</div></div>`;
+
+  html += `</div>`;
+  return html;
+}
+
+function buildHoleRow(holeNum, value, p1Name, p2Name, matchIndex) {
+  const par = COURSE_PARS[holeNum];
+  const isP1 = value === 1;
+  const isHalved = value === 0.5;
+  const isP2 = value === 0;
+
+  return `
+    <div class="hole-row">
+      <div class="hole-info">
+        <span class="hole-num">${holeNum}</span>
+        <span class="hole-par">Par ${par}</span>
+      </div>
+      <div class="hole-buttons">
+        <button class="hole-btn hole-btn-p1 ${isP1 ? 'active' : ''}" onclick="setHoleResult(${matchIndex}, ${holeNum}, ${isP1 ? 'null' : '1'})">${p1Name}</button>
+        <button class="hole-btn hole-btn-halved ${isHalved ? 'active' : ''}" onclick="setHoleResult(${matchIndex}, ${holeNum}, ${isHalved ? 'null' : '0.5'})">Tie</button>
+        <button class="hole-btn hole-btn-p2 ${isP2 ? 'active' : ''}" onclick="setHoleResult(${matchIndex}, ${holeNum}, ${isP2 ? 'null' : '0'})">${p2Name}</button>
+      </div>
+    </div>`;
+}
+
+function setHoleResult(matchIndex, holeNum, value) {
+  const match = data.matches[matchIndex];
+  if (!match.points.holes) {
+    match.points.holes = {};
+    for (let i = 1; i <= 18; i++) match.points.holes[i] = null;
+  }
+
+  match.points.holes[holeNum] = value;
+
+  // Auto-calculate front9 and back9
+  match.points.front9 = calculateNineFromHoles(match.points.holes, 1, 9);
+  match.points.back9 = calculateNineFromHoles(match.points.holes, 10, 18);
+
+  markUnsaved();
+  render();
+}
+
+function calculateNineFromHoles(holes, startHole, endHole) {
+  if (!holes) return null;
+
+  let p1Wins = 0;
+  let p2Wins = 0;
+  let anyPlayed = false;
+
+  for (let h = startHole; h <= endHole; h++) {
+    const v = holes[h];
+    if (v === null || v === undefined) continue;
+    anyPlayed = true;
+    if (v === 1) p1Wins++;
+    else if (v === 0) p2Wins++;
+    // 0.5 = halved, doesn't count for either
+  }
+
+  if (!anyPlayed) return null;
+  if (p1Wins > p2Wins) return 1;
+  if (p2Wins > p1Wins) return 0;
+  return 0.5;
+}
+
+function countHolesPlayed(holes, startHole, endHole) {
+  if (!holes) return 0;
+  let count = 0;
+  for (let h = startHole; h <= endHole; h++) {
+    if (holes[h] !== null && holes[h] !== undefined) count++;
+  }
+  return count;
+}
+
+function formatNineResult(result, p1Name, p2Name, holesPlayed) {
+  if (result === null) return holesPlayed > 0 ? `In progress (${holesPlayed} holes)` : 'Not started';
+  if (result === 1) return `${p1Name} wins (${holesPlayed} holes)`;
+  if (result === 0) return `${p2Name} wins (${holesPlayed} holes)`;
+  return `Halved (${holesPlayed} holes)`;
+}
+
 function isValidMatchup(match) {
   const [p1, p2] = match.playerIds;
   if (!p1 || !p2) return false;
@@ -642,11 +850,39 @@ function updateScore(matchIndex, key, value) {
   render();
 }
 
+function clearAll() {
+  if (!confirm("Reset EVERYTHING? This will undo the draft, matchups, and all scores.")) return;
+  if (!confirm("Are you sure? This cannot be undone without re-drafting.")) return;
+
+  // Reset all players to undrafted (except coaches)
+  Object.values(data.players).forEach(p => {
+    if (p.team !== "coach") p.team = null;
+  });
+
+  // Reset all matches
+  data.matches.forEach(match => {
+    match.playerIds = [null, null];
+    match.points.front9 = null;
+    match.points.back9 = null;
+    if (match.points.holes) {
+      for (let i = 1; i <= 18; i++) match.points.holes[i] = null;
+    }
+    match.status = "not_started";
+  });
+
+  markUnsaved();
+  render._initialized = false;
+  switchTab("draft");
+}
+
 function clearMatch(matchIndex) {
   if (!confirm("Clear all scores for this match?")) return;
   const match = data.matches[matchIndex];
   match.points.front9 = null;
   match.points.back9 = null;
+  if (match.points.holes) {
+    for (let i = 1; i <= 18; i++) match.points.holes[i] = null;
+  }
   markUnsaved();
   render();
 }

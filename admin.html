@@ -26,6 +26,7 @@
         <div class="admin-login-error" id="login-error"></div>
         <button type="submit" class="admin-login-btn">Sign In</button>
       </form>
+      <a href="index.html" class="admin-login-back">&larr; Back to Site</a>
     </div>
   </div>
 
@@ -45,12 +46,14 @@
   <main class="admin-page">
     <header class="admin-header">
       <div>
-        <div class="admin-eyebrow">Admin Console</div>
-        <h1>Admin Console</h1>
-        <p class="admin-subtitle">Draft players, build matchups, and enter scores.</p>
+        <div class="admin-eyebrow" id="admin-eyebrow">Admin Console</div>
+        <h1 id="admin-title">Admin Console</h1>
+        <p class="admin-subtitle" id="admin-subtitle">Draft players, build matchups, and enter scores.</p>
       </div>
       <div class="admin-actions">
         <button class="btn-primary" type="button" onclick="saveData()">Save</button>
+        <button class="btn-danger" type="button" onclick="clearAll()">Clear All</button>
+        <button class="btn-logout" type="button" onclick="logout()">Log Out</button>
         <div class="save-reminder" id="save-reminder">Unsaved changes</div>
       </div>
     </header>

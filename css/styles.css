@@ -228,15 +228,16 @@ body {
    ===================== */
 .rules-strip {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  flex-wrap: wrap;
-  gap: clamp(10px, 2vw, 16px);
+  gap: clamp(8px, 1.5vw, 12px);
   padding: clamp(10px, 2vw, 14px) clamp(12px, 3vw, 18px);
   margin-bottom: clamp(18px, 3vw, 26px);
   background: var(--color-card);
   border: 1px solid var(--masters-gold);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
+  text-align: center;
 }
 
 .rules-strip__title {
@@ -245,13 +246,13 @@ body {
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--masters-green);
-  flex: 0 0 auto;
 }
 
 .rules-strip__list {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: clamp(6px, 2vw, 12px);
   margin: 0;
   padding: 0;
@@ -270,7 +271,7 @@ body {
 
 @media (max-width: 640px) {
   .rules-strip {
-    align-items: flex-start;
+    align-items: center;
   }
 
   .rules-strip__list li {
@@ -1632,6 +1633,44 @@ button:active {
   cursor: not-allowed;
 }
 
+.btn-danger {
+  background: transparent;
+  color: var(--masters-red, #c0392b);
+  border: 1px solid var(--masters-red, #c0392b);
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-danger:hover {
+  background: var(--masters-red, #c0392b);
+  color: #fff;
+}
+
+.btn-logout {
+  background: transparent;
+  color: var(--masters-red, #c0392b);
+  border: 1px solid var(--masters-red, #c0392b);
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-logout:hover {
+  background: var(--masters-red, #c0392b);
+  color: #fff;
+}
+
 .save-reminder {
   display: none;
   font-weight: 600;
@@ -2674,26 +2713,66 @@ button[onclick="showDraftOrder()"],
    ===================================================== */
 
 @media (max-width: 768px) {
-  .player-card {
-    padding: clamp(14px, 2.5vw, 18px);  /* EXTRA compact on mobile */
+  /* Compact row layout for player pool cards on mobile */
+  .rankings-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
-  .rankings-grid {
-    gap: clamp(14px, 3vw, 16px);  /* TIGHTER on mobile */
+  .player-card {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    border-width: 1px;
+    border-radius: 8px;
+    animation: none !important;
+  }
+
+  .player-card::before {
+    display: none;
+  }
+
+  .player-card:hover {
+    transform: none;
   }
 
   .rank-badge {
-    width: clamp(40px, 8vw, 48px);
-    height: clamp(40px, 8vw, 48px);
-    font-size: clamp(1.2em, 3vw, 1.4em);
+    position: static;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    font-size: 0.9em;
+    margin-right: 12px;
+    box-shadow: none;
   }
 
   .player-name {
-    font-size: clamp(1.3em, 3vw, 1.5em);
+    font-size: 1.05em;
+    margin-bottom: 0;
+    padding-right: 0;
+    flex: 1;
+  }
+
+  .player-stats {
+    margin-top: 0;
+    gap: 0;
   }
 
   .stat {
-    padding: clamp(8px, 1.5vw, 11px);
+    padding: 4px 10px;
+    border: none;
+    background: none;
+    min-width: auto;
+  }
+
+  .stat-label {
+    font-size: 0.65em;
+    margin-bottom: 1px;
+  }
+
+  .stat-value {
+    font-size: 1em;
   }
 
   .highlight-box {
@@ -3090,21 +3169,56 @@ RESULT:
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .captains-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 8px;
     }
 
     .captains-vs {
-        transform: none;
-        margin: 10px 0;
+        font-size: clamp(1.4em, 4vw, 2em);
+        margin: 0;
+    }
+
+    .captain-card {
+        padding: 12px 10px;
+        max-width: none;
+    }
+
+    .captain-card h3 {
+        font-size: clamp(1.1em, 3.5vw, 1.4em);
+        margin-bottom: 8px;
+        letter-spacing: 1px;
     }
 
     .captain-stats {
-        gap: 12px;
+        gap: 6px;
+        margin: 8px 0;
     }
 
     .captain-stat {
-        min-width: clamp(65px, 20vw, 80px);
+        min-width: 0;
+        padding: 6px 8px;
+    }
+
+    .captain-stat .stat-label {
+        font-size: 0.65em;
+        margin-bottom: 2px;
+    }
+
+    .captain-stat .stat-value {
+        font-size: 1.05em;
+    }
+
+    .captains-section .draft-order-note {
+        padding: 10px 14px;
+        margin-top: 14px;
+        font-size: 0.85em;
+        line-height: 1.4;
+    }
+
+    .draft-order-guesses {
+        gap: 16px;
+        margin-top: 6px;
+        font-size: 0.9em;
     }
 }
 
@@ -3332,6 +3446,21 @@ RESULT:
   transform: translateY(0);
 }
 
+.admin-login-back {
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85em;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: color 0.2s;
+}
+
+.admin-login-back:hover {
+  color: #fff;
+}
+
 /* =====================================================
    ADMIN TAB STYLES
    ===================================================== */
@@ -3511,6 +3640,274 @@ RESULT:
 }
 
 /* =====================================================
+   HOLE-BY-HOLE SCORING - ADMIN
+   ===================================================== */
+
+.hole-scoring-section {
+  margin-top: 12px;
+}
+
+.nine-results-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.nine-result-item {
+  flex: 1;
+  background: rgba(0, 103, 71, 0.06);
+  border: 1px solid rgba(0, 103, 71, 0.15);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  text-align: center;
+}
+
+.nine-result-label {
+  display: block;
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-muted);
+  margin-bottom: 2px;
+}
+
+.nine-result-value {
+  display: block;
+  font-size: 0.85em;
+  font-weight: 700;
+  color: var(--masters-green);
+}
+
+.nine-result-value.pending {
+  color: var(--color-muted);
+  font-weight: 400;
+}
+
+.hole-grid-section {
+  margin-bottom: 12px;
+}
+
+.hole-grid-label {
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--color-muted);
+  margin-bottom: 6px;
+  padding-left: 2px;
+}
+
+.hole-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hole-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(0, 103, 71, 0.06);
+}
+
+.hole-row:last-child {
+  border-bottom: none;
+}
+
+.hole-info {
+  min-width: 70px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hole-num {
+  font-weight: 700;
+  font-size: 0.9em;
+  color: var(--masters-green);
+  min-width: 20px;
+  text-align: right;
+}
+
+.hole-par {
+  font-size: 0.7em;
+  color: var(--color-muted);
+  text-transform: uppercase;
+}
+
+.hole-buttons {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.hole-btn {
+  flex: 1;
+  padding: 6px 4px;
+  border: 2px solid rgba(0, 103, 71, 0.2);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
+  cursor: pointer;
+  font-size: 0.75em;
+  font-family: 'Copperplate', 'Copperplate Gothic', Georgia, serif;
+  transition: all 0.15s ease;
+  text-align: center;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hole-btn:hover {
+  border-color: var(--masters-green);
+  background: rgba(0, 103, 71, 0.05);
+}
+
+.hole-btn-p1.active {
+  background: var(--masters-green);
+  color: #fff;
+  border-color: var(--masters-green);
+}
+
+.hole-btn-halved.active {
+  background: var(--masters-gold);
+  color: #fff;
+  border-color: var(--masters-gold);
+}
+
+.hole-btn-p2.active {
+  background: var(--masters-dark-green);
+  color: #fff;
+  border-color: var(--masters-dark-green);
+}
+
+/* =====================================================
+   HOLE-BY-HOLE SCORECARD - LEADERBOARD MODAL
+   ===================================================== */
+
+.modal-scorecard {
+  margin-top: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal-scorecard-progress {
+  font-size: 0.8em;
+  color: var(--masters-green);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.scorecard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8em;
+  min-width: 420px;
+  margin-bottom: 12px;
+}
+
+.scorecard-table thead {
+  background: var(--masters-green);
+  color: #fff;
+}
+
+.scorecard-label {
+  text-align: left;
+  padding: 6px 8px;
+  font-size: 0.85em;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.scorecard-hole-num {
+  padding: 6px 4px;
+  text-align: center;
+  min-width: 28px;
+  font-weight: 700;
+}
+
+.scorecard-hole-num.current-hole {
+  background: var(--masters-gold);
+  color: var(--masters-black);
+}
+
+.scorecard-par-row {
+  background: rgba(0, 103, 71, 0.08);
+}
+
+.scorecard-par-label {
+  text-align: left;
+  padding: 4px 8px;
+  font-size: 0.8em;
+  color: var(--color-muted);
+  text-transform: uppercase;
+}
+
+.scorecard-par {
+  text-align: center;
+  padding: 4px;
+  font-size: 0.85em;
+  color: var(--color-muted);
+}
+
+.scorecard-winner-label {
+  text-align: left;
+  padding: 6px 8px;
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-muted);
+}
+
+.scorecard-cell {
+  text-align: center;
+  padding: 6px 2px;
+  font-size: 0.8em;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(0, 103, 71, 0.08);
+}
+
+.scorecard-cell.current-hole {
+  background: rgba(212, 175, 55, 0.15);
+}
+
+.scorecard-p1 {
+  color: var(--masters-green);
+  background: rgba(0, 103, 71, 0.08);
+}
+
+.scorecard-p2 {
+  color: var(--masters-dark-green);
+  background: rgba(0, 77, 53, 0.08);
+}
+
+.scorecard-halved {
+  color: var(--masters-gold);
+}
+
+.scorecard-empty {
+  color: #ccc;
+}
+
+.scorecard-tally {
+  padding: 6px 8px;
+  text-align: center;
+  font-weight: 700;
+  min-width: 60px;
+}
+
+.scorecard-tally-cell {
+  padding: 6px 8px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.8em;
+  color: var(--masters-green);
+  white-space: nowrap;
+}
+
+/* =====================================================
    DRAFT SLOTS & ADMIN - MOBILE RESPONSIVE
    ===================================================== */
 
@@ -3623,5 +4020,52 @@ RESULT:
 
   .matchup-builder-vs {
     font-size: 0.9em;
+  }
+
+  /* Hole-by-hole scoring mobile */
+  .nine-results-bar {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .hole-info {
+    min-width: 60px;
+  }
+
+  .hole-btn {
+    font-size: 0.68em;
+    padding: 6px 2px;
+    min-height: 38px;
+  }
+
+  .hole-num {
+    font-size: 0.85em;
+  }
+
+  /* Scorecard table mobile */
+  .modal-scorecard {
+    margin-left: -12px;
+    margin-right: -12px;
+    padding: 0 4px;
+  }
+
+  .scorecard-table {
+    font-size: 0.7em;
+    min-width: 360px;
+  }
+
+  .scorecard-hole-num {
+    min-width: 22px;
+    padding: 4px 2px;
+  }
+
+  .scorecard-cell {
+    padding: 4px 1px;
+    font-size: 0.75em;
+  }
+
+  .scorecard-tally-cell {
+    font-size: 0.7em;
+    padding: 4px;
   }
 }
