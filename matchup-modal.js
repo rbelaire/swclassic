@@ -30,11 +30,7 @@ const SCORECARD = {
 
 function showMatchupModal(match, data) {
   const [p1Id, p2Id] = match.playerIds;
-
-  // Don't show modal if players not selected yet
-  if (!p1Id || !p2Id) {
-    return;
-  }
+  if (!p1Id || !p2Id) return;
 
   const p1 = data.players[p1Id];
   const p2 = data.players[p2Id];
@@ -42,7 +38,6 @@ function showMatchupModal(match, data) {
   // Calculate differential
   const popsDiff = Math.abs(p1.pops - p2.pops);
   const underdog = p1.pops > p2.pops ? p1 : p2;
-  const favorite = p1.pops > p2.pops ? p2 : p1;
 
   // Get strokes per nine
   const strokeHoles = getStrokeHoles(popsDiff);
@@ -53,87 +48,26 @@ function showMatchupModal(match, data) {
   const modalHTML = `
     <div class="modal-overlay" onclick="closeMatchupModal()">
       <div class="modal-content" onclick="event.stopPropagation()">
-        <button class="modal-close" onclick="closeMatchupModal()">✕</button>
+        <button class="modal-close" onclick="closeMatchupModal()">\u2715</button>
 
         <div class="modal-header">
-          <h2>Match ${match.id} Details</h2>
+          <div class="modal-header-names">
+            <span class="modal-header-p1">${p1.name}</span>
+            <span class="modal-header-vs">vs</span>
+            <span class="modal-header-p2">${p2.name}</span>
+          </div>
+          <div class="modal-header-sub">${p1.pops} pops vs ${p2.pops} pops${popsDiff > 0 ? ` \u2022 ${underdog.name} gets ${popsDiff}` : ' \u2022 Even match'}</div>
         </div>
 
         <div class="modal-body">
-          <!-- Players -->
-          <div class="modal-matchup">
-            <div class="modal-player">
-              <div class="modal-player-name">${p1.name}</div>
-              <div class="modal-player-info">${p1.pops} pops • Team ${p1.team === 'brock' ? 'Brock' : 'Jared'}</div>
-            </div>
-            <div class="modal-vs">VS</div>
-            <div class="modal-player">
-              <div class="modal-player-name">${p2.name}</div>
-              <div class="modal-player-info">${p2.pops} pops • Team ${p2.team === 'brock' ? 'Brock' : 'Jared'}</div>
-            </div>
-          </div>
+          ${buildCompactScorecard(match, p1, p2)}
 
-          <!-- Handicap Advantage -->
-          <div class="modal-section">
-            <h3>📊 Handicap Advantage</h3>
-            ${popsDiff === 0
-              ? `<p>Even match - no handicap strokes.</p>`
-              : `<p><strong>${underdog.name}</strong> gets <strong>${popsDiff} stroke${popsDiff > 1 ? 's' : ''}</strong> on the hardest holes.</p>`
-            }
-          </div>
-
-          ${popsDiff > 0 ? `
-          <!-- Front 9 Breakdown -->
-          <div class="modal-section">
-            <h3>⛳ Front 9 Breakdown</h3>
-            <p><strong>${underdog.name}</strong> gets <strong>${front9Strokes.length} stroke${front9Strokes.length !== 1 ? 's' : ''}</strong>:</p>
-            <div class="hole-list">
-              ${front9Strokes.map(h => `
-                <div class="hole-item">
-                  <span class="hole-number">Hole ${h.hole}</span>
-                  <span class="hole-details">Par ${h.par} • ${h.yardage.black}yds • H${h.handicap}</span>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-
-          <!-- Back 9 Breakdown -->
-          <div class="modal-section">
-            <h3>⛳ Back 9 Breakdown</h3>
-            <p><strong>${underdog.name}</strong> gets <strong>${back9Strokes.length} stroke${back9Strokes.length !== 1 ? 's' : ''}</strong>:</p>
-            <div class="hole-list">
-              ${back9Strokes.map(h => `
-                <div class="hole-item">
-                  <span class="hole-number">Hole ${h.hole}</span>
-                  <span class="hole-details">Par ${h.par} • ${h.yardage.black}yds • H${h.handicap}</span>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-          ` : ''}
-
-          <!-- Current Score -->
-          <div class="modal-section">
-            <h3>📈 Current Score</h3>
-            <div class="score-summary">
-              <div class="score-row">
-                <span>Front 9:</span>
-                <span><strong>${match.points.front9 === null ? 'Not Started' : `${p1.name} ${match.points.front9} - ${1 - match.points.front9} ${p2.name}`}</strong></span>
-              </div>
-              <div class="score-row">
-                <span>Back 9:</span>
-                <span><strong>${match.points.back9 === null ? 'Not Started' : `${p1.name} ${match.points.back9} - ${1 - match.points.back9} ${p2.name}`}</strong></span>
-              </div>
-            </div>
-          </div>
-
-          ${buildModalScorecard(match, p1, p2)}
+          ${popsDiff > 0 ? buildPopsBreakdown(front9Strokes, back9Strokes, underdog) : ''}
         </div>
       </div>
     </div>
   `;
 
-  // Add modal to page
   const modalDiv = document.createElement('div');
   modalDiv.id = 'matchup-modal';
   modalDiv.innerHTML = modalHTML;
@@ -142,126 +76,127 @@ function showMatchupModal(match, data) {
 
 function closeMatchupModal() {
   const modal = document.getElementById('matchup-modal');
-  if (modal) {
-    modal.remove();
-  }
+  if (modal) modal.remove();
 }
 
 function getStrokeHoles(numStrokes) {
   if (numStrokes === 0) return [];
-
-  // Combine all holes and sort by handicap (1 = hardest)
   const allHoles = [...SCORECARD.front9, ...SCORECARD.back9];
   const sortedByDifficulty = allHoles.sort((a, b) => a.handicap - b.handicap);
-
-  // Return the N hardest holes
   return sortedByDifficulty.slice(0, numStrokes);
 }
 
 /*************************
- * HOLE-BY-HOLE SCORECARD IN MODAL
+ * COMPACT HOLE-BY-HOLE SCORECARD
  *************************/
 
-function buildModalScorecard(match, p1, p2) {
+function buildCompactScorecard(match, p1, p2) {
   const holes = match.points.holes;
-  if (!holes) return '';
+  if (!holes) return '<div class="modal-section"><p style="text-align:center;opacity:0.6;">No scores yet</p></div>';
 
-  // Check if any holes have been played
   const anyPlayed = Object.values(holes).some(v => v !== null && v !== undefined);
-  if (!anyPlayed) return '';
+  if (!anyPlayed) return '<div class="modal-section"><p style="text-align:center;opacity:0.6;">No scores yet</p></div>';
 
-  // Find current hole (first null = on course)
-  let currentHole = null;
+  // Count wins per nine
+  let f9p1 = 0, f9p2 = 0, b9p1 = 0, b9p2 = 0;
   let totalPlayed = 0;
   for (let h = 1; h <= 18; h++) {
-    if (holes[h] !== null && holes[h] !== undefined) {
-      totalPlayed++;
-    } else if (currentHole === null) {
-      currentHole = h;
+    const v = holes[h];
+    if (v === null || v === undefined) continue;
+    totalPlayed++;
+    if (h <= 9) {
+      if (v === 1) f9p1++;
+      else if (v === 0) f9p2++;
+    } else {
+      if (v === 1) b9p1++;
+      else if (v === 0) b9p2++;
     }
   }
 
-  const progressText = totalPlayed >= 18 ? 'Complete' : currentHole ? `Through ${totalPlayed}` : `Through ${totalPlayed}`;
+  const progressText = totalPlayed >= 18 ? 'Final' : `Thru ${totalPlayed}`;
 
-  // Build scorecard
-  let html = `<div class="modal-section">
-    <h3>Hole-by-Hole Scorecard</h3>
-    <div class="modal-scorecard-progress">${progressText}</div>
-    <div class="modal-scorecard">`;
+  let html = `<div class="modal-section compact-scorecard-section">
+    <div class="compact-scorecard-header">
+      <span class="compact-scorecard-progress">${progressText}</span>
+    </div>`;
 
   // Front 9
-  html += buildScorecardNine(holes, 1, 9, p1, p2, currentHole, 'Front 9');
+  html += buildCompactNine(holes, 1, 9, p1, p2, f9p1, f9p2, 'Front 9', match.points.front9);
 
   // Back 9
-  html += buildScorecardNine(holes, 10, 18, p1, p2, currentHole, 'Back 9');
+  html += buildCompactNine(holes, 10, 18, p1, p2, b9p1, b9p2, 'Back 9', match.points.back9);
+
+  html += `</div>`;
+  return html;
+}
+
+function buildCompactNine(holes, startHole, endHole, p1, p2, p1Wins, p2Wins, label, nineResult) {
+  // Nine result text
+  let resultText = '';
+  let resultClass = '';
+  if (nineResult === 1) { resultText = p1.name; resultClass = 'result-p1'; }
+  else if (nineResult === 0) { resultText = p2.name; resultClass = 'result-p2'; }
+  else if (nineResult === 0.5) { resultText = 'Halved'; resultClass = 'result-halved'; }
+  else { resultText = '-'; resultClass = 'result-pending'; }
+
+  let html = `<div class="compact-nine">
+    <div class="compact-nine-header">
+      <span class="compact-nine-label">${label}</span>
+      <span class="compact-nine-tally">${p1.name.substring(0, 3)} ${p1Wins} - ${p2Wins} ${p2.name.substring(0, 3)}</span>
+      <span class="compact-nine-result ${resultClass}">${resultText}</span>
+    </div>
+    <div class="compact-holes-row">`;
+
+  for (let h = startHole; h <= endHole; h++) {
+    const v = holes[h];
+    let circleClass = 'compact-hole';
+
+    if (v === 1) circleClass += ' hole-p1';
+    else if (v === 0) circleClass += ' hole-p2';
+    else if (v === 0.5) circleClass += ' hole-halved';
+    else circleClass += ' hole-empty';
+
+    html += `<div class="${circleClass}"><span class="compact-hole-num">${h}</span></div>`;
+  }
 
   html += `</div></div>`;
   return html;
 }
 
-function buildScorecardNine(holes, startHole, endHole, p1, p2, currentHole, label) {
-  let p1Wins = 0;
-  let p2Wins = 0;
-  let played = 0;
+/*************************
+ * POPS BREAKDOWN WITH CIRCLE ICONS
+ *************************/
 
-  let html = `<table class="scorecard-table">
-    <thead>
-      <tr>
-        <th class="scorecard-label" colspan="2">${label}</th>`;
-  for (let h = startHole; h <= endHole; h++) {
-    html += `<th class="scorecard-hole-num ${h === currentHole ? 'current-hole' : ''}">${h}</th>`;
+function buildPopsBreakdown(front9Strokes, back9Strokes, underdog) {
+  const front9Set = new Set(front9Strokes.map(h => h.hole));
+  const back9Set = new Set(back9Strokes.map(h => h.hole));
+
+  let html = `<div class="modal-section pops-section">
+    <div class="pops-header">
+      <span class="pops-title">${underdog.name}'s Stroke Holes</span>
+      <span class="pops-count">${front9Strokes.length + back9Strokes.length} total</span>
+    </div>`;
+
+  // Front 9 pops
+  html += `<div class="pops-nine">
+    <span class="pops-nine-label">Front</span>
+    <div class="pops-holes-row">`;
+  for (let h = 1; h <= 9; h++) {
+    const isStroke = front9Set.has(h);
+    html += `<div class="pops-hole ${isStroke ? 'pops-stroke' : 'pops-no-stroke'}"><span>${h}</span></div>`;
   }
-  html += `<th class="scorecard-tally">Result</th></tr>
-    <tr class="scorecard-par-row">
-      <td colspan="2" class="scorecard-par-label">Par</td>`;
-  for (let h = startHole; h <= endHole; h++) {
-    const holeData = h <= 9 ? SCORECARD.front9[h - 1] : SCORECARD.back9[h - 10];
-    html += `<td class="scorecard-par">${holeData.par}</td>`;
+  html += `<span class="pops-nine-count">${front9Strokes.length}</span></div></div>`;
+
+  // Back 9 pops
+  html += `<div class="pops-nine">
+    <span class="pops-nine-label">Back</span>
+    <div class="pops-holes-row">`;
+  for (let h = 10; h <= 18; h++) {
+    const isStroke = back9Set.has(h);
+    html += `<div class="pops-hole ${isStroke ? 'pops-stroke' : 'pops-no-stroke'}"><span>${h}</span></div>`;
   }
-  html += `<td></td></tr></thead><tbody><tr>
-    <td colspan="2" class="scorecard-winner-label">Winner</td>`;
+  html += `<span class="pops-nine-count">${back9Strokes.length}</span></div></div>`;
 
-  for (let h = startHole; h <= endHole; h++) {
-    const v = holes[h];
-    let cellClass = 'scorecard-cell';
-    let cellContent = '';
-
-    if (h === currentHole) cellClass += ' current-hole';
-
-    if (v === 1) {
-      cellClass += ' scorecard-p1';
-      cellContent = p1.name.substring(0, 3);
-      p1Wins++;
-      played++;
-    } else if (v === 0) {
-      cellClass += ' scorecard-p2';
-      cellContent = p2.name.substring(0, 3);
-      p2Wins++;
-      played++;
-    } else if (v === 0.5) {
-      cellClass += ' scorecard-halved';
-      cellContent = '-';
-      played++;
-    } else {
-      cellClass += ' scorecard-empty';
-    }
-
-    html += `<td class="${cellClass}">${cellContent}</td>`;
-  }
-
-  // Tally
-  let tallyText = '';
-  if (played === 0) {
-    tallyText = '-';
-  } else if (p1Wins > p2Wins) {
-    tallyText = `${p1.name.substring(0, 3)} ${p1Wins}-${p2Wins}`;
-  } else if (p2Wins > p1Wins) {
-    tallyText = `${p2.name.substring(0, 3)} ${p2Wins}-${p1Wins}`;
-  } else {
-    tallyText = `${p1Wins}-${p2Wins}`;
-  }
-
-  html += `<td class="scorecard-tally-cell">${tallyText}</td>`;
-  html += `</tr></tbody></table>`;
+  html += `</div>`;
   return html;
 }
