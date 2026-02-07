@@ -36,26 +36,26 @@
       "pops": 10,
       "team": "coach"
     },
-    "veed": {
-      "name": "Veed",
-      "rank": 7,
-      "pops": 12,
-      "team": null
-    },
     "hunter": {
       "name": "Hunter",
-      "rank": 8,
+      "rank": 7,
       "pops": 14,
       "team": null
     },
     "colby": {
       "name": "Colby",
-      "rank": 9,
+      "rank": 8,
       "pops": 16,
       "team": null
     },
     "lane": {
       "name": "Lane",
+      "rank": 9,
+      "pops": 18,
+      "team": null
+    },
+    "nick": {
+      "name": "Nick",
       "rank": 10,
       "pops": 18,
       "team": null
@@ -280,7 +280,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-02-07T04:00:00.000Z",
+    "lastUpdated": "2026-02-07T05:00:00.000Z",
     "tournamentDate": "2026-08-29",
     "venue": "Farm D' Allie Golf Club"
   },
