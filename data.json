@@ -89,8 +89,8 @@
     {
       "id": 1,
       "playerIds": [
-        null,
-        null
+        "gavin",
+        "alex"
       ],
       "points": {
         "front9": null,
@@ -121,8 +121,8 @@
     {
       "id": 2,
       "playerIds": [
-        null,
-        null
+        "bruce",
+        "ak"
       ],
       "points": {
         "front9": null,
@@ -153,8 +153,8 @@
     {
       "id": 3,
       "playerIds": [
-        null,
-        null
+        "colby",
+        "lane"
       ],
       "points": {
         "front9": null,
@@ -185,8 +185,8 @@
     {
       "id": 4,
       "playerIds": [
-        null,
-        null
+        "dex",
+        "hunter"
       ],
       "points": {
         "front9": null,
@@ -217,8 +217,8 @@
     {
       "id": 5,
       "playerIds": [
-        null,
-        null
+        "veed",
+        "steve"
       ],
       "points": {
         "front9": null,
@@ -249,8 +249,8 @@
     {
       "id": 6,
       "playerIds": [
-        null,
-        null
+        "jv",
+        "bel"
       ],
       "points": {
         "front9": null,
@@ -280,7 +280,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-02-07T03:18:16.914Z",
+    "lastUpdated": "2026-02-07T03:18:35.586Z",
     "tournamentDate": "2026-08-29",
     "venue": "Farm D' Allie Golf Club"
   },
