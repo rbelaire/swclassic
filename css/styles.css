@@ -1097,26 +1097,28 @@ body {
 
 .modal-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: rgba(255, 255, 255, 0.2);
+  top: 10px;
+  right: 10px;
+  background: #c0392b;
   color: #fff;
   border: none;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  font-size: 1.1em;
+  font-size: 0.75em;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease;
   font-weight: bold;
   z-index: 1;
+  line-height: 1;
+  padding: 0;
 }
 
 .modal-close:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: #e74c3c;
 }
 
 .modal-header {
