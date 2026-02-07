@@ -131,11 +131,15 @@ function buildCompactScorecard(match, p1, p2) {
 }
 
 function buildCompactNine(holes, startHole, endHole, p1, p2, p1Wins, p2Wins, label, nineResult) {
+  // Map p1/p2 to team
+  const p1Team = p1.team === 'brock' ? 'brock' : 'jared';
+  const p2Team = p2.team === 'brock' ? 'brock' : 'jared';
+
   // Nine result text
   let resultText = '';
   let resultClass = '';
-  if (nineResult === 1) { resultText = p1.name; resultClass = 'result-p1'; }
-  else if (nineResult === 0) { resultText = p2.name; resultClass = 'result-p2'; }
+  if (nineResult === 1) { resultText = p1.name; resultClass = 'result-' + p1Team; }
+  else if (nineResult === 0) { resultText = p2.name; resultClass = 'result-' + p2Team; }
   else if (nineResult === 0.5) { resultText = 'Halved'; resultClass = 'result-halved'; }
   else { resultText = '-'; resultClass = 'result-pending'; }
 
@@ -151,8 +155,8 @@ function buildCompactNine(holes, startHole, endHole, p1, p2, p1Wins, p2Wins, lab
     const v = holes[h];
     let circleClass = 'compact-hole';
 
-    if (v === 1) circleClass += ' hole-p1';
-    else if (v === 0) circleClass += ' hole-p2';
+    if (v === 1) circleClass += ' hole-' + p1Team;
+    else if (v === 0) circleClass += ' hole-' + p2Team;
     else if (v === 0.5) circleClass += ' hole-halved';
     else circleClass += ' hole-empty';
 

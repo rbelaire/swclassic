@@ -1240,19 +1240,20 @@ body {
   border-radius: 10px;
 }
 
-.compact-nine-result.result-p1 {
+.compact-nine-result.result-brock {
+  background: var(--masters-gold);
+  color: var(--masters-black);
+}
+
+.compact-nine-result.result-jared {
   background: var(--masters-green);
   color: #fff;
 }
 
-.compact-nine-result.result-p2 {
-  background: var(--masters-dark-green);
-  color: #fff;
-}
-
 .compact-nine-result.result-halved {
-  background: var(--masters-gold);
-  color: #fff;
+  background: #fff;
+  color: var(--masters-green);
+  border: 1.5px solid var(--masters-green);
 }
 
 .compact-nine-result.result-pending {
@@ -1282,19 +1283,20 @@ body {
   line-height: 1;
 }
 
-.compact-hole.hole-p1 {
+.compact-hole.hole-brock {
+  background: var(--masters-gold);
+  color: var(--masters-black);
+}
+
+.compact-hole.hole-jared {
   background: var(--masters-green);
   color: #fff;
 }
 
-.compact-hole.hole-p2 {
-  background: var(--masters-dark-green);
-  color: #fff;
-}
-
 .compact-hole.hole-halved {
-  background: var(--masters-gold);
-  color: #fff;
+  background: #fff;
+  color: var(--masters-green);
+  border: 1.5px solid var(--masters-green);
 }
 
 .compact-hole.hole-empty {
