@@ -4049,10 +4049,15 @@ RESULT:
     margin-bottom: 28px;
   }
 
+  .draft-teams .captains-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
   .draft-teams .captains-vs {
     font-size: 1.4em;
     color: var(--masters-gold);
-    margin: 8px 0;
+    margin: 16px 0;
     letter-spacing: 3px;
     opacity: 0.7;
   }
