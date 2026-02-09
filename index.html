@@ -265,11 +265,8 @@
         const widget = document.getElementById('weatherWidget');
         if (!widget) return;
 
-        const apiKey = '69fa01a6d893ca9129d2f9314d521289';
-        
         try {
-            const url = `https://api.openweathermap.org/data/2.5/weather?q=Lafayette,LA,US&units=imperial&appid=${apiKey}`;
-            const response = await fetch(url);
+            const response = await fetch('/api/weather');
             const data = await response.json();
             
             if (response.ok) {
@@ -405,15 +402,15 @@
                 </div>
             </div>
             <div class="captain-pick-order">
-                <strong>SB Guess: 44 pts</strong>
+                <strong>SB Winner — Picks Draft Order</strong>
             </div>
         </div>
     </div>
 
     <!-- Draft Format Note -->
     <div class="draft-format-note">
-        <p><strong>Snake Draft Format:</strong> Draft order decided by closest guess to the Super Bowl total score.
-        The winner chooses draft position, then picks alternate in snake order.</p>
+        <p><strong>Snake Draft Format:</strong> Jared won the Super Bowl bet and gets his choice of draft position.
+        Picks alternate in snake order.</p>
     </div>
 </div>
 
