@@ -7,6 +7,23 @@ const REFRESH_INTERVAL = 10000; // 10 seconds for draft night
 let autoRefreshEnabled = true;
 let lastUpdateTime = Date.now();
 let refreshTimer = null;
+const FINAL_DRAFT_ORDER = [
+  "brock",
+  "jared",
+  "jared",
+  "brock",
+  "jared",
+  "jared",
+  "brock",
+  "brock",
+  "brock",
+  "jared"
+];
+
+const TEAM_PICK_SLOTS = {
+  brock: FINAL_DRAFT_ORDER.map((team, index) => ({ pick: index + 1, team })).filter(slot => slot.team === "brock"),
+  jared: FINAL_DRAFT_ORDER.map((team, index) => ({ pick: index + 1, team })).filter(slot => slot.team === "jared")
+};
 
 /*************************
  * LOAD DATA
@@ -94,8 +111,8 @@ function render() {
 
   renderStatus(totalDrafted, totalDraftable);
   renderCaptains(coaches);
-  renderTeam("brock", teamBrock, 6);
-  renderTeam("jared", teamJared, 6);
+  renderTeam("brock", teamBrock, TEAM_PICK_SLOTS.brock);
+  renderTeam("jared", teamJared, TEAM_PICK_SLOTS.jared);
   renderPool(undrafted);
 }
 
@@ -134,6 +151,10 @@ function renderCaptains(coaches) {
           <div class="stat-label">Pops</div>
           <div class="stat-value">${brock ? brock.pops : "?"}</div>
         </div>
+        <div class="captain-stat">
+          <div class="stat-label">Avg Rank</div>
+          <div class="stat-value">6.25</div>
+        </div>
       </div>
     </div>
     <div class="captains-vs">VS</div>
@@ -148,6 +169,10 @@ function renderCaptains(coaches) {
           <div class="stat-label">Pops</div>
           <div class="stat-value">${jared ? jared.pops : "?"}</div>
         </div>
+        <div class="captain-stat">
+          <div class="stat-label">Avg Rank</div>
+          <div class="stat-value">6.36</div>
+        </div>
       </div>
     </div>
   `;
@@ -158,11 +183,14 @@ function renderTeam(team, players, slots) {
   if (!el) return;
 
   let html = "";
-  for (let i = 0; i < slots; i++) {
+  for (let i = 0; i < slots.length; i++) {
+    const slot = slots[i];
     const p = players[i];
+    const owner = slot.team === "brock" ? "Brock" : "Jared";
     if (p) {
       html += `
         <div class="draft-slot draft-slot--filled" style="animation-delay: ${i * 0.08}s">
+          <div class="draft-slot__placeholder">Pick ${slot.pick} — ${owner}</div>
           <div class="draft-slot__rank">#${p.rank}</div>
           <div class="draft-slot__name">${p.name}</div>
           <div class="draft-slot__pops">${p.pops} pops</div>
@@ -170,7 +198,7 @@ function renderTeam(team, players, slots) {
     } else {
       html += `
         <div class="draft-slot draft-slot--empty">
-          <div class="draft-slot__placeholder">Pick ${i + 1}</div>
+          <div class="draft-slot__placeholder">Pick ${slot.pick} — ${owner}</div>
         </div>`;
     }
   }
