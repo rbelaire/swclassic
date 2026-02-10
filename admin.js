@@ -4,25 +4,49 @@
  * Tabs: Draft | Matchups | Score Entry
  *************************/
 
-const ADMIN_PASSWORD = "classic2026";
+const ADMIN_PASSWORD_HASH = "5a40d95d61e29d6665ff382de6e0b0cc6a3bbb546aeececa59911e08d597587b";
 const VALID_USERS = ["admin", "foursome1", "foursome2", "foursome3"];
 let hasUnsavedChanges = false;
+
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+function escapeHTML(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 let expandedMatchIndex = null;
+let loadedLastUpdated = null;
 let activeTab = "draft";
 let adminUser = "";
 let userRole = "admin"; // "admin" or "foursome"
 let userFoursome = null; // 0, 1, 2 (index)
 
 // Login handling
-function handleLogin(e) {
+async function handleLogin(e) {
   e.preventDefault();
   const user = document.getElementById("login-user").value.trim();
   const pass = document.getElementById("login-pass").value;
   const errorEl = document.getElementById("login-error");
 
   const userLower = user.toLowerCase();
-  if (pass !== ADMIN_PASSWORD || !VALID_USERS.includes(userLower)) {
-    errorEl.textContent = !VALID_USERS.includes(userLower) ? "Invalid username" : "Invalid password";
+  if (!VALID_USERS.includes(userLower)) {
+    errorEl.textContent = "Invalid username";
+    document.getElementById("login-pass").value = "";
+    document.getElementById("login-pass").focus();
+    return;
+  }
+
+  const passHash = await hashPassword(pass);
+  if (passHash !== ADMIN_PASSWORD_HASH) {
+    errorEl.textContent = "Invalid password";
     document.getElementById("login-pass").value = "";
     document.getElementById("login-pass").focus();
     return;
@@ -31,6 +55,7 @@ function handleLogin(e) {
   adminUser = userLower;
   localStorage.setItem("adminAuth", "true");
   localStorage.setItem("adminUser", userLower);
+  localStorage.setItem("adminLoginTime", Date.now().toString());
   applyRole();
   showAdmin();
 }
@@ -82,6 +107,7 @@ function logout() {
   if (hasUnsavedChanges && !confirm("You have unsaved changes. Log out anyway?")) return;
   localStorage.removeItem("adminAuth");
   localStorage.removeItem("adminUser");
+  localStorage.removeItem("adminLoginTime");
   adminUser = "";
   hasUnsavedChanges = false;
   document.getElementById("admin-app").style.display = "none";
@@ -90,11 +116,25 @@ function logout() {
   document.getElementById("login-error").textContent = "";
 }
 
+function isSessionExpired() {
+  const loginTime = localStorage.getItem("adminLoginTime");
+  if (!loginTime) return true;
+  const elapsed = Date.now() - parseInt(loginTime, 10);
+  const EIGHT_HOURS = 8 * 60 * 60 * 1000;
+  return elapsed > EIGHT_HOURS;
+}
+
 // Check session on load
 if (localStorage.getItem("adminAuth") === "true") {
-  adminUser = localStorage.getItem("adminUser") || "";
-  applyRole();
-  showAdmin();
+  if (isSessionExpired()) {
+    localStorage.removeItem("adminAuth");
+    localStorage.removeItem("adminUser");
+    localStorage.removeItem("adminLoginTime");
+  } else {
+    adminUser = localStorage.getItem("adminUser") || "";
+    applyRole();
+    showAdmin();
+  }
 }
 
 /*************************
@@ -136,18 +176,53 @@ function isNewerData(nextData, currentData) {
   return Date.parse(nextData.meta.lastUpdated) >= Date.parse(currentData.meta.lastUpdated);
 }
 
+function validateData(d) {
+  const errors = [];
+  if (!d || typeof d !== "object") {
+    errors.push("Data is missing or not an object.");
+    return errors;
+  }
+  if (!d.players || typeof d.players !== "object" || Object.keys(d.players).length === 0) {
+    errors.push("Players object is missing or empty.");
+  }
+  if (!Array.isArray(d.matches)) {
+    errors.push("Matches array is missing.");
+  } else {
+    if (d.matches.length !== 6) {
+      errors.push(`Expected 6 matches, found ${d.matches.length}.`);
+    }
+    d.matches.forEach((m, i) => {
+      if (!Array.isArray(m.playerIds)) {
+        errors.push(`Match ${i + 1} is missing playerIds array.`);
+      }
+      if (!m.points || typeof m.points !== "object") {
+        errors.push(`Match ${i + 1} is missing points object.`);
+      }
+    });
+  }
+  return errors;
+}
+
 function loadData() {
   const cached = getCachedData();
   if (cached) {
     data = cached;
+    loadedLastUpdated = cached.meta?.lastUpdated || null;
     render();
   }
 
   fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
     .then(res => res.json())
     .then(json => {
+      const errors = validateData(json);
+      if (errors.length > 0) {
+        alert("Tournament data is invalid:\n\n" + errors.join("\n") + "\n\nPlease contact admin.");
+        console.error("Data validation errors:", errors);
+        return;
+      }
       if (!data || isNewerData(json, data)) {
         data = json;
+        loadedLastUpdated = json.meta?.lastUpdated || null;
         render();
         saveCachedData(json);
         saveLeaderboardCache(json);
@@ -201,37 +276,42 @@ function detectDefaultTab() {
  * RENDER DISPATCH
  *************************/
 function render() {
-  if (isFoursomeUser()) {
-    // Foursome users: always scores tab, only their foursome
-    activeTab = "scores";
-    document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
-    const scoresTab = document.getElementById("tab-scores");
-    if (scoresTab) scoresTab.classList.add("active");
+  try {
+    if (isFoursomeUser()) {
+      // Foursome users: always scores tab, only their foursome
+      activeTab = "scores";
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+      const scoresTab = document.getElementById("tab-scores");
+      if (scoresTab) scoresTab.classList.add("active");
 
-    renderStats();
-    renderTotals();
-    renderFoursomes();
-    return;
-  }
-
-  // Auto-detect tab on first load
-  if (!render._initialized) {
-    render._initialized = true;
-    const defaultTab = detectDefaultTab();
-    if (defaultTab !== activeTab) {
-      switchTab(defaultTab);
-      return; // switchTab calls render
+      renderStats();
+      renderTotals();
+      renderFoursomes();
+      return;
     }
-  }
 
-  if (activeTab === "draft") {
-    renderDraft();
-  } else if (activeTab === "matchups") {
-    renderMatchupBuilder();
-  } else if (activeTab === "scores") {
-    renderStats();
-    renderTotals();
-    renderFoursomes();
+    // Auto-detect tab on first load
+    if (!render._initialized) {
+      render._initialized = true;
+      const defaultTab = detectDefaultTab();
+      if (defaultTab !== activeTab) {
+        switchTab(defaultTab);
+        return; // switchTab calls render
+      }
+    }
+
+    if (activeTab === "draft") {
+      renderDraft();
+    } else if (activeTab === "matchups") {
+      renderMatchupBuilder();
+    } else if (activeTab === "scores") {
+      renderStats();
+      renderTotals();
+      renderFoursomes();
+    }
+  } catch (err) {
+    console.error("Render error:", err);
+    alert("Error rendering page: " + err.message + "\n\nTry refreshing the page.");
   }
 }
 
@@ -242,7 +322,7 @@ function renderDraft() {
   const players = Object.entries(data.players);
   const teamBrock = players.filter(([, p]) => p.team === "brock").sort((a, b) => a[1].rank - b[1].rank);
   const teamJared = players.filter(([, p]) => p.team === "jared").sort((a, b) => a[1].rank - b[1].rank);
-  const undrafted = players.filter(([, p]) => !p.team || p.team === null).sort((a, b) => a[1].rank - b[1].rank);
+  const pool = players.filter(([, p]) => p.team === null || p.team === "coach").sort((a, b) => a[1].rank - b[1].rank);
   const totalDraftable = players.filter(([, p]) => p.team !== "coach").length;
   const totalDrafted = teamBrock.length + teamJared.length;
 
@@ -254,7 +334,7 @@ function renderDraft() {
   renderAdminTeamColumn("admin-team-jared-slots", teamJared, 6);
 
   // Player pool
-  renderDraftPool(undrafted);
+  renderDraftPool(pool);
 }
 
 function renderDraftStatus(drafted, total) {
@@ -285,7 +365,7 @@ function renderAdminTeamColumn(elId, players, slots) {
       html += `
         <div class="draft-slot draft-slot--filled" style="animation-delay: ${i * 0.08}s">
           <div class="draft-slot__rank">#${p.rank}</div>
-          <div class="draft-slot__name">${p.name}</div>
+          <div class="draft-slot__name">${escapeHTML(p.name)}</div>
           <div class="draft-slot__pops">${p.pops} pops</div>
           <button class="draft-slot__undraft" onclick="undraftPlayer('${id}')">Remove</button>
         </div>`;
@@ -299,28 +379,39 @@ function renderAdminTeamColumn(elId, players, slots) {
   el.innerHTML = html;
 }
 
-function renderDraftPool(undrafted) {
+function renderDraftPool(pool) {
   const header = document.getElementById("admin-pool-header");
   const grid = document.getElementById("admin-pool-grid");
   if (!header || !grid) return;
 
-  if (undrafted.length === 0) {
+  if (pool.length === 0) {
     header.style.display = "none";
     grid.innerHTML = "";
     return;
   }
   header.style.display = "";
 
-  grid.innerHTML = undrafted.map(([id, p]) => `
-    <div class="draft-pool-card">
-      <div class="pool-player-name">${p.name}</div>
-      <div class="pool-player-info">#${p.rank} &bull; ${p.pops} pops</div>
-      <div class="pool-actions">
-        <button class="btn-brock" onclick="draftPlayer('${id}', 'brock')">Team Brock</button>
-        <button class="btn-jared" onclick="draftPlayer('${id}', 'jared')">Team Jared</button>
+  grid.innerHTML = pool.map(([id, p]) => {
+    const isCaptain = p.team === "coach";
+    const brockBtn = isCaptain
+      ? `<button class="btn-brock" disabled>Team Brock</button>`
+      : `<button class="btn-brock" onclick="draftPlayer('${id}', 'brock')">Team Brock</button>`;
+    const jaredBtn = isCaptain
+      ? `<button class="btn-jared" disabled>Team Jared</button>`
+      : `<button class="btn-jared" onclick="draftPlayer('${id}', 'jared')">Team Jared</button>`;
+
+    return `
+      <div class="draft-pool-card player-card">
+        <div class="rank-badge">${p.rank}</div>
+        <div class="pool-player-name">${escapeHTML(p.name)}</div>
+        <div class="pool-player-info">${p.pops} pops</div>
+        <div class="pool-actions">
+          ${brockBtn}
+          ${jaredBtn}
+        </div>
       </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 function draftPlayer(id, team) {
@@ -450,7 +541,7 @@ function buildMatchupSelect(match, playerIndex, matchIndex, team, teamPlayers, a
     const isAvailable = !assignedSet.has(id) || isSelected;
     if (!isAvailable) return;
 
-    html += `<option value="${id}" ${isSelected ? "selected" : ""}>${p.name} (${p.pops} pops)</option>`;
+    html += `<option value="${id}" ${isSelected ? "selected" : ""}>${escapeHTML(p.name)} (${p.pops} pops)</option>`;
   });
 
   html += `</select>`;
@@ -604,8 +695,8 @@ function buildMatch(match, matchIndex) {
   }
 
   const [p1, p2] = match.playerIds;
-  const p1Name = p1 ? data.players[p1].name + (data.players[p1].team === 'coach' ? ' (Coach)' : '') : "Not Selected";
-  const p2Name = p2 ? data.players[p2].name + (data.players[p2].team === 'coach' ? ' (Coach)' : '') : "Not Selected";
+  const p1Name = p1 ? escapeHTML(data.players[p1].name) + (data.players[p1].team === 'coach' ? ' (Coach)' : '') : "Not Selected";
+  const p2Name = p2 ? escapeHTML(data.players[p2].name) + (data.players[p2].team === 'coach' ? ' (Coach)' : '') : "Not Selected";
 
   const header = `
     <div class="match-header" onclick="toggleMatch(${matchIndex})">
@@ -663,7 +754,7 @@ function buildTeamSelect(match, playerIndex, matchIndex, team) {
   sortedPlayers.forEach(([id, p]) => {
     const selected = match.playerIds[playerIndex] === id ? 'selected' : '';
     const teamLabel = p.team === 'brock' ? ' [Team Brock]' : p.team === 'jared' ? ' [Team Jared]' : '';
-    html += `<option value="${id}" ${selected}>${p.name} (${p.pops} pops)${teamLabel}</option>`;
+    html += `<option value="${id}" ${selected}>${escapeHTML(p.name)} (${p.pops} pops)${teamLabel}</option>`;
   });
 
   html += '</select>';
@@ -675,8 +766,8 @@ function buildScoreSelect(match, key, matchIndex, valid) {
   const disabled = !valid ? 'disabled' : '';
 
   const [p1Id, p2Id] = match.playerIds;
-  const p1Name = p1Id ? data.players[p1Id].name : "Team Brock Player";
-  const p2Name = p2Id ? data.players[p2Id].name : "Team Jared Player";
+  const p1Name = p1Id ? escapeHTML(data.players[p1Id].name) : "Team Brock Player";
+  const p2Name = p2Id ? escapeHTML(data.players[p2Id].name) : "Team Jared Player";
 
   let html = `<select id="${selectId}" onchange="updateScore(${matchIndex}, '${key}', this.value)" ${disabled}>`;
   html += '<option value="">-- Select Winner --</option>';
@@ -700,8 +791,8 @@ const COURSE_PARS = {
 
 function buildHoleByHoleGrid(match, matchIndex) {
   const [p1Id, p2Id] = match.playerIds;
-  const p1Name = p1Id ? data.players[p1Id].name : "P1";
-  const p2Name = p2Id ? data.players[p2Id].name : "P2";
+  const p1Name = p1Id ? escapeHTML(data.players[p1Id].name) : "P1";
+  const p2Name = p2Id ? escapeHTML(data.players[p2Id].name) : "P2";
   const holes = match.points.holes || {};
 
   // Calculate nine results for display
@@ -943,31 +1034,48 @@ function saveData() {
 
   const saveBtn = document.querySelector('.btn-primary');
   const originalText = saveBtn.textContent;
-  saveBtn.textContent = "Saving...";
+  saveBtn.textContent = "Checking...";
   saveBtn.disabled = true;
 
-  data.meta.lastUpdated = new Date().toISOString();
-
-  fetch("/api/save", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      password: ADMIN_PASSWORD,
-      data: data
-    })
-  })
+  // Optimistic locking: fetch current data and compare lastUpdated
+  fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
     .then(res => res.json())
-    .then(resp => {
-      if (resp.success) {
-        markSaved();
-        saveCachedData(data);
-        saveLeaderboardCache(data);
-        alert("Saved successfully!");
-      } else {
-        throw new Error(resp.error || "Save failed");
+    .then(serverData => {
+      const serverTimestamp = serverData.meta?.lastUpdated;
+      if (loadedLastUpdated && serverTimestamp && serverTimestamp !== loadedLastUpdated) {
+        saveBtn.textContent = originalText;
+        saveBtn.disabled = false;
+        alert("Someone else saved changes since you loaded. Please reload the page to see their changes before saving.");
+        return;
       }
-      saveBtn.textContent = originalText;
-      saveBtn.disabled = false;
+
+      // Safe to save — update timestamp and send
+      saveBtn.textContent = "Saving...";
+      data.meta.lastUpdated = new Date().toISOString();
+
+      return fetch("/api/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          password: ADMIN_PASSWORD_HASH,
+          expectedLastUpdated: loadedLastUpdated,
+          data: data
+        })
+      })
+        .then(res => res.json())
+        .then(resp => {
+          if (resp.success) {
+            loadedLastUpdated = data.meta.lastUpdated;
+            markSaved();
+            saveCachedData(data);
+            saveLeaderboardCache(data);
+            alert("Saved successfully!");
+          } else {
+            throw new Error(resp.error || "Save failed");
+          }
+          saveBtn.textContent = originalText;
+          saveBtn.disabled = false;
+        });
     })
     .catch(err => {
       console.error(err);

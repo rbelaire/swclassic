@@ -13,7 +13,7 @@
       "team": null
     },
     "ak": {
-      "name": "Austin",
+      "name": "AK",
       "rank": 3,
       "pops": 4,
       "team": null
@@ -39,49 +39,37 @@
     "hunter": {
       "name": "Hunter",
       "rank": 7,
-      "pops": 14,
+      "pops": 12,
       "team": null
     },
     "colby": {
       "name": "Colby",
       "rank": 8,
-      "pops": 16,
+      "pops": 14,
       "team": null
     },
     "lane": {
       "name": "Lane",
       "rank": 9,
-      "pops": 18,
-      "team": null
-    },
-    "nick": {
-      "name": "Nick",
-      "rank": 10,
-      "pops": 18,
-      "team": null
-    },
-    "steve": {
-      "name": "Steve",
-      "rank": 11,
-      "pops": 20,
+      "pops": 16,
       "team": null
     },
     "alex": {
       "name": "Alex",
-      "rank": 12,
-      "pops": 22,
+      "rank": 10,
+      "pops": 18,
       "team": null
     },
     "dex": {
-      "name": "Dexter",
-      "rank": 13,
-      "pops": 24,
+      "name": "Dex",
+      "rank": 11,
+      "pops": 20,
       "team": null
     },
     "jv": {
-      "name": "Jordan",
-      "rank": 14,
-      "pops": 24,
+      "name": "JV",
+      "rank": 12,
+      "pops": 22,
       "team": null
     }
   },
