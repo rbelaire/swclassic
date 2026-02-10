@@ -7,6 +7,7 @@
 const ADMIN_PASSWORD_HASH = "5a40d95d61e29d6665ff382de6e0b0cc6a3bbb546aeececa59911e08d597587b";
 const VALID_USERS = ["admin", "foursome1", "foursome2", "foursome3"];
 let hasUnsavedChanges = false;
+const TEAM_PICK_LIMIT = 5;
 
 async function hashPassword(password) {
   const encoder = new TextEncoder();
@@ -330,8 +331,8 @@ function renderDraft() {
   renderDraftStatus(totalDrafted, totalDraftable);
 
   // Team columns
-  renderAdminTeamColumn("admin-team-brock-slots", teamBrock, 6);
-  renderAdminTeamColumn("admin-team-jared-slots", teamJared, 6);
+  renderAdminTeamColumn("admin-team-brock-slots", teamBrock, TEAM_PICK_LIMIT);
+  renderAdminTeamColumn("admin-team-jared-slots", teamJared, TEAM_PICK_LIMIT);
 
   // Player pool
   renderDraftPool(pool);
@@ -417,10 +418,10 @@ function renderDraftPool(pool) {
 function draftPlayer(id, team) {
   if (!data.players[id]) return;
 
-  // Check team isn't full (6 slots)
+  // Check team isn't full (captain + 5 picks = team of 6)
   const teamCount = Object.values(data.players).filter(p => p.team === team).length;
-  if (teamCount >= 6) {
-    alert(`Team ${team === 'brock' ? 'Brock' : 'Jared'} is full (6 players).`);
+  if (teamCount >= TEAM_PICK_LIMIT) {
+    alert(`Team ${team === 'brock' ? 'Brock' : 'Jared'} is full (${TEAM_PICK_LIMIT} players).`);
     return;
   }
 
@@ -460,10 +461,10 @@ function renderMatchupBuilder() {
     .sort((a, b) => a[1].rank - b[1].rank);
 
   // Check draft completeness
-  if (brockPlayers.length < 6 || jaredPlayers.length < 6) {
+  if (brockPlayers.length < TEAM_PICK_LIMIT || jaredPlayers.length < TEAM_PICK_LIMIT) {
     if (statusEl) {
       statusEl.className = "draft-status draft-status--waiting";
-      statusEl.textContent = "Draft not complete. Assign all 12 players before building matchups.";
+      statusEl.textContent = `Draft not complete. Assign all ${TEAM_PICK_LIMIT * 2} players before building matchups.`;
     }
     container.innerHTML = "";
     return;
@@ -485,14 +486,14 @@ function renderMatchupBuilder() {
     }
   });
 
-  const allAssigned = assignedBrock.size === 6 && assignedJared.size === 6;
+  const allAssigned = assignedBrock.size === TEAM_PICK_LIMIT && assignedJared.size === TEAM_PICK_LIMIT;
   if (statusEl) {
     if (allAssigned) {
       statusEl.className = "draft-status draft-status--complete";
       statusEl.textContent = "All matchups set! Switch to Score Entry to enter results.";
     } else {
       statusEl.className = "draft-status draft-status--live";
-      statusEl.textContent = `Assign players to match slots (${assignedBrock.size + assignedJared.size}/12 assigned)`;
+      statusEl.textContent = `Assign players to match slots (${assignedBrock.size + assignedJared.size}/${TEAM_PICK_LIMIT * 2} assigned)`;
     }
   }
 
