@@ -4,7 +4,7 @@
       "name": "Gavin",
       "rank": 1,
       "pops": 0,
-      "team": null
+      "team": "brock"
     },
     "bel": {
       "name": "Bel",
@@ -280,7 +280,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2099-01-02T00:00:00.000Z",
+    "lastUpdated": "2026-02-10T20:53:46.742Z",
     "tournamentDate": "2026-08-29",
     "venue": "Farm D' Allie Golf Club"
   },
