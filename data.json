@@ -4,19 +4,19 @@
       "name": "Gavin",
       "rank": 1,
       "pops": 0,
-      "team": "brock"
+      "team": null
     },
     "bel": {
       "name": "Bel",
       "rank": 2,
       "pops": 2,
-      "team": "jared"
+      "team": null
     },
     "ak": {
       "name": "Austin",
       "rank": 3,
       "pops": 4,
-      "team": "jared"
+      "team": null
     },
     "bruce": {
       "name": "Bruce",
@@ -280,7 +280,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-02-10T20:54:01.240Z",
+    "lastUpdated": "2026-02-10T20:55:07.112Z",
     "tournamentDate": "2026-08-29",
     "venue": "Farm D' Allie Golf Club"
   },
