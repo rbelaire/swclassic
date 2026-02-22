@@ -4272,3 +4272,323 @@ RESULT:
     padding: 4px;
   }
 }
+
+/* =====================================================
+   DESKTOP OPTIMIZATIONS — Masters.com Inspired
+   Only applies at min-width: 769px — mobile untouched
+   ===================================================== */
+
+@media (min-width: 769px) {
+
+  /* ---- NAVBAR: Wider, more spaced, Masters-style ---- */
+  .navbar {
+    padding: 0 var(--pad-page);
+  }
+
+  .nav-container {
+    height: 64px;
+    gap: 0;
+    justify-content: center;
+  }
+
+  .nav-link {
+    font-size: 0.8em;
+    letter-spacing: 3px;
+    padding: 0 28px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    border-radius: 0;
+    border: none;
+    border-bottom: 3px solid transparent;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  }
+
+  .nav-link:hover {
+    background: rgba(0, 103, 71, 0.06);
+    border-bottom-color: var(--masters-green);
+    border-radius: 0;
+    transform: none;
+  }
+
+  .nav-link.active {
+    background: transparent;
+    color: var(--masters-green);
+    border-bottom: 3px solid var(--masters-green);
+    border-radius: 0;
+  }
+
+  .nav-link.admin-link {
+    font-size: 0.75em;
+    padding: 0 20px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--masters-gold);
+    margin: 0 0 0 20px;
+    align-self: center;
+  }
+
+  .nav-link.admin-link:hover {
+    border-bottom: 2px solid var(--masters-green);
+  }
+
+  /* ---- HERO: Slimmer on desktop — content is the star ---- */
+  .hero {
+    padding: 40px var(--pad-page) 32px;
+    margin-bottom: 0;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.4em, 4vw, 3.2em);
+    letter-spacing: 14px;
+    margin-bottom: 8px;
+  }
+
+  .hero .subtitle {
+    font-size: clamp(0.9em, 1.5vw, 1.1em);
+    letter-spacing: 6px;
+    margin-top: 4px;
+  }
+
+  /* ---- CONTAINER: More breathing room on wide screens ---- */
+  .container {
+    padding: 40px var(--pad-page);
+  }
+
+  /* ---- SCOREBUG: Bigger, more prominent ---- */
+  .scorebug {
+    top: 64px; /* match new nav height */
+    border-radius: var(--radius-lg);
+    margin-bottom: 36px;
+    box-shadow: 0 6px 24px rgba(0, 77, 53, 0.4);
+  }
+
+  .scorebug-team {
+    padding: 18px 36px;
+    gap: 18px;
+  }
+
+  .scorebug-name {
+    font-size: 1.2em;
+    letter-spacing: 4px;
+  }
+
+  .scorebug-score {
+    font-size: 3em;
+    min-width: 2.5ch;
+  }
+
+  /* ---- MATCHES GRID: Side-by-side foursomes on desktop ---- */
+  .matches-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--gap-card);
+    align-items: start;
+  }
+
+  /* Third foursome (odd child) spans full width, centered */
+  .matches-grid > .foursome:nth-child(3):last-child {
+    grid-column: 1 / -1;
+    max-width: calc(50% - var(--gap-card) / 2);
+    margin: 0 auto;
+  }
+
+  /* ---- FOURSOME CARDS: Larger, more air ---- */
+  .foursome {
+    padding: 28px 32px;
+  }
+
+  .foursome-header {
+    font-size: 1.2em;
+    letter-spacing: 4px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+  }
+
+  /* ---- MATCHUP ROWS: Bigger players, clearer scores ---- */
+  .matchup {
+    padding: 20px 24px;
+    margin-top: 16px;
+  }
+
+  .player-name {
+    font-size: 1.35em;
+    letter-spacing: 2px;
+  }
+
+  .matchup-vs {
+    font-size: 0.8em;
+    letter-spacing: 3px;
+  }
+
+  .score-display {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .nine-score {
+    padding: 14px 16px;
+  }
+
+  .nine-label {
+    font-size: 0.85em;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+
+  .nine-result {
+    font-size: 1.5em;
+    font-weight: 800;
+    margin-top: 6px;
+  }
+
+  /* ---- SECTION HEADER: Larger label ---- */
+  .section-header {
+    margin: 40px 0 28px;
+  }
+
+  .section-header h2 {
+    font-size: 1.6em;
+    letter-spacing: 8px;
+    padding: 16px 50px;
+  }
+
+  /* ---- RULES STRIP: Horizontal, tighter ---- */
+  .rules-strip {
+    flex-direction: row;
+    justify-content: center;
+    gap: 20px;
+    padding: 12px 28px;
+    max-width: 900px;
+    margin: 28px auto;
+  }
+
+  .rules-strip__title {
+    font-size: 0.9em;
+    letter-spacing: 2px;
+    white-space: nowrap;
+  }
+
+  .rules-strip__list {
+    flex-wrap: nowrap;
+    font-size: 0.95em;
+  }
+
+  /* ---- REFRESH CONTROLS: Inline with more padding ---- */
+  .refresh-controls {
+    padding: 18px 28px;
+    margin-bottom: 0;
+    margin-top: 32px;
+  }
+
+  .refresh-indicator {
+    font-size: 1em;
+    letter-spacing: 1px;
+  }
+
+  .refresh-btn {
+    font-size: 0.9em;
+    padding: 10px 22px;
+    letter-spacing: 2px;
+  }
+
+  /* ---- LAST UPDATED: Slimmer ---- */
+  .last-updated {
+    margin: 24px 0 12px;
+    font-size: 0.9em;
+  }
+
+  /* ---- MODAL: Wider on desktop ---- */
+  .modal-content {
+    max-width: 600px;
+  }
+
+  .modal-header {
+    padding: 22px 28px;
+  }
+
+  .modal-header-p1,
+  .modal-header-p2 {
+    font-size: 1.8em;
+    letter-spacing: 3px;
+  }
+
+  .modal-body {
+    padding: 20px 24px;
+  }
+
+  .compact-hole {
+    width: 34px;
+    height: 34px;
+    font-size: 0.75em;
+  }
+
+  .pops-hole {
+    width: 32px;
+    height: 32px;
+    font-size: 0.7em;
+  }
+
+  /* ---- INDEX PAGE: Card grid two-column at desktop ---- */
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* ---- RANKINGS GRID: Three columns on desktop ---- */
+  .rankings-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* ---- EVENT HEADER: Wider max ---- */
+  .event-header {
+    max-width: var(--max-width);
+    width: min(100%, var(--max-width));
+    padding: 20px 40px;
+  }
+
+  .event-header__inner {
+    grid-template-columns: minmax(0, 2fr) auto minmax(0, 1fr);
+    gap: 40px;
+  }
+
+  .countdown__number {
+    font-size: 2.4rem;
+  }
+
+  .event-header__course-name {
+    font-size: 1.5rem;
+  }
+}
+
+/* ---- Large desktop (1200px+): even more spacious ---- */
+@media (min-width: 1200px) {
+  .scorebug-name {
+    font-size: 1.4em;
+    letter-spacing: 6px;
+  }
+
+  .scorebug-score {
+    font-size: 3.6em;
+  }
+
+  .scorebug-team {
+    padding: 22px 48px;
+  }
+
+  .matches-grid {
+    gap: 32px;
+  }
+
+  .player-name {
+    font-size: 1.5em;
+  }
+
+  .nine-result {
+    font-size: 1.7em;
+  }
+
+  .foursome {
+    padding: 32px 40px;
+  }
+}
