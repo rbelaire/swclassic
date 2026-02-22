@@ -2,6 +2,12 @@
    MATCHUP MODAL (Shared)
    ====================== */
 
+function escapeHTML(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // Scorecard Data - Handicap rankings per hole
 const SCORECARD = {
   front9: [
@@ -52,11 +58,11 @@ function showMatchupModal(match, data) {
 
         <div class="modal-header">
           <div class="modal-header-names">
-            <span class="modal-header-p1">${p1.name}</span>
+            <span class="modal-header-p1">${escapeHTML(p1.name)}</span>
             <span class="modal-header-vs">vs</span>
-            <span class="modal-header-p2">${p2.name}</span>
+            <span class="modal-header-p2">${escapeHTML(p2.name)}</span>
           </div>
-          <div class="modal-header-sub">${p1.pops} pops vs ${p2.pops} pops${popsDiff > 0 ? ` \u2022 ${underdog.name} gets ${popsDiff}` : ' \u2022 Even match'}</div>
+          <div class="modal-header-sub">${p1.pops} pops vs ${p2.pops} pops${popsDiff > 0 ? ` \u2022 ${escapeHTML(underdog.name)} gets ${popsDiff}` : ' \u2022 Even match'}</div>
         </div>
 
         <div class="modal-body">
@@ -146,8 +152,8 @@ function buildCompactNine(holes, startHole, endHole, p1, p2, p1Wins, p2Wins, lab
   let html = `<div class="compact-nine">
     <div class="compact-nine-header">
       <span class="compact-nine-label">${label}</span>
-      <span class="compact-nine-tally">${p1.name.substring(0, 3)} ${p1Wins} - ${p2Wins} ${p2.name.substring(0, 3)}</span>
-      <span class="compact-nine-result ${resultClass}">${resultText}</span>
+      <span class="compact-nine-tally">${escapeHTML(p1.name.substring(0, 3))} ${p1Wins} - ${p2Wins} ${escapeHTML(p2.name.substring(0, 3))}</span>
+      <span class="compact-nine-result ${resultClass}">${escapeHTML(resultText)}</span>
     </div>
     <div class="compact-holes-row">`;
 
@@ -177,7 +183,7 @@ function buildPopsBreakdown(front9Strokes, back9Strokes, underdog) {
 
   let html = `<div class="modal-section pops-section">
     <div class="pops-header">
-      <span class="pops-title">${underdog.name}'s Stroke Holes</span>
+      <span class="pops-title">${escapeHTML(underdog.name)}'s Stroke Holes</span>
       <span class="pops-count">${front9Strokes.length + back9Strokes.length} total</span>
     </div>`;
 
