@@ -484,14 +484,15 @@ function renderMatchupBuilder() {
     });
   });
 
-  const allAssigned = assignedBrock.size === TEAM_PICK_LIMIT && assignedJared.size === TEAM_PICK_LIMIT;
+  const matchSlots = TEAM_PICK_LIMIT + 1; // drafted players + coach
+  const allAssigned = assignedBrock.size === matchSlots && assignedJared.size === matchSlots;
   if (statusEl) {
     if (allAssigned) {
       statusEl.className = "draft-status draft-status--complete";
       statusEl.textContent = "All matchups set! Switch to Score Entry to enter results.";
     } else {
       statusEl.className = "draft-status draft-status--live";
-      statusEl.textContent = `Assign players to match slots (${assignedBrock.size + assignedJared.size}/${TEAM_PICK_LIMIT * 2} assigned)`;
+      statusEl.textContent = `Assign players to match slots (${assignedBrock.size + assignedJared.size}/${matchSlots * 2} assigned)`;
     }
   }
 

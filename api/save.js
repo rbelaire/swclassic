@@ -20,7 +20,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { password, data, expectedLastUpdated } = req.body || {};
+  const { password, data } = req.body || {};
 
   if (password !== ADMIN_PASSWORD_HASH) {
     return res.status(401).json({ error: "Invalid password" });
@@ -51,19 +51,6 @@ module.exports = async function handler(req, res) {
   }
   const fileInfo = await getRes.json();
   const sha = fileInfo.sha;
-
-  // Optimistic locking: decode current content and compare lastUpdated
-  if (expectedLastUpdated) {
-    try {
-      const currentContent = JSON.parse(Buffer.from(fileInfo.content, "base64").toString("utf8"));
-      const currentTs = currentContent?.meta?.lastUpdated;
-      if (currentTs && currentTs !== expectedLastUpdated) {
-        return res.status(409).json({ error: "Data was modified by another user. Reload and try again." });
-      }
-    } catch (_) {
-      // If we can't parse, allow the save
-    }
-  }
 
   // Encode new content as base64
   const newContent = Buffer.from(JSON.stringify(data, null, 2) + "\n").toString("base64");
