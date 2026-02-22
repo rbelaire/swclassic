@@ -2595,11 +2595,26 @@ select:focus {
   }
 
   .hero {
-    margin-bottom: clamp(32px, 8vw, 40px);
+    margin-bottom: 0;
+    padding-top: 28px;
+    padding-bottom: 24px;
   }
 
   .section-header {
-    margin: clamp(32px, 8vw, 40px) 0 clamp(20px, 5vw, 24px);
+    margin: 24px 0 16px;
+  }
+
+  .section-header h2 {
+    font-size: 1em;
+    letter-spacing: 3px;
+    padding: 8px 0;
+    background: none;
+    border: none;
+    border-radius: 0;
+    border-bottom: 2px solid var(--masters-green);
+    display: block;
+    width: 100%;
+    animation: none;
   }
 
   .team-scores {
@@ -2608,7 +2623,9 @@ select:focus {
   }
 
   .scorebug {
-    top: 65px;
+    top: 0;
+    border-radius: 0;
+    margin-bottom: 0;
   }
 
   .scorebug-team {
@@ -2647,7 +2664,11 @@ select:focus {
 
   .compact-holes-row,
   .pops-holes-row {
-    gap: 3px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px;
+    padding-bottom: 4px;
   }
 
   .modal-header-p1,
@@ -2656,19 +2677,7 @@ select:focus {
   }
 
   .refresh-controls {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--gap-small);
-  }
-
-  .refresh-buttons {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .refresh-btn {
-    flex: 1;
-    min-width: clamp(130px, 40%, 160px);
+    display: none;
   }
 
   .balance-meter {
@@ -2677,6 +2686,42 @@ select:focus {
 
   .vs-icon {
     transform: rotate(90deg);
+  }
+
+  /* FIX 5: Last-updated strip decoration on mobile */
+  .last-updated {
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 8px 0;
+    margin: 16px 0 4px;
+    font-size: 0.8em;
+    color: var(--color-muted);
+  }
+
+  /* FIX 6: Modal close button bigger touch target */
+  .modal-close {
+    width: 44px;
+    height: 44px;
+    font-size: 1em;
+    top: 6px;
+    right: 6px;
+  }
+
+  /* FIX 8: Player names in matchup prevent overflow */
+  .matchup-names .player-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+
+  /* FIX 11: Suppress hero animations on mobile */
+  .hero h1,
+  .hero .subtitle,
+  .hero .date,
+  .hero p {
+    animation: none;
   }
 }
 
@@ -3367,13 +3412,12 @@ RESULT:
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .captains-grid {
-        grid-template-columns: 1fr auto 1fr;
-        gap: 8px;
+        grid-template-columns: 1fr;
+        gap: 16px;
     }
 
     .captains-vs {
-        font-size: clamp(1.4em, 4vw, 2em);
-        margin: 0;
+        display: none;
     }
 
     .captain-card {
@@ -4590,5 +4634,19 @@ RESULT:
 
   .foursome {
     padding: 32px 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero h1,
+  .hero .subtitle,
+  .hero .date,
+  .hero p,
+  .card-grid .card,
+  .player-card,
+  .scorebug-team,
+  .section-header h2 {
+    animation: none !important;
+    transition: none !important;
   }
 }
