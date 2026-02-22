@@ -1071,14 +1071,22 @@ function markUnsaved() {
   hasUnsavedChanges = true;
   document.getElementById("save-reminder").style.display = "block";
   const btn = document.getElementById("save-btn");
-  if (btn) btn.classList.add("unsaved");
+  if (btn) {
+    btn.classList.add("unsaved");
+    btn.style.background = "#d4af37";
+    btn.style.color = "#1a1a1a";
+  }
 }
 
 function markSaved() {
   hasUnsavedChanges = false;
   document.getElementById("save-reminder").style.display = "none";
   const btn = document.getElementById("save-btn");
-  if (btn) btn.classList.remove("unsaved");
+  if (btn) {
+    btn.classList.remove("unsaved");
+    btn.style.background = "";
+    btn.style.color = "";
+  }
 }
 
 function showToast(message, type = "success") {
