@@ -142,8 +142,8 @@ if (localStorage.getItem("adminAuth") === "true") {
  * LOAD DATA
  *************************/
 let data;
-const DATA_CACHE_KEY = "classicAdminData";
-const LEADERBOARD_CACHE_KEY = "classicLeaderboardData";
+const DATA_CACHE_KEY = "classicAdminData_v2";
+const LEADERBOARD_CACHE_KEY = "classicLeaderboardData_v2";
 
 function getCachedData() {
   try {
