@@ -454,10 +454,10 @@ function renderMatchupBuilder() {
   if (!container) return;
 
   const brockPlayers = Object.entries(data.players)
-    .filter(([, p]) => p.team === "brock")
+    .filter(([id, p]) => p.team === "brock" || (p.team === "coach" && id === "brock"))
     .sort((a, b) => a[1].rank - b[1].rank);
   const jaredPlayers = Object.entries(data.players)
-    .filter(([, p]) => p.team === "jared")
+    .filter(([id, p]) => p.team === "jared" || (p.team === "coach" && id === "jared"))
     .sort((a, b) => a[1].rank - b[1].rank);
 
   // Check draft completeness
@@ -474,16 +474,14 @@ function renderMatchupBuilder() {
   const assignedBrock = new Set();
   const assignedJared = new Set();
   data.matches.forEach(match => {
-    if (match.playerIds[0]) {
-      const p = data.players[match.playerIds[0]];
-      if (p && p.team === "brock") assignedBrock.add(match.playerIds[0]);
-      if (p && p.team === "jared") assignedJared.add(match.playerIds[0]);
-    }
-    if (match.playerIds[1]) {
-      const p = data.players[match.playerIds[1]];
-      if (p && p.team === "brock") assignedBrock.add(match.playerIds[1]);
-      if (p && p.team === "jared") assignedJared.add(match.playerIds[1]);
-    }
+    [0, 1].forEach(i => {
+      const id = match.playerIds[i];
+      if (!id) return;
+      const p = data.players[id];
+      if (!p) return;
+      if (p.team === "brock" || (p.team === "coach" && id === "brock")) assignedBrock.add(id);
+      if (p.team === "jared" || (p.team === "coach" && id === "jared")) assignedJared.add(id);
+    });
   });
 
   const allAssigned = assignedBrock.size === TEAM_PICK_LIMIT && assignedJared.size === TEAM_PICK_LIMIT;
@@ -622,9 +620,10 @@ function calculateTotals() {
     const [p1, p2] = match.playerIds;
     if (!p1 || !p2) return;
 
-    const t1 = data.players[p1].team;
-    const t2 = data.players[p2].team;
-    if (t1 === 'coach' || t2 === 'coach') return;
+    const t1raw = data.players[p1].team;
+    const t2raw = data.players[p2].team;
+    const t1 = t1raw === 'coach' ? p1 : t1raw;
+    const t2 = t2raw === 'coach' ? p2 : t2raw;
 
     ["front9", "back9"].forEach(key => {
       const v = match.points[key];
@@ -918,8 +917,12 @@ function formatNineResult(result, p1Name, p2Name, holesPlayed) {
 function isValidMatchup(match) {
   const [p1, p2] = match.playerIds;
   if (!p1 || !p2) return false;
-  if (data.players[p1].team === 'coach' || data.players[p2].team === 'coach') return false;
-  return data.players[p1].team !== data.players[p2].team;
+  const t1 = data.players[p1].team;
+  const t2 = data.players[p2].team;
+  // Coaches count as their team (brock coach -> brock side, jared coach -> jared side)
+  const side1 = t1 === 'coach' ? p1 : t1;
+  const side2 = t2 === 'coach' ? p2 : t2;
+  return side1 !== side2;
 }
 
 /*************************
@@ -1024,15 +1027,6 @@ window.addEventListener('beforeunload', (e) => {
  * SAVE DATA
  *************************/
 function saveData() {
-  const coachInMatch = data.matches.some(match => {
-    const [p1, p2] = match.playerIds;
-    return (p1 && data.players[p1].team === 'coach') || (p2 && data.players[p2].team === 'coach');
-  });
-  if (coachInMatch) {
-    alert("Cannot save: One or more matches contain a coach (non-playing). Remove coaches from all matches before saving.");
-    return;
-  }
-
   const saveBtn = document.querySelector('.btn-primary');
   const originalText = saveBtn.textContent;
   saveBtn.textContent = "Checking...";
