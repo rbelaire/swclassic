@@ -23,7 +23,7 @@ function escapeHTML(str) {
   return div.innerHTML;
 }
 
-let expandedMatchIndex = null;
+let expandedMatches = new Set();
 let loadedLastUpdated = null;
 let activeTab = "draft";
 let adminUser = "";
@@ -323,7 +323,7 @@ function renderDraft() {
   const players = Object.entries(data.players);
   const teamBrock = players.filter(([, p]) => p.team === "brock").sort((a, b) => a[1].rank - b[1].rank);
   const teamJared = players.filter(([, p]) => p.team === "jared").sort((a, b) => a[1].rank - b[1].rank);
-  const pool = players.filter(([, p]) => p.team === null || p.team === "coach").sort((a, b) => a[1].rank - b[1].rank);
+  const pool = players.filter(([, p]) => p.team === null).sort((a, b) => a[1].rank - b[1].rank);
   const totalDraftable = players.filter(([, p]) => p.team !== "coach").length;
   const totalDrafted = teamBrock.length + teamJared.length;
 
@@ -672,7 +672,7 @@ function buildMatch(match, matchIndex) {
   div.className = "match";
   div.id = `match-${matchIndex}`;
 
-  if (expandedMatchIndex === matchIndex) {
+  if (expandedMatches.has(matchIndex)) {
     div.classList.add("expanded");
   }
 
@@ -745,17 +745,17 @@ function buildMatch(match, matchIndex) {
 
 function buildTeamSelect(match, playerIndex, matchIndex, team) {
   const selectId = `player-${matchIndex}-${playerIndex}`;
-  let html = `<select id="${selectId}" onchange="updatePlayer(${matchIndex}, ${playerIndex}, this.value, '${team}')">`;
+  let html = `<select id="${selectId}" onchange="updatePlayer(${matchIndex}, ${playerIndex}, this.value)">`;
   html += '<option value="">-- Select Player --</option>';
 
   const sortedPlayers = Object.entries(data.players)
-    .filter(([, p]) => p.team !== 'coach')
+    .filter(([id, p]) => p.team === team || (p.team === 'coach' && id === team))
     .sort((a, b) => a[1].rank - b[1].rank);
 
   sortedPlayers.forEach(([id, p]) => {
     const selected = match.playerIds[playerIndex] === id ? 'selected' : '';
-    const teamLabel = p.team === 'brock' ? ' [Team Brock]' : p.team === 'jared' ? ' [Team Jared]' : '';
-    html += `<option value="${id}" ${selected}>${escapeHTML(p.name)} (${p.pops} pops)${teamLabel}</option>`;
+    const label = p.team === 'coach' ? `${escapeHTML(p.name)} (Coach)` : `${escapeHTML(p.name)} (${p.pops} pops)`;
+    html += `<option value="${id}" ${selected}>${label}</option>`;
   });
 
   html += '</select>';
@@ -874,7 +874,83 @@ function setHoleResult(matchIndex, holeNum, value) {
   match.points.back9 = calculateNineFromHoles(match.points.holes, 10, 18);
 
   markUnsaved();
-  render();
+  updateMatchInPlace(matchIndex);
+}
+
+// Update only the hole buttons and nine-result summary for a match
+// without rebuilding the entire DOM (preserves expand state and scroll position)
+function updateMatchInPlace(matchIndex) {
+  const match = data.matches[matchIndex];
+  const matchEl = document.getElementById(`match-${matchIndex}`);
+  if (!matchEl) { render(); return; }
+
+  const [p1Id, p2Id] = match.playerIds;
+  const p1Name = p1Id ? escapeHTML(data.players[p1Id].name) : "P1";
+  const p2Name = p2Id ? escapeHTML(data.players[p2Id].name) : "P2";
+  const holes = match.points.holes || {};
+
+  // Update each hole row's button active states
+  for (let h = 1; h <= 18; h++) {
+    const v = holes[h];
+    const row = matchEl.querySelector(`.hole-row:nth-of-type(${h <= 9 ? h : h - 9})`);
+    // Use data attributes for targeted selection
+    const btnP1 = matchEl.querySelector(`[onclick="setHoleResult(${matchIndex}, ${h}, ${v === 1 ? 'null' : '1'})"]`);
+    const btnHalved = matchEl.querySelector(`[onclick="setHoleResult(${matchIndex}, ${h}, ${v === 0.5 ? 'null' : '0.5'})"]`);
+    const btnP2 = matchEl.querySelector(`[onclick="setHoleResult(${matchIndex}, ${h}, ${v === 0 ? 'null' : '0'})"]`);
+
+    if (btnP1) {
+      btnP1.classList.toggle('active', v === 1);
+      btnP1.setAttribute('onclick', `setHoleResult(${matchIndex}, ${h}, ${v === 1 ? 'null' : '1'})`);
+    }
+    if (btnHalved) {
+      btnHalved.classList.toggle('active', v === 0.5);
+      btnHalved.setAttribute('onclick', `setHoleResult(${matchIndex}, ${h}, ${v === 0.5 ? 'null' : '0.5'})`);
+    }
+    if (btnP2) {
+      btnP2.classList.toggle('active', v === 0);
+      btnP2.setAttribute('onclick', `setHoleResult(${matchIndex}, ${h}, ${v === 0 ? 'null' : '0'})`);
+    }
+  }
+
+  // Update the nine-result summary bar
+  const front9Result = calculateNineFromHoles(holes, 1, 9);
+  const back9Result = calculateNineFromHoles(holes, 10, 18);
+  const front9Played = countHolesPlayed(holes, 1, 9);
+  const back9Played = countHolesPlayed(holes, 10, 18);
+
+  const nineValues = matchEl.querySelectorAll('.nine-result-value');
+  if (nineValues[0]) {
+    nineValues[0].textContent = formatNineResult(front9Result, p1Name, p2Name, front9Played);
+    nineValues[0].classList.toggle('pending', front9Result === null);
+  }
+  if (nineValues[1]) {
+    nineValues[1].textContent = formatNineResult(back9Result, p1Name, p2Name, back9Played);
+    nineValues[1].classList.toggle('pending', back9Result === null);
+  }
+
+  // Update match header status badge
+  const front = match.points.front9;
+  const back = match.points.back9;
+  let status = 'not-started';
+  let statusText = 'Not Started';
+  if (front !== null && back !== null) { status = 'complete'; statusText = 'Complete'; }
+  else if (front !== null || back !== null) { status = 'in-progress'; statusText = 'In Progress'; }
+
+  const badge = matchEl.querySelector('.match-status-badge');
+  if (badge) {
+    badge.className = `match-status-badge ${status}`;
+    badge.textContent = statusText;
+  }
+  matchEl.classList.toggle('complete', front !== null && back !== null);
+
+  // Update match preview F9/B9 line
+  const preview = matchEl.querySelector('.match-preview div:last-child');
+  if (preview) {
+    preview.textContent = `F9: ${front === null ? '-' : front} | B9: ${back === null ? '-' : back}`;
+  }
+
+  // Also update the totals panel (non-destructive)
+  if (!isFoursomeUser()) renderTotals();
 }
 
 function calculateNineFromHoles(holes, startHole, endHole) {
@@ -929,13 +1005,8 @@ function isValidMatchup(match) {
 /*************************
  * UPDATE FUNCTIONS
  *************************/
-function updatePlayer(matchIndex, playerIndex, playerId, team) {
+function updatePlayer(matchIndex, playerIndex, playerId) {
   data.matches[matchIndex].playerIds[playerIndex] = playerId || null;
-
-  if (playerId && data.players[playerId] && data.players[playerId].team !== 'coach') {
-    data.players[playerId].team = team;
-  }
-
   markUnsaved();
   render();
 }
@@ -984,24 +1055,13 @@ function clearMatch(matchIndex) {
 }
 
 function toggleMatch(index) {
+  if (expandedMatches.has(index)) {
+    expandedMatches.delete(index);
+  } else {
+    expandedMatches.add(index);
+  }
   const match = document.getElementById(`match-${index}`);
-  if (!match) return;
-
-  if (expandedMatchIndex === index) {
-    match.classList.remove("expanded");
-    expandedMatchIndex = null;
-    return;
-  }
-
-  if (expandedMatchIndex !== null) {
-    const previous = document.getElementById(`match-${expandedMatchIndex}`);
-    if (previous) {
-      previous.classList.remove("expanded");
-    }
-  }
-
-  match.classList.add("expanded");
-  expandedMatchIndex = index;
+  if (match) match.classList.toggle("expanded", expandedMatches.has(index));
 }
 
 /*************************
@@ -1010,11 +1070,30 @@ function toggleMatch(index) {
 function markUnsaved() {
   hasUnsavedChanges = true;
   document.getElementById("save-reminder").style.display = "block";
+  const btn = document.getElementById("save-btn");
+  if (btn) btn.classList.add("unsaved");
 }
 
 function markSaved() {
   hasUnsavedChanges = false;
   document.getElementById("save-reminder").style.display = "none";
+  const btn = document.getElementById("save-btn");
+  if (btn) btn.classList.remove("unsaved");
+}
+
+function showToast(message, type = "success") {
+  let toast = document.getElementById("admin-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "admin-toast";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.className = `admin-toast admin-toast--${type} admin-toast--visible`;
+  clearTimeout(toast._hideTimer);
+  toast._hideTimer = setTimeout(() => {
+    toast.classList.remove("admin-toast--visible");
+  }, 3000);
 }
 
 window.addEventListener('beforeunload', (e) => {
@@ -1024,14 +1103,20 @@ window.addEventListener('beforeunload', (e) => {
   }
 });
 
+window.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+    e.preventDefault();
+    if (hasUnsavedChanges) saveData();
+  }
+});
+
 /*************************
  * SAVE DATA
  *************************/
 function saveData() {
-  const saveBtn = document.querySelector('.btn-primary');
-  const originalText = saveBtn.textContent;
-  saveBtn.textContent = "Checking...";
-  saveBtn.disabled = true;
+  const saveBtn = document.getElementById('save-btn');
+  const originalText = saveBtn ? saveBtn.textContent : "Save";
+  if (saveBtn) { saveBtn.textContent = "Checking..."; saveBtn.disabled = true; }
 
   // Optimistic locking: fetch current data and compare lastUpdated
   fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
@@ -1039,14 +1124,13 @@ function saveData() {
     .then(serverData => {
       const serverTimestamp = serverData.meta?.lastUpdated;
       if (loadedLastUpdated && serverTimestamp && serverTimestamp !== loadedLastUpdated) {
-        saveBtn.textContent = originalText;
-        saveBtn.disabled = false;
-        alert("Someone else saved changes since you loaded. Please reload the page to see their changes before saving.");
+        if (saveBtn) { saveBtn.textContent = originalText; saveBtn.disabled = false; }
+        showToast("Conflict: someone else saved first. Reload to get latest changes.", "error");
         return;
       }
 
       // Safe to save — update timestamp and send
-      saveBtn.textContent = "Saving...";
+      if (saveBtn) saveBtn.textContent = "Saving...";
       data.meta.lastUpdated = new Date().toISOString();
 
       return fetch("/api/save", {
@@ -1065,18 +1149,20 @@ function saveData() {
             markSaved();
             saveCachedData(data);
             saveLeaderboardCache(data);
-            alert("Saved successfully!");
+            showToast("Saved successfully!");
           } else {
-            throw new Error(resp.error || "Save failed");
+            const msg = resp.error || "Save failed";
+            const friendly = msg.includes("conflict") ? "Save conflict — please reload and try again."
+              : msg.includes("auth") || msg.includes("401") ? "Authentication error — try logging out and back in."
+              : "Save failed — check your connection and try again.";
+            throw new Error(friendly);
           }
-          saveBtn.textContent = originalText;
-          saveBtn.disabled = false;
+          if (saveBtn) { saveBtn.textContent = originalText; saveBtn.disabled = false; }
         });
     })
     .catch(err => {
       console.error(err);
-      alert("Save failed: " + err.message);
-      saveBtn.textContent = originalText;
-      saveBtn.disabled = false;
+      showToast(err.message || "Save failed — check your connection.", "error");
+      if (saveBtn) { saveBtn.textContent = originalText; saveBtn.disabled = false; }
     });
 }

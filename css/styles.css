@@ -4282,7 +4282,7 @@ RESULT:
   .hole-btn {
     font-size: 0.68em;
     padding: 6px 2px;
-    min-height: 38px;
+    min-height: 44px;
   }
 
   .hole-num {
@@ -4637,6 +4637,55 @@ RESULT:
   }
 }
 
+/* ==========================================
+ * TOAST NOTIFICATION
+ * ========================================== */
+.admin-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--masters-green);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-family: 'Copperplate', 'Copperplate Gothic', Georgia, serif;
+  font-size: 0.85em;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 9999;
+  white-space: nowrap;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.admin-toast--error {
+  background: #c0392b;
+}
+
+.admin-toast--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Save button unsaved state */
+#save-btn.unsaved {
+  background: var(--masters-gold);
+  color: #1a1a1a;
+  animation: pulse-unsaved 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse-unsaved {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.5); }
+  50%       { box-shadow: 0 0 0 6px rgba(212, 175, 55, 0); }
+}
+
+/* ==========================================
+ * REDUCED MOTION
+ * ========================================== */
 @media (prefers-reduced-motion: reduce) {
   .hero h1,
   .hero .subtitle,
