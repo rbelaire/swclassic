@@ -109,14 +109,14 @@ function renderTotals(data) {
   document.getElementById("team-jared-score").textContent =
     (totals.jared || 0).toFixed(1);
 
-  const brockCard = document.getElementById("team-brock");
-  const jaredCard = document.getElementById("team-jared");
+  const brockEl = document.getElementById("team-brock");
+  const jaredEl = document.getElementById("team-jared");
 
-  brockCard.classList.remove("winning");
-  jaredCard.classList.remove("winning");
+  brockEl.classList.remove("winning");
+  jaredEl.classList.remove("winning");
 
-  if (totals.brock > totals.jared) brockCard.classList.add("winning");
-  if (totals.jared > totals.brock) jaredCard.classList.add("winning");
+  if (totals.brock > totals.jared) brockEl.classList.add("winning");
+  if (totals.jared > totals.brock) jaredEl.classList.add("winning");
 }
 
 function calculateTotals(data) {
@@ -126,9 +126,10 @@ function calculateTotals(data) {
     const [p1, p2] = match.playerIds;
     if (!p1 || !p2) return;
 
-    const t1 = data.players[p1].team;
-    const t2 = data.players[p2].team;
-    if (t1 === 'coach' || t2 === 'coach') return;
+    const t1raw = data.players[p1].team;
+    const t2raw = data.players[p2].team;
+    const t1 = t1raw === 'coach' ? p1 : t1raw;
+    const t2 = t2raw === 'coach' ? p2 : t2raw;
 
     ["front9", "back9"].forEach(key => {
       const v = match.points[key];

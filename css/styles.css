@@ -730,6 +730,76 @@ body {
   opacity: 0.85;
 }
 
+/* ======================
+   SCOREBUG
+   ====================== */
+.scorebug {
+  display: flex;
+  align-items: stretch;
+  position: sticky;
+  top: 75px;
+  z-index: 900;
+  background: var(--masters-green);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: var(--gap-section);
+  box-shadow: 0 4px 16px rgba(0, 77, 53, 0.35);
+}
+
+.scorebug-team {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  padding: 12px 20px;
+  transition: background 0.3s ease;
+}
+
+.scorebug-team--brock {
+  justify-content: flex-end;
+}
+
+.scorebug-team--jared {
+  justify-content: flex-start;
+}
+
+.scorebug-team.winning {
+  background: rgba(212, 175, 55, 0.22);
+}
+
+.scorebug-name {
+  font-family: 'Copperplate Gothic', Copperplate, 'Copperplate Gothic Light', serif;
+  font-size: clamp(0.85em, 3.5vw, 1.1em);
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+}
+
+.scorebug-team.winning .scorebug-name {
+  color: var(--masters-gold);
+}
+
+.scorebug-score {
+  font-family: 'Copperplate Gothic', Copperplate, 'Copperplate Gothic Light', serif;
+  font-size: clamp(1.6em, 6vw, 2.4em);
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+  min-width: 2.2ch;
+  text-align: center;
+}
+
+.scorebug-team.winning .scorebug-score {
+  color: var(--masters-gold);
+}
+
+.scorebug-divider {
+  width: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  align-self: stretch;
+}
+
 /* Matches Grid */
 .matches-grid {
   display: grid;
@@ -834,9 +904,11 @@ body {
 }
 
 .player-name {
-  font-size: clamp(1.05em, 3vw, 1.35em);
-  font-weight: 700;
+  font-size: clamp(1.15em, 3.5vw, 1.5em);
+  font-weight: 800;
   color: var(--masters-dark-green);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .matchup-names .player-name:first-child {
@@ -2535,17 +2607,13 @@ select:focus {
     gap: clamp(12px, 3vw, 16px);
   }
 
-  .team-scores--sticky {
+  .scorebug {
     top: 65px;
-    padding: clamp(12px, 2vw, 16px);
   }
 
-  .team-scores--sticky .team-card {
-    padding: clamp(14px, 2.5vw, 20px);
-  }
-
-  .team-scores--sticky .total-score {
-    font-size: clamp(2.4em, 7vw, 3.5em);
+  .scorebug-team {
+    padding: 10px 14px;
+    gap: 8px;
   }
 
   .team-card {
