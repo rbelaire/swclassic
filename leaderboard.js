@@ -200,8 +200,9 @@ function buildMatch(match, data) {
       <span class="player-name player-name--right">${p2name}</span>
     </div>
   `;
-  if (p1team) div.style.borderLeft = `4px solid ${p1team === "brock" ? "#d4af37" : "#006747"}`;
-  if (p2team) div.style.borderRight = `4px solid ${p2team === "brock" ? "#d4af37" : "#006747"}`;
+  const teamColor = (team, id) => (team === "brock" || id === "brock") ? "#d4af37" : "#006747";
+  if (p1team) div.style.borderLeft = `4px solid ${teamColor(p1team, p1)}`;
+  if (p2team) div.style.borderRight = `4px solid ${teamColor(p2team, p2)}`;
   return div;
 }
 
