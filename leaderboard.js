@@ -184,56 +184,33 @@ function buildMatch(match, data) {
   div.style.cursor = "pointer";
   div.onclick = () => showMatchupModal(match, data);
 
-  const header = document.createElement("header");
-  header.className = "matchup-header";
-
   const [p1, p2] = match.playerIds;
-
-  const names = document.createElement("div");
-  names.className = "matchup-names";
-
-  const left = document.createElement("span");
-  left.className = "player-name";
-  left.textContent = p1 ? data.players[p1].name : "TBD";
-
-  const vs = document.createElement("span");
-  vs.className = "matchup-vs";
-  vs.textContent = "vs";
-
-  const right = document.createElement("span");
-  right.className = "player-name";
-  right.textContent = p2 ? data.players[p2].name : "TBD";
-
-  names.append(left, vs, right);
-  header.append(names);
-
-  const scores = document.createElement("div");
-  scores.className = "score-display";
-  scores.setAttribute("role", "group");
-  scores.setAttribute("aria-label", "Front 9 and Back 9 scores");
-  scores.append(
-    buildNine("Front 9", match.points.front9),
-    buildNine("Back 9", match.points.back9)
-  );
-
-    div.append(header, scores);
-  return div;
-}
-
-function buildNine(label, val) {
-  const div = document.createElement("div");
-  div.className = "nine-score";
-
-  if (val === 1) div.classList.add("won");
-  if (val === 0.5) div.classList.add("tied");
-  if (val === 0) div.classList.add("lost");
+  const p1team = p1 ? data.players[p1].team : null;
+  const p2team = p2 ? data.players[p2].team : null;
+  const p1name = p1 ? data.players[p1].name : "TBD";
+  const p2name = p2 ? data.players[p2].name : "TBD";
 
   div.innerHTML = `
-    <div class="nine-label">${label}</div>
-    <div class="nine-result">${val === null ? "-" : val}</div>
+    <div class="matchup-row">
+      <span class="player-name player-name--${p1team}">${p1name}</span>
+      <div class="matchup-scores">
+        ${buildNineInline("F9", match.points.front9)}
+        ${buildNineInline("B9", match.points.back9)}
+      </div>
+      <span class="player-name player-name--${p2team} player-name--right">${p2name}</span>
+    </div>
   `;
   return div;
 }
+
+function buildNineInline(label, val) {
+  let cls = "nine-score";
+  if (val === 1) cls += " won";
+  if (val === 0.5) cls += " tied";
+  if (val === 0) cls += " lost";
+  return `<div class="${cls}"><div class="nine-label">${label}</div><div class="nine-result">${val === null ? "-" : val}</div></div>`;
+}
+
 
 /* ======================
    META

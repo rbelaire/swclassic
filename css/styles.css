@@ -871,103 +871,108 @@ body {
 }
 
 /* Individual Matchups */
+/* Match card */
 .matchup {
-  background: rgba(0, 103, 71, 0.04);
-  border: 1px solid rgba(0, 77, 53, 0.2);
+  background: #fff;
+  border: 1px solid rgba(0, 77, 53, 0.15);
   border-radius: var(--radius-md);
-  padding: clamp(15px, 3vw, 20px);
+  padding: clamp(12px, 2.5vw, 16px) clamp(14px, 3vw, 20px);
   margin-top: var(--gap-small);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .matchup:hover {
-  border-color: rgba(0, 77, 53, 0.45);
-  background: rgba(0, 103, 71, 0.07);
+  border-color: rgba(0, 77, 53, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 103, 71, 0.1);
 }
 
-.matchup-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: clamp(8px, 2vw, 10px);
-  margin-bottom: var(--gap-small);
-  flex-wrap: wrap;
-}
-
-.matchup-names {
+/* Single-row layout: name | scores | name */
+.matchup-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: baseline;
-  column-gap: clamp(10px, 2vw, 14px);
-  width: 100%;
+  align-items: center;
+  gap: clamp(8px, 2vw, 16px);
 }
 
+/* Player names */
 .player-name {
-  font-size: clamp(1.15em, 3.5vw, 1.5em);
+  font-size: clamp(1em, 3vw, 1.3em);
   font-weight: 800;
-  color: var(--masters-dark-green);
   text-transform: uppercase;
   letter-spacing: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.matchup-names .player-name:first-child {
-  text-align: right;
+/* Team color accents */
+.player-name--brock {
+  color: #006747;
+  border-left: 3px solid #006747;
+  padding-left: 8px;
 }
 
-.matchup-names .player-name:last-child {
-  text-align: left;
+.player-name--jared {
+  color: #1a3a5c;
+  border-left: 3px solid #1a3a5c;
+  padding-left: 8px;
 }
 
-/* MASTERS RED FOR WINNERS */
-.player-name.winner {
+.player-name--coach {
   color: var(--masters-dark-green);
-  text-shadow: none;
+  border-left: 3px solid var(--masters-gold);
+  padding-left: 8px;
 }
 
-.matchup-vs {
-  font-size: 0.75em;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--masters-black);
-  opacity: 0.4;
+/* Right-side player — flip the accent to the right */
+.player-name--right {
+  text-align: right;
+  border-left: none;
+  padding-left: 0;
+  border-right: 3px solid currentColor;
+  padding-right: 8px;
 }
 
-/* Score Display */
-.score-display {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
-  gap: clamp(8px, 2vw, 10px);
-  margin-top: var(--gap-small);
+/* Score pills in the center */
+.matchup-scores {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
 }
 
 .nine-score {
-  background: rgba(0, 103, 71, 0.06);
-  border: 1px solid rgba(0, 77, 53, 0.2);
-  border-radius: var(--radius-md);
-  padding: clamp(10px, 2vw, 12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 44px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 77, 53, 0.15);
+  background: rgba(0, 103, 71, 0.04);
   text-align: center;
 }
 
-/* MASTERS RED NUMBERS FOR WINNING SCORES */
 .nine-score.won {
-  background: rgba(0, 103, 71, 0.14);
+  background: rgba(0, 103, 71, 0.12);
   border-color: rgba(0, 77, 53, 0.35);
 }
 
 .nine-score.won .nine-result {
-  color: var(--masters-dark-green);
+  color: #006747;
   font-weight: 800;
 }
 
 .nine-score.tied {
-  background: rgba(0, 103, 71, 0.04);
-  border-style: solid;
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.4);
 }
 
 .nine-score.lost {
-  background: rgba(200, 16, 46, 0.12);
-  border-color: rgba(200, 16, 46, 0.35);
+  background: rgba(200, 16, 46, 0.08);
+  border-color: rgba(200, 16, 46, 0.3);
 }
 
 .nine-score.lost .nine-result {
@@ -975,20 +980,19 @@ body {
 }
 
 .nine-label {
-  font-size: clamp(0.8em, 2vw, 0.9em);
-  opacity: 0.75;
-  font-weight: 600;
+  font-size: 0.6em;
+  font-weight: 700;
   color: var(--masters-dark-green);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 5px;
+  opacity: 0.6;
 }
 
 .nine-result {
-  font-size: clamp(1.1em, 2.5vw, 1.3em);
-  font-weight: bold;
-  margin-top: 5px;
+  font-size: clamp(1em, 2.5vw, 1.2em);
+  font-weight: 700;
   color: var(--masters-dark-green);
+  line-height: 1;
 }
 
 .match-status {
