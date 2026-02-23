@@ -192,14 +192,16 @@ function buildMatch(match, data) {
 
   div.innerHTML = `
     <div class="matchup-row">
-      <span class="player-name player-name--${p1team}">${p1name}</span>
+      <span class="player-name player-name--left">${p1name}</span>
       <div class="matchup-scores">
         ${buildNineInline("F9", match.points.front9)}
         ${buildNineInline("B9", match.points.back9)}
       </div>
-      <span class="player-name player-name--${p2team} player-name--right">${p2name}</span>
+      <span class="player-name player-name--right">${p2name}</span>
     </div>
   `;
+  if (p1team) div.style.borderLeft = `4px solid ${p1team === "brock" ? "#d4af37" : "#006747"}`;
+  if (p2team) div.style.borderRight = `4px solid ${p2team === "brock" ? "#d4af37" : "#006747"}`;
   return div;
 }
 

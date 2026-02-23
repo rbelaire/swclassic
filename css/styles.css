@@ -916,7 +916,7 @@ body {
     font-size: 0.8em;
     letter-spacing: 0;
   }
-  .player-name--brock, .player-name--jared, .player-name--coach {
+  .player-name--left {
     padding-left: 6px;
   }
   .player-name--right {
@@ -924,32 +924,16 @@ body {
   }
 }
 
-/* Team color accents */
-.player-name--brock {
-  color: #b8860b;
-  border-left: 3px solid #d4af37;
-  padding-left: 10px;
-}
-
-.player-name--jared {
-  color: #006747;
-  border-left: 3px solid #006747;
-  padding-left: 10px;
-}
-
-.player-name--coach {
+/* Player name positioning */
+.player-name--left {
   color: var(--masters-dark-green);
-  border-left: 3px solid var(--masters-gold);
   padding-left: 10px;
 }
 
-/* Right-side player — flip the accent to the right */
 .player-name--right {
   text-align: right;
-  border-left: none;
-  padding-left: 0;
-  border-right: 3px solid currentColor;
-  padding-right: 16px;
+  color: var(--masters-dark-green);
+  padding-right: 10px;
 }
 
 /* Score pills in the center */
