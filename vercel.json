@@ -1,9 +1,9 @@
 {
   "redirects": [
     {
-      "source": "/",
-      "destination": "/leaderboard.html",
-      "permanent": false
+      "source": "/leaderboard.html",
+      "destination": "/",
+      "permanent": true
     }
   ],
   "headers": [

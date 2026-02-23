@@ -1,630 +1,96 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Classic 2026 - Tournament Format</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260223">
-    <link rel="icon" href="/favicon.ico">
-    <meta http-equiv="refresh" content="0; url=leaderboard.html">
-    <script>window.location.replace("leaderboard.html");</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Classic 2026 - Live Leaderboard</title>
+  <link rel="stylesheet" href="css/styles.css?v=20260223">
+  <style>
+  @media (max-width: 768px) {
+    .hero { margin-bottom: 0; padding-top: 28px; padding-bottom: 24px; }
+    .section-header { margin: 24px 0 16px; }
+    .section-header h2 { font-size: 1em; letter-spacing: 3px; padding: 8px 0; background: none; border: none; border-radius: 0; border-bottom: 2px solid #006747; display: block; width: 100%; animation: none; }
+    .scorebug { top: 0; border-radius: 0; margin-bottom: 0; }
+    .scorebug-team { padding: 10px 14px; gap: 8px; }
+    .refresh-controls { display: none; }
+    .last-updated { background: none; border: none; border-radius: 0; padding: 8px 0; margin: 16px 0 4px; font-size: 0.8em; }
+    .hero h1, .hero .subtitle, .hero .date, .hero p { animation: none; }
+    .compact-holes-row, .pops-holes-row { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; gap: 4px; padding-bottom: 4px; }
+    .matchup-names .player-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .modal-close { width: 44px; height: 44px; font-size: 1em; top: 6px; right: 6px; }
+  }
+  </style>
 </head>
-<body class="homepage">
-    <nav class="navbar">
-        <input type="checkbox" id="nav-toggle" class="nav-toggle">
+
+<body>
+
+<nav class="navbar">
+  <input type="checkbox" id="nav-toggle" class="nav-toggle">
         <label for="nav-toggle" class="nav-toggle-label">Menu</label>
-        <div class="nav-container">
-            <a href="index.html" class="nav-link active">Tournament Format</a>
-            <a href="draft.html" class="nav-link">Draft Board</a>
-            <a href="leaderboard.html" class="nav-link">Live Leaderboard</a>
-            <a href="history.html" class="nav-link">History</a>
-        </div>
-    </nav>
+  <div class="nav-container">
+    <a href="rules.html" class="nav-link">Tournament Format</a>
+    <a href="draft.html" class="nav-link">Draft Board</a>
+    <a href="index.html" class="nav-link active" title="v2">Live Leaderboard</a>
+    <a href="history.html" class="nav-link">History</a>
+    <a href="admin.html" class="nav-link admin-link">Admin</a>
+  </div>
+</nav>
 
 <div class="hero">
-    <h1>THE CLASSIC 2026</h1>
-    <div class="quick-stats">
-        <div class="stat-box">
-            <span class="number">6v6</span>
-            <span class="label">Team Battle</span>
-        </div>
-        <div class="stat-box">
-            <span class="number">12</span>
-            <span class="label">Golfers</span>
-        </div>
-        <div class="stat-box">
-            <span class="number">3</span>
-            <span class="label">Foursomes</span>
-        </div>
-    </div>
-</div>
-
-<section class="event-header" aria-labelledby="event-header-title">
-    <div class="event-header__inner">
-        <div class="event-header__countdown" aria-labelledby="event-header-title">
-            <p class="event-header__label" id="event-header-title">Countdown</p>
-            <div class="countdown" id="countdown" role="timer" aria-live="polite" aria-label="Countdown to event">
-                <div class="countdown__unit">
-                    <span class="countdown__number" data-unit="days">--</span>
-                    <span class="countdown__label">Days</span>
-                </div>
-                <span class="countdown__divider" aria-hidden="true">:</span>
-                <div class="countdown__unit">
-                    <span class="countdown__number" data-unit="hours">--</span>
-                    <span class="countdown__label">Hours</span>
-                </div>
-                <span class="countdown__divider" aria-hidden="true">:</span>
-                <div class="countdown__unit">
-                    <span class="countdown__number" data-unit="minutes">--</span>
-                    <span class="countdown__label">Minutes</span>
-                </div>
-                <span class="countdown__divider countdown__divider--accent" aria-hidden="true">:</span>
-                <div class="countdown__unit">
-                    <span class="countdown__number countdown__number--seconds" data-unit="seconds">--</span>
-                    <span class="countdown__label">Seconds</span>
-                </div>
-            </div>
-        </div>
-        <div class="event-header__divider" aria-hidden="true"></div>
-        <div class="event-header__course" aria-labelledby="event-header-course">
-            <p class="event-header__label" id="event-header-course">Course</p>
-            <h2 class="event-header__course-name">Farm D' Allie Golf Club</h2>
-        </div>
-    </div>
-    </div>
-<!-- COMPACT WEATHER STRIP -->
-
-<style>
-.weather-strip {
-    background: linear-gradient(135deg, #004d35 0%, #006747 100%);
-    border: 2px solid #d4af37;
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin: 16px auto;
-    max-width: 900px;
-    color: #f5f3e8;
-    font-family: 'Copperplate', Georgia, serif;
-    box-shadow: 0 4px 12px rgba(0, 103, 71, 0.2);
-}
-
-.weather-strip-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.weather-strip-temp {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.weather-strip-icon {
-    font-size: 2em;
-    line-height: 1;
-}
-
-.weather-strip-main {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.weather-strip-degrees {
-    font-size: 1.8em;
-    font-weight: 800;
-    line-height: 1;
-    color: #f5f3e8;
-}
-
-.weather-strip-desc {
-    font-size: 0.75em;
-    opacity: 0.85;
-    text-transform: capitalize;
-}
-
-.weather-strip-stats {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-}
-
-.weather-strip-stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-}
-
-.weather-strip-stat-icon {
-    font-size: 1.2em;
-    line-height: 1;
-}
-
-.weather-strip-stat-value {
-    font-size: 0.9em;
-    font-weight: 700;
-    color: #d4af37;
-    line-height: 1;
-}
-
-.weather-strip-stat-label {
-    font-size: 0.65em;
-    text-transform: uppercase;
-    opacity: 0.7;
-    letter-spacing: 0.5px;
-}
-
-.weather-strip-condition {
-    padding: 6px 14px;
-    border-radius: 16px;
-    font-size: 0.7em;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border: 1.5px solid;
-    white-space: nowrap;
-}
-
-.weather-strip-condition.ideal {
-    background: rgba(76, 175, 80, 0.2);
-    border-color: #4caf50;
-    color: #4caf50;
-}
-
-.weather-strip-condition.good {
-    background: rgba(255, 193, 7, 0.2);
-    border-color: #ffc107;
-    color: #ffc107;
-}
-
-.weather-strip-condition.fair {
-    background: rgba(255, 152, 0, 0.2);
-    border-color: #ff9800;
-    color: #ff9800;
-}
-
-.weather-strip-condition.poor {
-    background: rgba(244, 67, 54, 0.2);
-    border-color: #f44336;
-    color: #f44336;
-}
-
-/* Mobile - Stack but still compact */
-@media (max-width: 768px) {
-    .weather-strip {
-        padding: 10px 12px;
-        margin: 12px 16px;
-    }
-    
-    .weather-strip-content {
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-    
-    .weather-strip-temp {
-        flex: 1 1 auto;
-        min-width: 140px;
-    }
-    
-    .weather-strip-stats {
-        flex: 1 1 auto;
-        gap: 12px;
-        justify-content: center;
-    }
-    
-    .weather-strip-condition {
-        flex: 1 1 100%;
-        text-align: center;
-    }
-    
-    .weather-strip-degrees {
-        font-size: 1.6em;
-    }
-    
-    .weather-strip-icon {
-        font-size: 1.8em;
-    }
-}
-
-@media (max-width: 480px) {
-    .weather-strip-stats {
-        gap: 8px;
-    }
-    
-    .weather-strip-stat-icon {
-        font-size: 1em;
-    }
-    
-    .weather-strip-stat-value {
-        font-size: 0.85em;
-    }
-    
-    .weather-strip-stat-label {
-        font-size: 0.6em;
-    }
-}
-</style>
-
-<div id="weatherWidget"></div>
-
-<script>
-(function() {
-    'use strict';
-
-    const ICONS = {
-        '01d': '☀️', '01n': '🌙', '02d': '⛅', '02n': '☁️',
-        '03d': '☁️', '03n': '☁️', '04d': '☁️', '04n': '☁️',
-        '09d': '🌧️', '09n': '🌧️', '10d': '🌦️', '10n': '🌧️',
-        '11d': '⛈️', '11n': '⛈️', '13d': '🌨️', '13n': '🌨️',
-        '50d': '🌫️', '50n': '🌫️'
-    };
-
-    async function loadWeather() {
-        const widget = document.getElementById('weatherWidget');
-        if (!widget) return;
-
-        try {
-            const response = await fetch('/api/weather');
-            const data = await response.json();
-            
-            if (response.ok) {
-                displayWeather(data, widget);
-                setTimeout(() => loadWeather(), 600000);
-            }
-        } catch (error) {
-            console.error('Weather error:', error);
-        }
-    }
-
-    function displayWeather(data, widget) {
-        const temp = Math.round(data.main.temp);
-        const description = data.weather[0].description;
-        const humidity = data.main.humidity;
-        const wind = Math.round(data.wind.speed);
-        const visibility = Math.round(data.visibility / 1609.34);
-        const icon = ICONS[data.weather[0].icon] || '🌤️';
-
-        // Calculate conditions
-        let score = 0;
-        if (temp >= 60 && temp <= 80) score += 3;
-        else if (temp >= 50 && temp < 90) score += 2;
-        else if (temp >= 40 && temp < 95) score += 1;
-        
-        if (wind <= 10) score += 3;
-        else if (wind <= 15) score += 2;
-        else if (wind <= 20) score += 1;
-        
-        if (['Clear', 'Clouds'].includes(data.weather[0].main)) score += 2;
-        else if (data.weather[0].main === 'Drizzle') score += 1;
-        
-        if (humidity >= 40 && humidity <= 60) score += 2;
-        else if (humidity >= 30 && humidity <= 70) score += 1;
-        
-        let conditions;
-        if (score >= 9) conditions = { level: 'ideal', icon: '⛳', text: 'Ideal' };
-        else if (score >= 6) conditions = { level: 'good', icon: '✓', text: 'Good' };
-        else if (score >= 4) conditions = { level: 'fair', icon: '⚠️', text: 'Fair' };
-        else conditions = { level: 'poor', icon: '🌪️', text: 'Tough' };
-
-        widget.innerHTML = `
-            <div class="weather-strip">
-                <div class="weather-strip-content">
-                    <div class="weather-strip-temp">
-                        <div class="weather-strip-icon">${icon}</div>
-                        <div class="weather-strip-main">
-                            <div class="weather-strip-degrees">${temp}°F</div>
-                            <div class="weather-strip-desc">${description}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="weather-strip-stats">
-                        <div class="weather-strip-stat">
-                            <span class="weather-strip-stat-icon">💨</span>
-                            <span class="weather-strip-stat-value">${wind}</span>
-                            <span class="weather-strip-stat-label">mph</span>
-                        </div>
-                        <div class="weather-strip-stat">
-                            <span class="weather-strip-stat-icon">💧</span>
-                            <span class="weather-strip-stat-value">${humidity}%</span>
-                            <span class="weather-strip-stat-label">humid</span>
-                        </div>
-                        <div class="weather-strip-stat">
-                            <span class="weather-strip-stat-icon">👁️</span>
-                            <span class="weather-strip-stat-value">${visibility}</span>
-                            <span class="weather-strip-stat-label">mi</span>
-                        </div>
-                    </div>
-                    
-                    <div class="weather-strip-condition ${conditions.level}">
-                        ${conditions.icon} ${conditions.text}
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', loadWeather);
-    } else {
-        loadWeather();
-    }
-
-})();
-</script>
-
-<!-- TEAM CAPTAINS SECTION -->
-<div class="captains-section">
-    <h2 class="section-title">The Captains</h2>
-
-    <div class="captains-grid">
-        <!-- Captain 1: Brock -->
-        <div class="captain-card">
-            <h3>BROCK</h3>
-            <div class="captain-stats">
-                <div class="captain-stat">
-                    <div class="stat-label">Rank</div>
-                    <div class="stat-value">#6</div>
-                </div>
-                <div class="captain-stat">
-                    <div class="stat-label">Pops</div>
-                    <div class="stat-value">8</div>
-                </div>
-                <div class="captain-stat">
-                    <div class="stat-label">Avg Rank</div>
-                    <div class="stat-value">6.25</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VS Divider -->
-        <div class="captains-vs">VS</div>
-
-        <!-- Captain 2: Jared -->
-        <div class="captain-card">
-            <h3>JARED</h3>
-            <div class="captain-stats">
-                <div class="captain-stat">
-                    <div class="stat-label">Rank</div>
-                    <div class="stat-value">#7</div>
-                </div>
-                <div class="captain-stat">
-                    <div class="stat-label">Pops</div>
-                    <div class="stat-value">10</div>
-                </div>
-                <div class="captain-stat">
-                    <div class="stat-label">Avg Rank</div>
-                    <div class="stat-value">6.36</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Draft Format Note -->
-    <div class="draft-format-note">
-        <p><strong>Final Draft Order:</strong> Draft order finalized by trade. Brock picks first.</p>
-    </div>
+  <h1>LIVE LEADERBOARD</h1>
+  <div class="subtitle">The Classic 2026</div>
 </div>
 
 <div class="container">
-    <div class="section-header">
-        <h2>How The Event Works</h2>
+  <div class="rules-strip" aria-label="Today’s Rules">
+    <div class="rules-strip__title">Today’s Rules</div>
+    <ul class="rules-strip__list">
+      <li>Match play</li>
+      <li>Pops reset per 9</li>
+      <li>Shamble — tee shot only</li>
+    </ul>
+  </div>
+
+  <!-- TEAM TOTALS SCOREBUG -->
+  <div class="scorebug" id="scorebug">
+    <div class="scorebug-team scorebug-team--brock" id="team-brock">
+      <span class="scorebug-name">BROCK</span>
+      <span class="scorebug-score" id="team-brock-score">0.0</span>
     </div>
-    
-    <div class="card-grid">
-        <div class="card">
-            <h2>The Format</h2>
-            <div class="card-content">
-                <div class="highlight-box">
-                    3 Foursomes | 4 Golfers Per Group
-                </div>
-                <p style="margin-top: 15px;">Each foursome becomes a mini-arena with <strong>TWO simultaneous 1v1 matches</strong>:</p>
-                
-                <div class="match-visual">
-                    <div class="Golfer-box">Golfer A</div>
-                    <div class="vs-text">VS</div>
-                    <div class="Golfer-box">Golfer B</div>
-                </div>
-                
-                <div class="match-visual">
-                    <div class="Golfer-box">Golfer C</div>
-                    <div class="vs-text">VS</div>
-                    <div class="Golfer-box">Golfer D</div>
-                </div>
-                
-                <div class="tip-box">
-                    <strong>Key Rule:</strong>
-                    You're only playing against YOUR 1v1 opponent. Your teammate is in your cart, but on their own.
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>The Shamble Twist</h2>
-            <div class="card-content">
-                 <p>Both players tee off, select the best drive, then each plays their own ball from that spot for the remainder of the hole.</p>
-                <p><strong>On every hole, here's the dance:</strong></p>
-                
-                <div class="info-grid" style="margin-top: 20px;">
-                    <div class="info-item">
-                        <strong>Step 1</strong>
-                        Both cart teammates hit drives
-                    </div>
-                    <div class="info-item">
-                        <strong>Step 2</strong>
-                        Each Golfer picks ONE drive to play from
-                    </div>
-                    <div class="info-item">
-                        <strong>Step 3</strong>
-                        Play your own ball from there
-                    </div>
-                    <div class="info-item">
-                        <strong>Step 4</strong>
-                        Finish solo—no help allowed!
-                    </div>
-                </div>
-                
-                <div style="margin-top: 15px; font-style: italic; opacity: 0.7;">
-                    Approach shots, chips, and putts are played solo with no assistance.
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>The Pops System</h2>
-            <div class="card-content">
-                 <div class="highlight-box">
-                    <ul>
-                        <li><strong>Pops System (Quick Rules):</strong> Pops are handicap strokes applied per hole.</li>
-                        <li>Pops apply independently on the front and back 9.</li>
-                        <li>Pops do not carry over.</li>
-                        <li>Lower handicap gives pops to the higher handicap.</li>
-                    </ul>
-                </div>
-                <div class="highlight-box">
-                    Pops = Match-Play Power-Ups
-                </div>
-                
-                <p style="margin-top: 20px;"><strong>Strokes are applied on the HARDEST holes</strong></p>
-                
-                <div style="background: #f5f3e8; padding: 25px; border-radius: 8px; margin: 20px 0; border: 2px solid #0d3d1f;">
-                    <div style="font-size: 1.3em; color: #0d3d1f; margin-bottom: 15px; font-weight: bold;">Example Time:</div>
-                    <div style="font-size: 1.1em; line-height: 2;">
-                        <span style="background: #0d3d1f; color: #f5f3e8; padding: 5px 15px; border-radius: 6px; display: inline-block; margin: 5px;">6 Pops</span>
-                        <span style="margin: 0 10px;">=</span>
-                        <span style="background: #0d3d1f; color: #f5f3e8; padding: 5px 15px; border-radius: 6px; display: inline-block; margin: 5px;">1 Stroke on the 6 Toughest Holes</span>
-                    </div>
-                </div>
-
-                <button onclick="document.getElementById('pops-example').style.display = document.getElementById('pops-example').style.display === 'none' ? 'block' : 'none'" class="btn-primary" style="margin-top: 10px; cursor: pointer; width: 100%;">Click to See Example Matchup</button>
-
-                <div id="pops-example" style="display: none; margin-top: 16px; background: #f5f3e8; padding: 20px; border-radius: 8px; border: 2px solid #0d3d1f;">
-                    <div style="display: flex; justify-content: center; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px;">
-                        <div style="text-align: center;">
-                            <div style="font-size: 1.3em; font-weight: 700; color: #0d3d1f;">Austin</div>
-                            <div style="font-size: 0.9em; opacity: 0.7;">Rank #3 &bull; 4 Pops</div>
-                        </div>
-                        <div style="font-size: 1.4em; font-weight: 700; color: #d4af37;">VS</div>
-                        <div style="text-align: center;">
-                            <div style="font-size: 1.3em; font-weight: 700; color: #0d3d1f;">Colby</div>
-                            <div style="font-size: 0.9em; opacity: 0.7;">Rank #9 &bull; 16 Pops</div>
-                        </div>
-                    </div>
-                    <div style="background: #0d3d1f; color: #f5f3e8; padding: 14px; border-radius: 6px; text-align: center; font-size: 1.05em; line-height: 1.6;">
-                        <strong>16 &minus; 4 = 12 Pops</strong><br>
-                        Colby gets <strong>1 stroke on each of the 12 hardest holes</strong> (6 per nine).<br>
-                        <span style="opacity: 0.8; font-size: 0.9em;">On those holes, if both golfers score the same, Colby wins the hole.</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Scoring Breakdown</h2>
-            <div class="card-content">
-                <p><strong>Each 1v1 match is worth 2 Match Points total:</strong></p>
-                
-                <table class="scoring-table">
-                    <thead>
-                        <tr>
-                            <th>Result</th>
-                            <th>Match Points</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Win the Front 9</strong></td>
-                            <td>1 Match Point</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Win the Back 9</strong></td>
-                            <td>1 Match Point</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Tied on a Side?</strong></td>
-                            <td>Split it (0.5 / 0.5 Match Points)</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <p>Each 9 is scored independently, and a tie on one side does not affect the other.</p>
-                
-                <div class="highlight-box" style="margin-top: 20px;">
-                    Match Points Per Match: 2<br>
-                    Maximum Team Total: 12 Match Points (if you sweep all 6 matches)
-                </div>
-                
-                <p style="margin-top: 15px; font-style: italic; opacity: 0.7;">
-                    Match play scoring is NET (pops apply). Keep it clean, keep it moving!
-                </p>
-            </div>
-        </div>
+    <div class="scorebug-divider"></div>
+    <div class="scorebug-team scorebug-team--jared" id="team-jared">
+      <span class="scorebug-score" id="team-jared-score">0.0</span>
+      <span class="scorebug-name">JARED</span>
     </div>
+  </div>
 
-    <div class="card">
-        <h2>Important Notes</h2>
-        <div class="card-content">
-            <div class="info-grid notes-grid">
-                <div class="info-item">
-                    <strong>Keep Pace</strong>
-                    Play ready golf—pick up and move
-                </div>
-                <div class="info-item">
-                    <strong>Pops on Scorecard</strong>
-                    Check Stroke Index holes carefully
-                </div>
-                <div class="info-item">
-                    <strong>Concede Putts</strong>
-                    Be reasonable, keep it friendly
-                </div>
-                <div class="info-item">
-                    <strong>NET Scoring</strong>
-                    All match play uses pops
-                </div>
-            </div>
-        </div>
+  <div class="section-header">
+    <h2>Individual Matches</h2>
+  </div>
+
+  <!-- MATCHES -->
+  <div class="matches-grid" id="matches-grid"></div>
+
+  <div class="last-updated" id="last-updated"></div>
+
+    <!-- AUTO-REFRESH CONTROLS -->
+  <div class="refresh-controls" style="display:none">
+    <div class="refresh-indicator" id="refresh-indicator">
+      Loading scores...
     </div>
+    <div class="refresh-buttons">
+      <button id="manual-refresh-btn" onclick="manualRefresh()" class="refresh-btn">
+        ⟳ Refresh Now
+      </button>
+      <button id="toggle-refresh-btn" onclick="toggleAutoRefresh()" class="refresh-btn">
+        ⏸ Pause Updates
+      </button>
+    </div>
+  </div>
+  
 </div>
 
-
-     <script>
-        const countdownElement = document.getElementById('countdown');
-        const countdownValues = {
-            days: countdownElement.querySelector('[data-unit="days"]'),
-            hours: countdownElement.querySelector('[data-unit="hours"]'),
-            minutes: countdownElement.querySelector('[data-unit="minutes"]'),
-            seconds: countdownElement.querySelector('[data-unit="seconds"]')
-        };
-        const targetTime = new Date('2026-08-29T07:00:00-06:00');
-
-        const updateCountdown = () => {
-            const now = new Date();
-            const diff = targetTime - now;
-
-            if (diff <= 0) {
-                countdownElement.textContent = 'Event underway';
-                return;
-            }
-
-            const totalSeconds = Math.floor(diff / 1000);
-            const days = Math.floor(totalSeconds / (24 * 60 * 60));
-            const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
-            const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
-            const seconds = totalSeconds % 60;
-
-            countdownValues.days.textContent = days;
-            countdownValues.hours.textContent = String(hours).padStart(2, '0');
-            countdownValues.minutes.textContent = String(minutes).padStart(2, '0');
-            countdownValues.seconds.textContent = String(seconds).padStart(2, '0');
-            countdownValues.seconds.classList.remove('countdown__number--pulse');
-            void countdownValues.seconds.offsetWidth;
-            countdownValues.seconds.classList.add('countdown__number--pulse');
-        };
-
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
-    </script>
+<script src="matchup-modal.js"></script>
+<script src="leaderboard.js"></script>
 </body>
 </html>
