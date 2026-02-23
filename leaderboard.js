@@ -86,8 +86,6 @@ function render() {
   renderTotals(data);
   renderMatches(data);
   renderLastUpdated(data);
-  renderDataStatus(data);
-  
   // Add fade-in animation
   const container = document.getElementById("matches-grid");
   container.style.opacity = "0";
@@ -245,20 +243,6 @@ function renderLastUpdated(data) {
   const d = new Date(data.meta.lastUpdated);
   document.getElementById("last-updated").textContent =
     `Last updated: ${d.toLocaleString()}`;
-}
-
-function renderDataStatus(data) {
-  const status = document.getElementById("data-status");
-  if (!status) return;
-
-  status.classList.remove("data-status--warning");
-  const lastUpdated = data?.meta?.lastUpdated;
-  if (lastUpdated) {
-    const timestamp = new Date(lastUpdated).toLocaleString();
-    status.textContent = `Live from GitHub — Last saved at ${timestamp}`;
-  } else {
-    status.textContent = "Live from GitHub — Last saved time unavailable";
-  }
 }
 
 function getFoursomeStatus(group) {
