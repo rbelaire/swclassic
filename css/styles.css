@@ -948,7 +948,7 @@ body {
   border-left: none;
   padding-left: 0;
   border-right: 3px solid currentColor;
-  padding-right: 10px;
+  padding-right: 16px;
 }
 
 /* Score pills in the center */
