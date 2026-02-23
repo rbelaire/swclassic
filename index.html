@@ -377,47 +377,32 @@
         <div class="card">
             <h2>The Pops System</h2>
             <div class="card-content">
-                 <div class="highlight-box">
-                    <ul>
-                        <li><strong>Pops System (Quick Rules):</strong> Pops are handicap strokes applied per hole.</li>
-                        <li>Pops apply independently on the front and back 9.</li>
-                        <li>Pops do not carry over.</li>
-                        <li>Lower handicap gives pops to the higher handicap.</li>
-                    </ul>
+                <div style="display:flex; gap:10px; margin-bottom:14px;">
+                    <div style="background:#006747; color:#d4af37; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-size:1.2em; flex-shrink:0;">⛳</div>
+                    <div style="display:flex; align-items:center; color:#0d3d1f; font-weight:600;">Pops are handicap strokes applied on the hardest holes</div>
                 </div>
-                <div class="highlight-box">
-                    Pops = Match-Play Power-Ups
-                </div>
-                
-                <p style="margin-top: 20px;"><strong>Strokes are applied on the HARDEST holes</strong></p>
-                
-                <div style="background: #f5f3e8; padding: 25px; border-radius: 8px; margin: 20px 0; border: 2px solid #0d3d1f;">
-                    <div style="font-size: 1.3em; color: #0d3d1f; margin-bottom: 15px; font-weight: bold;">Example Time:</div>
-                    <div style="font-size: 1.1em; line-height: 2;">
-                        <span style="background: #0d3d1f; color: #f5f3e8; padding: 5px 15px; border-radius: 6px; display: inline-block; margin: 5px;">6 Pops</span>
-                        <span style="margin: 0 10px;">=</span>
-                        <span style="background: #0d3d1f; color: #f5f3e8; padding: 5px 15px; border-radius: 6px; display: inline-block; margin: 5px;">1 Stroke on the 6 Toughest Holes</span>
-                    </div>
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <div style="background:#d4af37; color:#0d3d1f; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.2em; flex-shrink:0;">−</div>
+                    <div style="display:flex; align-items:center; color:#0d3d1f; font-weight:600;">Lower handicap gives strokes to the higher — difference = strokes received</div>
                 </div>
 
-                <button onclick="document.getElementById('pops-example').style.display = document.getElementById('pops-example').style.display === 'none' ? 'block' : 'none'" class="btn-primary" style="margin-top: 10px; cursor: pointer; width: 100%;">Click to See Example Matchup</button>
+                <button onclick="document.getElementById('pops-example').style.display = document.getElementById('pops-example').style.display === 'none' ? 'block' : 'none'" class="btn-primary" style="cursor:pointer; width:100%;">See Example</button>
 
-                <div id="pops-example" style="display: none; margin-top: 16px; background: #f5f3e8; padding: 20px; border-radius: 8px; border: 2px solid #0d3d1f;">
-                    <div style="display: flex; justify-content: center; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px;">
-                        <div style="text-align: center;">
-                            <div style="font-size: 1.3em; font-weight: 700; color: #0d3d1f;">Austin</div>
-                            <div style="font-size: 0.9em; opacity: 0.7;">Rank #3 &bull; 4 Pops</div>
+                <div id="pops-example" style="display:none; margin-top:16px; background:#006747; border:2px solid #d4af37; border-radius:8px; padding:20px; text-align:center;">
+                    <div style="display:flex; justify-content:center; align-items:center; gap:20px; flex-wrap:wrap; margin-bottom:16px;">
+                        <div>
+                            <div style="font-size:1.2em; font-weight:700; color:#f5f3e8;">Austin</div>
+                            <div style="font-size:0.85em; color:#d4af37;">4 Pops</div>
                         </div>
-                        <div style="font-size: 1.4em; font-weight: 700; color: #d4af37;">VS</div>
-                        <div style="text-align: center;">
-                            <div style="font-size: 1.3em; font-weight: 700; color: #0d3d1f;">Colby</div>
-                            <div style="font-size: 0.9em; opacity: 0.7;">Rank #9 &bull; 16 Pops</div>
+                        <div style="font-size:1.4em; font-weight:700; color:#d4af37;">VS</div>
+                        <div>
+                            <div style="font-size:1.2em; font-weight:700; color:#f5f3e8;">Colby</div>
+                            <div style="font-size:0.85em; color:#d4af37;">16 Pops</div>
                         </div>
                     </div>
-                    <div style="background: #0d3d1f; color: #f5f3e8; padding: 14px; border-radius: 6px; text-align: center; font-size: 1.05em; line-height: 1.6;">
-                        <strong>16 &minus; 4 = 12 Pops</strong><br>
-                        Colby gets <strong>1 stroke on each of the 12 hardest holes</strong> (6 per nine).<br>
-                        <span style="opacity: 0.8; font-size: 0.9em;">On those holes, if both golfers score the same, Colby wins the hole.</span>
+                    <div style="background:#004d35; border-radius:6px; padding:14px; color:#f5f3e8; line-height:1.8;">
+                        <strong style="color:#d4af37; font-size:1.1em;">16 − 4 = 12 pops for Colby</strong><br>
+                        12 hardest holes — Colby gets a one shot advantage
                     </div>
                 </div>
             </div>
