@@ -1,11 +1,5 @@
 {
-  "redirects": [
-    {
-      "source": "/leaderboard.html",
-      "destination": "/",
-      "permanent": true
-    }
-  ],
+  "redirects": [],
   "headers": [
     {
       "source": "/css/(.*)",
