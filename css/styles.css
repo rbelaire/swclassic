@@ -739,11 +739,12 @@ body {
   position: sticky;
   top: 75px;
   z-index: 900;
-  background: var(--masters-green);
+  background: #ffffff;
   border-radius: var(--radius-md);
   overflow: hidden;
   margin-bottom: var(--gap-section);
-  box-shadow: 0 4px 16px rgba(0, 77, 53, 0.35);
+  border: 1px solid rgba(0, 77, 53, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 103, 71, 0.1);
 }
 
 .scorebug-team {
@@ -757,16 +758,16 @@ body {
 
 .scorebug-team--brock {
   justify-content: flex-end;
-  border-bottom: 3px solid #d4af37;
+  border-left: 4px solid #d4af37;
 }
 
 .scorebug-team--jared {
   justify-content: flex-start;
-  border-bottom: 3px solid #4caf7d;
+  border-right: 4px solid #006747;
 }
 
 .scorebug-team.winning {
-  background: rgba(212, 175, 55, 0.22);
+  background: rgba(0, 103, 71, 0.04);
 }
 
 .scorebug-name {
@@ -774,31 +775,31 @@ body {
   font-size: clamp(0.85em, 3.5vw, 1.1em);
   font-weight: 700;
   letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(0, 50, 30, 0.6);
   text-transform: uppercase;
 }
 
 .scorebug-team.winning .scorebug-name {
-  color: var(--masters-gold);
+  color: var(--masters-dark-green);
 }
 
 .scorebug-score {
   font-family: 'Copperplate Gothic', Copperplate, 'Copperplate Gothic Light', serif;
   font-size: clamp(1.6em, 6vw, 2.4em);
   font-weight: 800;
-  color: #ffffff;
+  color: var(--masters-dark-green);
   line-height: 1;
   min-width: 2.2ch;
   text-align: center;
 }
 
 .scorebug-team.winning .scorebug-score {
-  color: var(--masters-gold);
+  color: var(--masters-dark-green);
 }
 
 .scorebug-divider {
   width: 2px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 77, 53, 0.15);
   align-self: stretch;
 }
 
