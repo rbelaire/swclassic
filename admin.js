@@ -652,7 +652,6 @@ function renderFoursomes() {
   }
 
   foursomes.forEach((matches, foursomeIndex) => {
-    // Foursome users only see their own foursome
     if (isFoursomeUser() && foursomeIndex !== userFoursome) return;
 
     const foursomeDiv = document.createElement("div");
@@ -665,13 +664,105 @@ function renderFoursomes() {
       foursomeDiv.appendChild(title);
     }
 
-    matches.forEach((match, localIndex) => {
-      const matchIndex = foursomeIndex * 2 + localIndex;
-      foursomeDiv.appendChild(buildMatch(match, matchIndex));
-    });
+    if (isFoursomeUser()) {
+      // Two-column layout, always expanded, circle buttons
+      const grid = document.createElement("div");
+      grid.className = "foursome-two-col";
+      matches.forEach((match, localIndex) => {
+        const matchIndex = foursomeIndex * 2 + localIndex;
+        grid.appendChild(buildMatchCircles(match, matchIndex));
+      });
+      foursomeDiv.appendChild(grid);
+    } else {
+      matches.forEach((match, localIndex) => {
+        const matchIndex = foursomeIndex * 2 + localIndex;
+        foursomeDiv.appendChild(buildMatch(match, matchIndex));
+      });
+    }
 
     container.appendChild(foursomeDiv);
   });
+}
+
+function buildMatchCircles(match, matchIndex) {
+  const div = document.createElement("div");
+  div.className = "match-circles";
+  div.id = `match-${matchIndex}`;
+
+  const [p1Id, p2Id] = match.playerIds;
+  const p1Name = p1Id ? escapeHTML(data.players[p1Id].name) : "TBD";
+  const p2Name = p2Id ? escapeHTML(data.players[p2Id].name) : "TBD";
+  const holes = match.points.holes || {};
+
+  const front9Result = calculateNineFromHoles(holes, 1, 9);
+  const back9Result = calculateNineFromHoles(holes, 10, 18);
+  const front9Played = countHolesPlayed(holes, 1, 9);
+  const back9Played = countHolesPlayed(holes, 10, 18);
+
+  // Player name header
+  let html = `<div class="match-circles-header">
+    <span class="circles-p1-name">${p1Name}</span>
+    <span class="circles-vs">vs</span>
+    <span class="circles-p2-name">${p2Name}</span>
+  </div>`;
+
+  // Nine result summary
+  html += `<div class="circles-nine-bar">
+    <div class="circles-nine-item">
+      <span class="circles-nine-label">F9</span>
+      <span class="circles-nine-value${front9Result === null ? ' pending' : ''}">${formatNineResult(front9Result, p1Name, p2Name, front9Played)}</span>
+    </div>
+    <div class="circles-nine-item">
+      <span class="circles-nine-label">B9</span>
+      <span class="circles-nine-value${back9Result === null ? ' pending' : ''}">${formatNineResult(back9Result, p1Name, p2Name, back9Played)}</span>
+    </div>
+  </div>`;
+
+  // Legend
+  html += `<div class="circles-legend">
+    <div class="circles-hole-info"></div>
+    <div class="circles-btns">
+      <span class="circles-legend-label">${p1Name.split(' ')[0]}</span>
+      <span class="circles-legend-label">Tie</span>
+      <span class="circles-legend-label">${p2Name.split(' ')[0]}</span>
+    </div>
+  </div>`;
+
+  // Front 9
+  html += `<div class="circles-section-label">Front 9</div><div class="circles-hole-list" data-nine="front">`;
+  for (let h = 1; h <= 9; h++) {
+    html += buildHoleCircleRow(h, holes[h], matchIndex);
+  }
+  html += `</div>`;
+
+  // Back 9
+  html += `<div class="circles-section-label">Back 9</div><div class="circles-hole-list" data-nine="back">`;
+  for (let h = 10; h <= 18; h++) {
+    html += buildHoleCircleRow(h, holes[h], matchIndex);
+  }
+  html += `</div>`;
+
+  div.innerHTML = html;
+  return div;
+}
+
+function buildHoleCircleRow(holeNum, value, matchIndex) {
+  const par = COURSE_PARS[holeNum];
+  const isP1 = value === 1;
+  const isHalved = value === 0.5;
+  const isP2 = value === 0;
+
+  return `<div class="circles-row">
+    <div class="circles-hole-info">
+      <span class="circles-hole-num">${holeNum}</span>
+      <span class="circles-hole-par">P${par}</span>
+    </div>
+    <div class="circles-btns">
+      <button class="hole-circle hole-circle-p1${isP1 ? ' active' : ''}" onclick="setHoleResult(${matchIndex}, ${holeNum}, ${isP1 ? 'null' : '1'})" title="P1 wins hole ${holeNum}"></button>
+      <button class="hole-circle hole-circle-halved${isHalved ? ' active' : ''}" onclick="setHoleResult(${matchIndex}, ${holeNum}, ${isHalved ? 'null' : '0.5'})" title="Halved hole ${holeNum}"></button>
+      <button class="hole-circle hole-circle-p2${isP2 ? ' active' : ''}" onclick="setHoleResult(${matchIndex}, ${holeNum}, ${isP2 ? 'null' : '0'})" title="P2 wins hole ${holeNum}"></button>
+    </div>
+  </div>`;
 }
 
 function buildMatch(match, matchIndex) {
@@ -925,7 +1016,8 @@ function updateMatchInPlace(matchIndex) {
   const front9Played = countHolesPlayed(holes, 1, 9);
   const back9Played = countHolesPlayed(holes, 10, 18);
 
-  const nineValues = matchEl.querySelectorAll('.nine-result-value');
+  // Update nine-result summary — supports both old (.nine-result-value) and circle (.circles-nine-value) layouts
+  const nineValues = matchEl.querySelectorAll('.nine-result-value, .circles-nine-value');
   if (nineValues[0]) {
     nineValues[0].textContent = formatNineResult(front9Result, p1Name, p2Name, front9Played);
     nineValues[0].classList.toggle('pending', front9Result === null);
