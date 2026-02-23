@@ -110,7 +110,6 @@ function render() {
   const totalDrafted = teamBrock.length + teamJared.length;
 
   renderStatus(totalDrafted, totalDraftable);
-  renderCaptains(coaches);
   renderTeam("brock", teamBrock, TEAM_PICK_SLOTS.brock);
   renderTeam("jared", teamJared, TEAM_PICK_SLOTS.jared);
   renderPool(undrafted);
@@ -132,51 +131,6 @@ function renderStatus(drafted, total) {
   }
 }
 
-function renderCaptains(coaches) {
-  const brock = coaches.find(c => c.name === "Brock");
-  const jared = coaches.find(c => c.name === "Jared");
-
-  const el = document.getElementById("captains-area");
-  if (!el) return;
-
-  el.innerHTML = `
-    <div class="captain-card">
-      <h3>BROCK</h3>
-      <div class="captain-stats">
-        <div class="captain-stat">
-          <div class="stat-label">Rank</div>
-          <div class="stat-value">#${brock ? brock.rank : "?"}</div>
-        </div>
-        <div class="captain-stat">
-          <div class="stat-label">Pops</div>
-          <div class="stat-value">${brock ? brock.pops : "?"}</div>
-        </div>
-        <div class="captain-stat">
-          <div class="stat-label">Avg Rank</div>
-          <div class="stat-value">6.25</div>
-        </div>
-      </div>
-    </div>
-    <div class="captains-vs">VS</div>
-    <div class="captain-card">
-      <h3>JARED</h3>
-      <div class="captain-stats">
-        <div class="captain-stat">
-          <div class="stat-label">Rank</div>
-          <div class="stat-value">#${jared ? jared.rank : "?"}</div>
-        </div>
-        <div class="captain-stat">
-          <div class="stat-label">Pops</div>
-          <div class="stat-value">${jared ? jared.pops : "?"}</div>
-        </div>
-        <div class="captain-stat">
-          <div class="stat-label">Avg Rank</div>
-          <div class="stat-value">6.36</div>
-        </div>
-      </div>
-    </div>
-  `;
-}
 
 function renderTeam(team, players, slots) {
   const el = document.getElementById(`team-${team}-slots`);
