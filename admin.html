@@ -135,10 +135,16 @@
         </div>
       </section>
 
-      <section class="foursomes" id="foursomes" aria-live="polite"></section>
+      <section class="foursomes" id="foursomes" aria-live="polite" style="padding-bottom: 80px;"></section>
     </div>
   </main>
   </div><!-- end #admin-app -->
+
+  <!-- Sticky save bar for foursome users -->
+  <div id="foursome-save-bar" style="display:none; position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:2px solid #d4af37; padding:12px 20px; align-items:center; justify-content:space-between; z-index:1000; box-shadow:0 -2px 12px rgba(0,0,0,0.1);">
+    <span id="foursome-save-status" style="font-family:'Copperplate',Georgia,serif; font-size:0.85em; color:#006747;"></span>
+    <button class="btn-primary" type="button" onclick="saveData()" style="background:#006747; color:#f5f3e8; border:none; padding:10px 28px; border-radius:6px; font-size:1em; font-weight:700; cursor:pointer;">Save Scores</button>
+  </div>
 
   <script src="admin.js"></script>
 </body>

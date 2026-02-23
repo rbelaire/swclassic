@@ -93,6 +93,11 @@ function showAdmin() {
     if (eyebrow) eyebrow.textContent = `Foursome ${userFoursome + 1} Scorer`;
     if (title) title.textContent = `Foursome ${userFoursome + 1}`;
     if (subtitle) subtitle.textContent = "Enter hole-by-hole scores for your matches.";
+    const saveBar = document.getElementById("foursome-save-bar");
+    if (saveBar) saveBar.style.display = "flex";
+    // Hide the header save button — the sticky bar handles it
+    const saveBtn = document.getElementById("save-btn");
+    if (saveBtn) saveBtn.style.display = "none";
   } else {
     if (tabBar) tabBar.style.display = "";
     if (clearBtn) clearBtn.style.display = "";
@@ -653,10 +658,12 @@ function renderFoursomes() {
     const foursomeDiv = document.createElement("div");
     foursomeDiv.className = "foursome-container";
 
-    const title = document.createElement("div");
-    title.className = "foursome-title";
-    title.textContent = `Foursome ${foursomeIndex + 1}`;
-    foursomeDiv.appendChild(title);
+    if (!isFoursomeUser()) {
+      const title = document.createElement("div");
+      title.className = "foursome-title";
+      title.textContent = `Foursome ${foursomeIndex + 1}`;
+      foursomeDiv.appendChild(title);
+    }
 
     matches.forEach((match, localIndex) => {
       const matchIndex = foursomeIndex * 2 + localIndex;
@@ -713,10 +720,7 @@ function buildMatch(match, matchIndex) {
     </div>
   `;
 
-  const details = `
-    <div class="match-details">
-      ${!valid && (p1 || p2) ? '<div class="error-message">Invalid matchup: Both players must be from different teams.</div>' : ''}
-
+  const playerSelects = isFoursomeUser() ? '' : `
       <div class="teams-row">
         <div class="team-select-box team-brock">
           <label>Team Brock Player</label>
@@ -727,10 +731,13 @@ function buildMatch(match, matchIndex) {
           <label>Team Jared Player</label>
           ${buildTeamSelect(match, 1, matchIndex, 'jared')}
         </div>
-      </div>
+      </div>`;
 
+  const details = `
+    <div class="match-details">
+      ${!valid && (p1 || p2) ? '<div class="error-message">Invalid matchup: Both players must be from different teams.</div>' : ''}
+      ${playerSelects}
       ${valid ? buildHoleByHoleGrid(match, matchIndex) : ''}
-
       <div class="match-actions">
         <button class="match-btn" onclick="clearMatch(${matchIndex})">
           Clear Scores
@@ -1076,6 +1083,8 @@ function markUnsaved() {
     btn.style.background = "#d4af37";
     btn.style.color = "#1a1a1a";
   }
+  const status = document.getElementById("foursome-save-status");
+  if (status) status.textContent = "Unsaved changes";
 }
 
 function markSaved() {
@@ -1087,6 +1096,8 @@ function markSaved() {
     btn.style.background = "";
     btn.style.color = "";
   }
+  const status = document.getElementById("foursome-save-status");
+  if (status) status.textContent = "Saved ✓";
 }
 
 function showToast(message, type = "success") {
