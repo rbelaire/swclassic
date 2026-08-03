@@ -88,7 +88,10 @@ function closeMatchupModal() {
 function getStrokeHoles(numStrokes) {
   if (numStrokes === 0) return [];
   const allHoles = [...SCORECARD.front9, ...SCORECARD.back9];
-  const sortedByDifficulty = allHoles.sort((a, b) => a.handicap - b.handicap);
+  // Pops are not applied on par 3s
+  const sortedByDifficulty = allHoles
+    .filter(h => h.par !== 3)
+    .sort((a, b) => a.handicap - b.handicap);
   return sortedByDifficulty.slice(0, numStrokes);
 }
 
