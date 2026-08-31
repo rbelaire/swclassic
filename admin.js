@@ -6,6 +6,13 @@
 
 const ADMIN_PASSWORD_HASH = "5a40d95d61e29d6665ff382de6e0b0cc6a3bbb546aeececa59911e08d597587b";
 const VALID_USERS = ["admin", "foursome1", "foursome2", "foursome3"];
+// Per-foursome scan-to-score tokens (from the printed QR cards). Each token
+// maps to a foursome number and logs that group straight into live scoring.
+const FOURSOME_TOKENS = {
+  "yV1JnmlDCdqU": 1,
+  "KG1rvuXke98L": 2,
+  "gproOkos4EEl": 3
+};
 let hasUnsavedChanges = false;
 const TEAM_PICK_LIMIT = 5;
 
@@ -130,8 +137,27 @@ function isSessionExpired() {
   return elapsed > EIGHT_HOURS;
 }
 
-// Check session on load
-if (localStorage.getItem("adminAuth") === "true") {
+// Scan-to-score: log a foursome in directly from its QR token (no password)
+function tryTokenLogin() {
+  const token = new URLSearchParams(window.location.search).get("s");
+  if (!token) return false;
+  const num = FOURSOME_TOKENS[token];
+  if (!num) return false;
+  adminUser = "foursome" + num;
+  localStorage.setItem("adminAuth", "true");
+  localStorage.setItem("adminUser", adminUser);
+  localStorage.setItem("adminLoginTime", Date.now().toString());
+  applyRole();
+  showAdmin();
+  // Strip the token from the URL so it isn't bookmarked or shared onward
+  try {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  } catch (e) {}
+  return true;
+}
+
+// On load: QR token first, otherwise restore an existing session
+if (!tryTokenLogin() && localStorage.getItem("adminAuth") === "true") {
   if (isSessionExpired()) {
     localStorage.removeItem("adminAuth");
     localStorage.removeItem("adminUser");
