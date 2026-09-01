@@ -178,6 +178,13 @@ function renderMatches(data) {
   });
 }
 
+// Small round headshot for a player; removes itself if no photo exists.
+function playerAvatar(name) {
+  const slug = String(name || "").toLowerCase().replace(/[^a-z]/g, "");
+  if (!slug) return "";
+  return `<img class="lb-avatar" src="images/players/${slug}.jpg" alt="" loading="lazy" onerror="this.remove()">`;
+}
+
 function buildMatch(match, data) {
   const div = document.createElement("article");
   div.className = "matchup";
@@ -192,12 +199,18 @@ function buildMatch(match, data) {
 
   div.innerHTML = `
     <div class="matchup-row">
-      <span class="player-name player-name--left">${p1name}</span>
+      <div class="matchup-player matchup-player--left">
+        ${playerAvatar(p1name)}
+        <span class="player-name player-name--left">${p1name}</span>
+      </div>
       <div class="matchup-scores">
         ${buildNineInline("F9", match.points.front9)}
         ${buildNineInline("B9", match.points.back9)}
       </div>
-      <span class="player-name player-name--right">${p2name}</span>
+      <div class="matchup-player matchup-player--right">
+        <span class="player-name player-name--right">${p2name}</span>
+        ${playerAvatar(p2name)}
+      </div>
     </div>
   `;
   const teamColor = (team, id) => (team === "brock" || id === "brock") ? "#d4af37" : "#006747";
