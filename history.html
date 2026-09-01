@@ -344,6 +344,75 @@
         padding: 12px 14px;
       }
     }
+
+    /* Hole-by-hole scorecard (archived rounds) */
+    .h-scorecard {
+      background: var(--color-card);
+      border: 1px solid rgba(0, 103, 71, 0.15);
+      border-radius: var(--radius-md);
+      padding: 12px 14px 14px;
+      margin: -4px 0 14px;
+    }
+    .hsc-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .hsc-chip {
+      font-size: 0.8em;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      color: #fff;
+    }
+    .hsc-nine { margin-top: 8px; }
+    .hsc-nine-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72em;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--masters-green);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .hsc-nine-res {
+      color: var(--masters-red);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: none;
+    }
+    .hsc-row {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 3px;
+    }
+    .hsc-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      padding: 4px 0;
+      font-weight: 700;
+      line-height: 1.1;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    .hsc-h { font-size: 0.78em; }
+    .hsc-p { font-size: 0.62em; opacity: 0.7; font-weight: 600; }
+    .hsc-brock { background: var(--masters-green); color: #fff; }
+    .hsc-jared { background: var(--masters-gold); color: #1a1a1a; }
+    .hsc-tie { background: #d8d8d8; color: #333; }
+    .hsc-empty { background: #f2f0e6; color: #bbb; }
+    .hsc-none { background: #888; color: #fff; }
+    @media (max-width: 480px) {
+      .hsc-p { display: none; }
+      .hsc-h { font-size: 0.7em; }
+    }
   </style>
 </head>
 <body>
