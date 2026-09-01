@@ -1161,9 +1161,58 @@ window.addEventListener('keydown', (e) => {
 function saveData() {
   const saveBtn = document.getElementById('save-btn');
   const originalText = saveBtn ? saveBtn.textContent : "Save";
+  const foursomeMode = isFoursomeUser();
+
+  // Sends the current data to the server. Foursome scorers tag their group so
+  // the server merges only their two matches — concurrent groups never clobber
+  // each other. The admin sends a full document guarded by the optimistic lock.
+  const postSave = () => {
+    if (saveBtn) saveBtn.textContent = "Saving...";
+    data.meta.lastUpdated = new Date().toISOString();
+
+    return fetch("/api/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        password: ADMIN_PASSWORD_HASH,
+        expectedLastUpdated: loadedLastUpdated,
+        foursome: foursomeMode ? userFoursome : null,
+        data: data
+      })
+    })
+      .then(res => res.json())
+      .then(resp => {
+        if (resp.success) {
+          loadedLastUpdated = resp.lastUpdated || data.meta.lastUpdated;
+          if (data.meta) data.meta.lastUpdated = loadedLastUpdated;
+          markSaved();
+          saveCachedData(data);
+          saveLeaderboardCache(data);
+          showToast("Saved successfully!");
+        } else {
+          const msg = resp.error || "Save failed";
+          const friendly = msg.includes("conflict") ? "Save conflict — please reload and try again."
+            : msg.includes("auth") || msg.includes("401") ? "Authentication error — try logging out and back in."
+            : "Save failed — check your connection and try again.";
+          throw new Error(friendly);
+        }
+        if (saveBtn) { saveBtn.textContent = originalText; saveBtn.disabled = false; }
+      });
+  };
+
   if (saveBtn) { saveBtn.textContent = "Checking..."; saveBtn.disabled = true; }
 
-  // Optimistic locking: fetch current data and compare lastUpdated
+  // Foursome scorers save straight through (server-side per-group merge is
+  // conflict-free). The admin does a client-side pre-check on the whole file.
+  if (foursomeMode) {
+    postSave().catch(err => {
+      console.error(err);
+      showToast(err.message || "Save failed — check your connection.", "error");
+      if (saveBtn) { saveBtn.textContent = originalText; saveBtn.disabled = false; }
+    });
+    return;
+  }
+
   fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
     .then(res => res.json())
     .then(serverData => {
@@ -1173,37 +1222,7 @@ function saveData() {
         showToast("Conflict: someone else saved first. Reload to get latest changes.", "error");
         return;
       }
-
-      // Safe to save — update timestamp and send
-      if (saveBtn) saveBtn.textContent = "Saving...";
-      data.meta.lastUpdated = new Date().toISOString();
-
-      return fetch("/api/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          password: ADMIN_PASSWORD_HASH,
-          expectedLastUpdated: loadedLastUpdated,
-          data: data
-        })
-      })
-        .then(res => res.json())
-        .then(resp => {
-          if (resp.success) {
-            loadedLastUpdated = data.meta.lastUpdated;
-            markSaved();
-            saveCachedData(data);
-            saveLeaderboardCache(data);
-            showToast("Saved successfully!");
-          } else {
-            const msg = resp.error || "Save failed";
-            const friendly = msg.includes("conflict") ? "Save conflict — please reload and try again."
-              : msg.includes("auth") || msg.includes("401") ? "Authentication error — try logging out and back in."
-              : "Save failed — check your connection and try again.";
-            throw new Error(friendly);
-          }
-          if (saveBtn) { saveBtn.textContent = originalText; saveBtn.disabled = false; }
-        });
+      return postSave();
     })
     .catch(err => {
       console.error(err);
