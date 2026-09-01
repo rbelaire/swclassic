@@ -11,6 +11,14 @@
     10: 4, 11: 5, 12: 4, 13: 3, 14: 4, 15: 4, 16: 4, 17: 3, 18: 5
   };
 
+  // Small round headshot next to a player's name. Falls back cleanly (the img
+  // removes itself) for players whose photo hasn't been added yet.
+  function playerAvatar(name) {
+    const slug = String(name || '').toLowerCase().replace(/[^a-z]/g, '');
+    if (!slug) return '';
+    return `<img class="h-avatar" src="images/players/${slug}.jpg" alt="" loading="lazy" onerror="this.remove()">`;
+  }
+
   fetch(`./history-data.json?t=${Date.now()}`, { cache: "no-store" })
     .then(res => res.json())
     .then(data => renderHistory(data))
@@ -81,10 +89,12 @@
         const p1Winner = m.result && m.result.p1 > m.result.p2;
         const p2Winner = m.result && m.result.p2 > m.result.p1;
 
+        const p1Label = `<span class="h-name">${m.player1}${m.result ? ' <span class="h-score">(' + m.result.p1 + ')</span>' : ''}</span>`;
+        const p2Label = `<span class="h-name">${m.player2}${m.result ? ' <span class="h-score">(' + m.result.p2 + ')</span>' : ''}</span>`;
         html += `<div class="history-match">`;
-        html += `<div class="h-player ${p1Winner ? 'h-winner' : ''}">${m.player1}${m.result ? ' <span class="h-score">(' + m.result.p1 + ')</span>' : ''}</div>`;
+        html += `<div class="h-player ${p1Winner ? 'h-winner' : ''}">${p1Label}${playerAvatar(m.player1)}</div>`;
         html += `<div class="h-vs">vs</div>`;
-        html += `<div class="h-player ${p2Winner ? 'h-winner' : ''}">${m.player2}${m.result ? ' <span class="h-score">(' + m.result.p2 + ')</span>' : ''}</div>`;
+        html += `<div class="h-player ${p2Winner ? 'h-winner' : ''}">${playerAvatar(m.player2)}${p2Label}</div>`;
         html += `</div>`;
         html += renderHoleScorecard(m);
       });
