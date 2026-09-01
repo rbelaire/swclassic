@@ -90,6 +90,7 @@ function showAdmin() {
   // Hide tabs + admin-only buttons for foursome users
   const tabBar = document.querySelector(".admin-tabs");
   const clearBtn = document.querySelector(".btn-danger");
+  const archiveBtn = document.getElementById("archive-btn");
   const eyebrow = document.getElementById("admin-eyebrow");
   const title = document.getElementById("admin-title");
   const subtitle = document.getElementById("admin-subtitle");
@@ -97,6 +98,7 @@ function showAdmin() {
   if (isFoursomeUser()) {
     if (tabBar) tabBar.style.display = "none";
     if (clearBtn) clearBtn.style.display = "none";
+    if (archiveBtn) archiveBtn.style.display = "none";
     if (eyebrow) eyebrow.textContent = `Foursome ${userFoursome + 1} Scorer`;
     if (title) title.textContent = `Foursome ${userFoursome + 1}`;
     if (subtitle) subtitle.textContent = "Enter hole-by-hole scores for your matches.";
@@ -108,6 +110,7 @@ function showAdmin() {
   } else {
     if (tabBar) tabBar.style.display = "";
     if (clearBtn) clearBtn.style.display = "";
+    if (archiveBtn) archiveBtn.style.display = "";
     if (eyebrow) eyebrow.textContent = "Admin Console";
     if (title) title.textContent = "Admin Console";
     if (subtitle) subtitle.textContent = "Draft players, build matchups, and enter scores.";
@@ -1228,5 +1231,112 @@ function saveData() {
       console.error(err);
       showToast(err.message || "Save failed — check your connection.", "error");
       if (saveBtn) { saveBtn.textContent = originalText; saveBtn.disabled = false; }
+    });
+}
+
+/*************************
+ * ARCHIVE ROUND -> HISTORY
+ * Snapshots the finished round (hole-by-hole) into history-data.json so the
+ * History page keeps a permanent scorecard even after data.json is reused.
+ *************************/
+function formatTournamentDate(iso) {
+  if (!iso) return "";
+  const parts = String(iso).split("-").map(Number);
+  const [y, m, d] = parts;
+  const months = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
+  if (!y || !m || !d || m < 1 || m > 12) return String(iso);
+  return `${months[m - 1]} ${d}, ${y}`;
+}
+
+function buildHistoryMatches() {
+  return data.matches.map(m => {
+    const [p1, p2] = m.playerIds;
+    const pl1 = p1 ? data.players[p1] : null;
+    const pl2 = p2 ? data.players[p2] : null;
+    // Resolve which team side each player counts for (coaches count as themselves).
+    const side1 = pl1 ? (pl1.team === "coach" ? p1 : pl1.team) : null;
+    const side2 = pl2 ? (pl2.team === "coach" ? p2 : pl2.team) : null;
+    const f = m.points.front9;
+    const b = m.points.back9;
+    const p1pts = (f === null ? 0 : f) + (b === null ? 0 : b);
+    const p2pts = (f === null ? 0 : 1 - f) + (b === null ? 0 : 1 - b);
+    return {
+      id: m.id,
+      player1: pl1 ? pl1.name : "TBD",
+      player2: pl2 ? pl2.name : "TBD",
+      side1,
+      side2,
+      pops1: pl1 ? pl1.pops : null,
+      pops2: pl2 ? pl2.pops : null,
+      holes: Object.assign({}, m.points.holes),
+      front9: f,
+      back9: b,
+      result: { p1: p1pts, p2: p2pts }
+    };
+  });
+}
+
+function archiveToHistory() {
+  if (!data) { showToast("No data loaded yet.", "error"); return; }
+
+  const totals = calculateTotals();
+  const year = parseInt(String(data.meta?.tournamentDate || "").slice(0, 4), 10) || new Date().getFullYear();
+  const brockName = data.players.brock?.name || "Brock";
+  const jaredName = data.players.jared?.name || "Jared";
+
+  if (!confirm(
+    `Archive the current round to History as ${year}?\n\n` +
+    `Team ${brockName} ${totals.brock} — Team ${jaredName} ${totals.jared}\n\n` +
+    `This saves a hole-by-hole record and marks the tournament complete. ` +
+    `You can run it again to update the archive.`
+  )) return;
+
+  const archiveBtn = document.getElementById("archive-btn");
+  const orig = archiveBtn ? archiveBtn.textContent : "";
+  if (archiveBtn) { archiveBtn.textContent = "Archiving..."; archiveBtn.disabled = true; }
+  const restore = () => { if (archiveBtn) { archiveBtn.textContent = orig; archiveBtn.disabled = false; } };
+
+  fetch(`./history-data.json?t=${Date.now()}`, { cache: "no-store" })
+    .then(res => (res.ok ? res.json() : { tournaments: [] }))
+    .then(hist => {
+      if (!hist || !Array.isArray(hist.tournaments)) hist = { tournaments: [] };
+      const existing = hist.tournaments.find(t => t.year === year);
+
+      const record = {
+        year,
+        name: `The Classic ${year}`,
+        date: formatTournamentDate(data.meta?.tournamentDate),
+        venue: data.meta?.venue || "Farm D' Allie Golf Club",
+        status: "complete",
+        captains: { brock: brockName, jared: jaredName },
+        finalScore: { brock: totals.brock, jared: totals.jared },
+        matches: buildHistoryMatches(),
+        mvp: existing?.mvp || null,
+        notes: existing?.notes || ""
+      };
+
+      if (existing) Object.assign(existing, record);
+      else hist.tournaments.push(record);
+
+      return fetch("/api/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          password: ADMIN_PASSWORD_HASH,
+          file: "history-data.json",
+          data: hist
+        })
+      }).then(r => r.json());
+    })
+    .then(resp => {
+      if (resp && resp.success) showToast("Round archived to History ✓");
+      else throw new Error(resp && resp.error ? resp.error : "Archive failed");
+      restore();
+    })
+    .catch(err => {
+      console.error(err);
+      showToast("Archive failed — " + (err.message || "try again."), "error");
+      restore();
     });
 }

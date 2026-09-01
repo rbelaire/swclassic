@@ -14,7 +14,9 @@
 const ADMIN_PASSWORD_HASH = "5a40d95d61e29d6665ff382de6e0b0cc6a3bbb546aeececa59911e08d597587b";
 const GITHUB_REPO = "rbelaire/swclassic";
 const GITHUB_BRANCH = "main";
-const DATA_FILE_PATH = "data.json";
+// Only these files may be written. "data.json" is live scoring; the admin can
+// also archive a finished round into "history-data.json".
+const ALLOWED_FILES = { "data.json": true, "history-data.json": true };
 const MAX_ATTEMPTS = 4;
 
 module.exports = async function handler(req, res) {
@@ -30,7 +32,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { password, data, foursome, expectedLastUpdated } = req.body || {};
+  const { password, data, foursome, expectedLastUpdated, file } = req.body || {};
 
   if (password !== ADMIN_PASSWORD_HASH) {
     return res.status(401).json({ error: "Invalid password" });
@@ -40,15 +42,22 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: "No valid data provided" });
   }
 
+  const targetFile = file || "data.json";
+  if (!ALLOWED_FILES[targetFile]) {
+    return res.status(400).json({ error: "File not allowed" });
+  }
+
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
     return res.status(500).json({ error: "GitHub token not configured" });
   }
 
+  // Per-foursome merge only applies to live scoring in data.json.
   const isFoursome =
+    targetFile === "data.json" &&
     Number.isInteger(foursome) && foursome >= 0 && foursome <= 2;
 
-  const apiBase = `https://api.github.com/repos/${GITHUB_REPO}/contents/${DATA_FILE_PATH}`;
+  const apiBase = `https://api.github.com/repos/${GITHUB_REPO}/contents/${targetFile}`;
   const headers = {
     Authorization: `Bearer ${token}`,
     Accept: "application/vnd.github+json",
@@ -96,8 +105,11 @@ module.exports = async function handler(req, res) {
         });
       }
       toWrite = data;
-      toWrite.meta = toWrite.meta || {};
-      if (!toWrite.meta.lastUpdated) toWrite.meta.lastUpdated = new Date().toISOString();
+      // Only the live scoring file carries a meta.lastUpdated stamp.
+      if (targetFile === "data.json") {
+        toWrite.meta = toWrite.meta || {};
+        if (!toWrite.meta.lastUpdated) toWrite.meta.lastUpdated = new Date().toISOString();
+      }
     }
 
     // 3. Commit it
@@ -116,7 +128,7 @@ module.exports = async function handler(req, res) {
     });
 
     if (putRes.ok) {
-      return res.status(200).json({ success: true, lastUpdated: toWrite.meta.lastUpdated });
+      return res.status(200).json({ success: true, lastUpdated: toWrite.meta?.lastUpdated || null });
     }
 
     // 409/422 => the SHA moved under us (another writer committed). Re-read and retry.
