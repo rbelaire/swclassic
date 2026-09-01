@@ -178,11 +178,13 @@ function renderMatches(data) {
   });
 }
 
-// Small round headshot for a player; removes itself if no photo exists.
+// Round headshot for a player. The name is kept as alt/title text for
+// accessibility and hover. If the photo is missing, falls back to the name.
 function playerAvatar(name) {
+  const safe = escapeHTML(name || "");
   const slug = String(name || "").toLowerCase().replace(/[^a-z]/g, "");
   if (!slug) return "";
-  return `<img class="lb-avatar" src="images/players/${slug}.jpg" alt="" loading="lazy" onerror="this.remove()">`;
+  return `<img class="lb-avatar" src="images/players/${slug}.jpg" alt="${safe}" title="${safe}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'player-name',textContent:this.alt}))">`;
 }
 
 function buildMatch(match, data) {
@@ -201,14 +203,12 @@ function buildMatch(match, data) {
     <div class="matchup-row">
       <div class="matchup-player matchup-player--left">
         ${playerAvatar(p1name)}
-        <span class="player-name player-name--left">${p1name}</span>
       </div>
       <div class="matchup-scores">
         ${buildNineInline("F9", match.points.front9)}
         ${buildNineInline("B9", match.points.back9)}
       </div>
       <div class="matchup-player matchup-player--right">
-        <span class="player-name player-name--right">${p2name}</span>
         ${playerAvatar(p2name)}
       </div>
     </div>
