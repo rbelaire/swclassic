@@ -103,14 +103,29 @@
     .history-match .h-player {
       font-weight: 700;
       color: var(--masters-green);
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .history-match .h-player:first-child {
       text-align: right;
+      justify-content: flex-end;
     }
 
     .history-match .h-player:last-child {
       text-align: left;
+      justify-content: flex-start;
+    }
+
+    .h-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--masters-gold);
+      background: #e9e6d8;
+      flex-shrink: 0;
     }
 
     .history-match .h-player.h-winner {
@@ -314,6 +329,12 @@
       .history-match .h-player:first-child,
       .history-match .h-player:last-child {
         text-align: center;
+        justify-content: center;
+      }
+
+      .h-avatar {
+        width: 40px;
+        height: 40px;
       }
 
       .upcoming-banner {
