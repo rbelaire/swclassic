@@ -210,7 +210,7 @@
       ],
       "points": {
         "front9": 1,
-        "back9": 0,
+        "back9": 0.5,
         "holes": {
           "1": 0.5,
           "2": 0.5,
@@ -229,7 +229,7 @@
           "15": 0,
           "16": 0,
           "17": 0.5,
-          "18": null
+          "18": 1
         }
       },
       "status": "not_started"
@@ -261,14 +261,14 @@
           "15": 0,
           "16": 1,
           "17": 0.5,
-          "18": null
+          "18": 0.5
         }
       },
       "status": "not_started"
     }
   ],
   "meta": {
-    "lastUpdated": "2026-09-05T18:04:59.835Z",
+    "lastUpdated": "2026-09-05T18:19:29.948Z",
     "tournamentDate": "2026-09-06",
     "venue": "Farm D' Allie Golf Club"
   },
