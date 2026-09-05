@@ -154,7 +154,7 @@
           "4": 0,
           "5": 1,
           "6": 1,
-          "7": null,
+          "7": 0.5,
           "8": null,
           "9": null,
           "10": null,
@@ -177,7 +177,7 @@
         "hunter"
       ],
       "points": {
-        "front9": 0.5,
+        "front9": 1,
         "back9": null,
         "holes": {
           "1": 0.5,
@@ -186,7 +186,7 @@
           "4": 1,
           "5": 0.5,
           "6": 0,
-          "7": null,
+          "7": 1,
           "8": null,
           "9": null,
           "10": null,
@@ -268,7 +268,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-09-05T15:48:34.238Z",
+    "lastUpdated": "2026-09-05T15:51:46.707Z",
     "tournamentDate": "2026-09-06",
     "venue": "Farm D' Allie Golf Club"
   },
