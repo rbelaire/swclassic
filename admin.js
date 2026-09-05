@@ -83,6 +83,30 @@ function isFoursomeUser() {
   return userRole === "foursome";
 }
 
+// iOS Safari anchors position:fixed to the layout viewport, so the sticky save
+// bar jumps when the browser's toolbar animates in/out on scroll. Pin the bar
+// to the *visual* viewport's bottom so it tracks the toolbar smoothly.
+let barPinInit = false;
+function pinFoursomeBar() {
+  const bar = document.getElementById("foursome-save-bar");
+  if (!bar || bar.style.display === "none") return;
+  const vv = window.visualViewport;
+  if (!vv) { bar.style.bottom = "0px"; return; }
+  const offset = Math.max(0, window.innerHeight - (vv.height + vv.offsetTop));
+  bar.style.bottom = offset + "px";
+}
+function initBarPinning() {
+  pinFoursomeBar();
+  if (barPinInit) return;
+  barPinInit = true;
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", pinFoursomeBar);
+    window.visualViewport.addEventListener("scroll", pinFoursomeBar);
+  }
+  window.addEventListener("scroll", pinFoursomeBar, { passive: true });
+  window.addEventListener("orientationchange", () => setTimeout(pinFoursomeBar, 250));
+}
+
 function showAdmin() {
   document.getElementById("login-overlay").classList.add("hidden");
   document.getElementById("admin-app").style.display = "";
@@ -103,7 +127,7 @@ function showAdmin() {
     if (title) title.textContent = `Foursome ${userFoursome + 1}`;
     if (subtitle) subtitle.textContent = "Enter hole-by-hole scores for your matches.";
     const saveBar = document.getElementById("foursome-save-bar");
-    if (saveBar) saveBar.style.display = "flex";
+    if (saveBar) { saveBar.style.display = "flex"; initBarPinning(); }
     // Hide the header save button — the sticky bar handles it
     const saveBtn = document.getElementById("save-btn");
     if (saveBtn) saveBtn.style.display = "none";
