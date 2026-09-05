@@ -262,6 +262,20 @@ function validateData(d) {
   return errors;
 }
 
+// Read current scores from /api/data (straight from GitHub, updated within
+// seconds of any save) so a phone taking over scoring loads the latest holes
+// immediately; fall back to the statically served ./data.json.
+function fetchLiveData() {
+  return fetch(`/api/data?t=${Date.now()}`, { cache: "no-store" })
+    .then(res => {
+      if (!res.ok) return Promise.reject(new Error("api/data " + res.status));
+      return res.json();
+    })
+    .catch(() =>
+      fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" }).then(res => res.json())
+    );
+}
+
 function loadData() {
   const cached = getCachedData();
   if (cached) {
@@ -270,8 +284,7 @@ function loadData() {
     render();
   }
 
-  fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
-    .then(res => res.json())
+  fetchLiveData()
     .then(json => {
       const errors = validateData(json);
       if (errors.length > 0) {
