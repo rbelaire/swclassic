@@ -113,7 +113,7 @@
         "jared"
       ],
       "points": {
-        "front9": 0.5,
+        "front9": 1,
         "back9": null,
         "holes": {
           "1": 1,
@@ -124,7 +124,7 @@
           "6": 1,
           "7": 0,
           "8": 0,
-          "9": null,
+          "9": 1,
           "10": null,
           "11": null,
           "12": null,
@@ -268,7 +268,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-09-05T15:51:46.707Z",
+    "lastUpdated": "2026-09-05T15:57:15.216Z",
     "tournamentDate": "2026-09-06",
     "venue": "Farm D' Allie Golf Club"
   },
