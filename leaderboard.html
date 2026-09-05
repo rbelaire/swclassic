@@ -46,6 +46,35 @@
   @media (max-width: 480px) {
     .lb-avatar { width: 48px; height: 48px; }
   }
+
+  /* Center column: match-play status (hero) + point pills + holes played */
+  .matchup-center {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 5px; min-width: 0;
+  }
+  .mp-status {
+    font-weight: 800;
+    font-size: clamp(1.05rem, 3.6vw, 1.4rem);
+    letter-spacing: 0.5px;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--masters-green);
+  }
+  .mp-status--as { color: #6b7280; letter-spacing: 1px; }
+  .mp-status--none { color: #b8b8b8; }
+  .mp-thru {
+    font-size: clamp(0.6rem, 2vw, 0.72rem);
+    color: #6b7280; letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  /* Slightly smaller point pills so the status reads as primary */
+  .matchup-center .matchup-scores { gap: 6px; }
+  .matchup-center .nine-score { padding: 3px 9px; }
+
+  @media (max-width: 480px) {
+    .matchup-row { gap: 6px; }
+    .matchup-center { gap: 4px; }
+    .matchup-center .nine-score { padding: 2px 7px; }
+  }
   </style>
 </head>
 
