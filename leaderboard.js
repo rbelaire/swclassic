@@ -4,7 +4,7 @@
  *************************/
 
 // Configuration
-const REFRESH_INTERVAL = 30000; // 30 seconds
+const REFRESH_INTERVAL = 15000; // 15 seconds
 let autoRefreshEnabled = true;
 let lastUpdateTime = Date.now();
 let refreshTimer = null;
@@ -39,16 +39,28 @@ function isNewerData(nextData, currentData) {
   return Date.parse(nextData.meta.lastUpdated) >= Date.parse(currentData.meta.lastUpdated);
 }
 
+// Prefer /api/data (reads GitHub directly, updates within seconds of a save);
+// fall back to the statically served ./data.json if that endpoint is
+// unavailable, so the leaderboard always loads.
+function fetchLiveData() {
+  return fetch(`/api/data?t=${Date.now()}`, { cache: "no-store" })
+    .then(res => {
+      if (!res.ok) return Promise.reject(new Error("api/data " + res.status));
+      return res.json();
+    })
+    .catch(() =>
+      fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" }).then(res => res.json())
+    );
+}
+
 function loadData() {
   const cached = getCachedData();
   if (cached) {
     data = cached;
     render();
   }
-  
-  // Add cache-busting parameter to ensure fresh data
-  fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
-    .then(res => res.json())
+
+  fetchLiveData()
     .then(json => {
       if (!data || isNewerData(json, data)) {
         data = json;

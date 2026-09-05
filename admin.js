@@ -889,9 +889,9 @@ function buildHoleRow(holeNum, value, p1Name, p2Name, matchIndex) {
         <span class="hole-par">Par ${par}</span>
       </div>
       <div class="hole-buttons">
-        <button class="hole-btn hole-btn-p1 ${isP1 ? 'active' : ''}" onclick="setHoleResult(${matchIndex}, ${holeNum}, ${isP1 ? 'null' : '1'})">${p1Name}</button>
-        <button class="hole-btn hole-btn-halved ${isHalved ? 'active' : ''}" onclick="setHoleResult(${matchIndex}, ${holeNum}, ${isHalved ? 'null' : '0.5'})">Tie</button>
-        <button class="hole-btn hole-btn-p2 ${isP2 ? 'active' : ''}" onclick="setHoleResult(${matchIndex}, ${holeNum}, ${isP2 ? 'null' : '0'})">${p2Name}</button>
+        <button class="hole-btn hole-btn-p1 ${isP1 ? 'active' : ''}" data-hole="${holeNum}" data-res="1" onclick="setHoleResult(${matchIndex}, ${holeNum}, 1)">${p1Name}</button>
+        <button class="hole-btn hole-btn-halved ${isHalved ? 'active' : ''}" data-hole="${holeNum}" data-res="0.5" onclick="setHoleResult(${matchIndex}, ${holeNum}, 0.5)">Tie</button>
+        <button class="hole-btn hole-btn-p2 ${isP2 ? 'active' : ''}" data-hole="${holeNum}" data-res="0" onclick="setHoleResult(${matchIndex}, ${holeNum}, 0)">${p2Name}</button>
       </div>
     </div>`;
 }
@@ -903,7 +903,8 @@ function setHoleResult(matchIndex, holeNum, value) {
     for (let i = 1; i <= 18; i++) match.points.holes[i] = null;
   }
 
-  match.points.holes[holeNum] = value;
+  // Tapping the already-selected result clears it (toggle off); otherwise set it.
+  match.points.holes[holeNum] = (match.points.holes[holeNum] === value) ? null : value;
 
   // Auto-calculate front9 and back9
   match.points.front9 = calculateNineFromHoles(match.points.holes, 1, 9);
@@ -925,28 +926,15 @@ function updateMatchInPlace(matchIndex) {
   const p2Name = p2Id ? escapeHTML(data.players[p2Id].name) : "P2";
   const holes = match.points.holes || {};
 
-  // Update each hole row's button active states
-  for (let h = 1; h <= 18; h++) {
+  // Update each hole's button highlight from the current value. Buttons are
+  // selected by their stable data-hole/data-res attributes, and the active
+  // class simply reflects whether that button's result matches the value.
+  matchEl.querySelectorAll('.hole-btn[data-hole]').forEach(btn => {
+    const h = Number(btn.getAttribute('data-hole'));
+    const res = Number(btn.getAttribute('data-res')); // 1, 0.5, or 0
     const v = holes[h];
-    const row = matchEl.querySelector(`.hole-row:nth-of-type(${h <= 9 ? h : h - 9})`);
-    // Use data attributes for targeted selection
-    const btnP1 = matchEl.querySelector(`[onclick="setHoleResult(${matchIndex}, ${h}, ${v === 1 ? 'null' : '1'})"]`);
-    const btnHalved = matchEl.querySelector(`[onclick="setHoleResult(${matchIndex}, ${h}, ${v === 0.5 ? 'null' : '0.5'})"]`);
-    const btnP2 = matchEl.querySelector(`[onclick="setHoleResult(${matchIndex}, ${h}, ${v === 0 ? 'null' : '0'})"]`);
-
-    if (btnP1) {
-      btnP1.classList.toggle('active', v === 1);
-      btnP1.setAttribute('onclick', `setHoleResult(${matchIndex}, ${h}, ${v === 1 ? 'null' : '1'})`);
-    }
-    if (btnHalved) {
-      btnHalved.classList.toggle('active', v === 0.5);
-      btnHalved.setAttribute('onclick', `setHoleResult(${matchIndex}, ${h}, ${v === 0.5 ? 'null' : '0.5'})`);
-    }
-    if (btnP2) {
-      btnP2.classList.toggle('active', v === 0);
-      btnP2.setAttribute('onclick', `setHoleResult(${matchIndex}, ${h}, ${v === 0 ? 'null' : '0'})`);
-    }
-  }
+    btn.classList.toggle('active', v !== null && v !== undefined && v === res);
+  });
 
   // Update the nine-result summary bar
   const front9Result = calculateNineFromHoles(holes, 1, 9);
@@ -1162,9 +1150,9 @@ window.addEventListener('keydown', (e) => {
  * SAVE DATA
  *************************/
 function saveData() {
-  const saveBtn = document.getElementById('save-btn');
-  const originalText = saveBtn ? saveBtn.textContent : "Save";
   const foursomeMode = isFoursomeUser();
+  const saveBtn = document.getElementById(foursomeMode ? 'foursome-save-btn' : 'save-btn');
+  const originalText = saveBtn ? saveBtn.textContent : "Save";
 
   // Sends the current data to the server. Foursome scorers tag their group so
   // the server merges only their two matches — concurrent groups never clobber
