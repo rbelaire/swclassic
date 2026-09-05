@@ -1183,7 +1183,14 @@ function saveData() {
         data: data
       })
     })
-      .then(res => res.json())
+      .then(async res => {
+        const text = await res.text();
+        let resp;
+        try { resp = JSON.parse(text); }
+        catch (e) { resp = { error: `HTTP ${res.status}: ${(text || "no response").slice(0, 140)}` }; }
+        if (!res.ok && !resp.error) resp.error = `HTTP ${res.status}`;
+        return resp;
+      })
       .then(resp => {
         if (resp.success) {
           loadedLastUpdated = resp.lastUpdated || data.meta.lastUpdated;
@@ -1194,9 +1201,8 @@ function saveData() {
           showToast("Saved successfully!");
         } else {
           const msg = resp.error || "Save failed";
-          const friendly = msg.includes("conflict") ? "Save conflict — please reload and try again."
-            : msg.includes("auth") || msg.includes("401") ? "Authentication error — try logging out and back in."
-            : "Save failed — check your connection and try again.";
+          const friendly = /\bconflict\b/i.test(msg) ? "Save conflict — reload to get the latest, then re-enter."
+            : "Save failed: " + msg;
           throw new Error(friendly);
         }
         if (saveBtn) { saveBtn.textContent = originalText; saveBtn.disabled = false; }
