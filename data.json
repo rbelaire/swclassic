@@ -91,8 +91,8 @@
           "5": 1,
           "6": 0.5,
           "7": 1,
-          "8": null,
-          "9": null,
+          "8": 1,
+          "9": 1,
           "10": null,
           "11": null,
           "12": null,
@@ -268,7 +268,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-09-05T15:58:15.407Z",
+    "lastUpdated": "2026-09-05T15:58:56.131Z",
     "tournamentDate": "2026-09-06",
     "venue": "Farm D' Allie Golf Club"
   },
