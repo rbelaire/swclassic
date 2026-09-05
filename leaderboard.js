@@ -259,8 +259,8 @@ function buildMatch(match, data) {
       <div class="matchup-center">
         <div class="${statusClass}" style="${statusStyle}">${statusText}</div>
         <div class="matchup-scores">
-          ${buildNineInline("F9", match.points.front9)}
-          ${buildNineInline("B9", match.points.back9)}
+          ${buildNineInline("F9", match.points.front9, teamColor(p1team, p1), teamColor(p2team, p2))}
+          ${buildNineInline("B9", match.points.back9, teamColor(p1team, p1), teamColor(p2team, p2))}
         </div>
         <div class="mp-thru">${thru}</div>
       </div>
@@ -274,12 +274,19 @@ function buildMatch(match, data) {
   return div;
 }
 
-function buildNineInline(label, val) {
-  let cls = "nine-score";
-  if (val === 1) cls += " won";
-  if (val === 0.5) cls += " tied";
-  if (val === 0) cls += " lost";
-  return `<div class="${cls}"><div class="nine-label">${label}</div><div class="nine-result">${val === null ? "-" : val}</div></div>`;
+// Shows the point earned on a nine from the WINNER's side: a decided nine is
+// worth 1 point, shown as "1" in the winning team's color (gold/green) whether
+// the left or right player won — so the box always reflects the point, matching
+// the team total. A tie is a half point; an undecided nine shows "-".
+function buildNineInline(label, val, c1, c2) {
+  if (val === null || val === undefined) {
+    return `<div class="nine-score"><div class="nine-label">${label}</div><div class="nine-result">-</div></div>`;
+  }
+  if (val === 0.5) {
+    return `<div class="nine-score tied"><div class="nine-label">${label}</div><div class="nine-result">½</div></div>`;
+  }
+  const color = val === 1 ? c1 : c2; // 1 = left player won, 0 = right player won
+  return `<div class="nine-score" style="border-color:${color}; background:${color}1f;"><div class="nine-label">${label}</div><div class="nine-result" style="color:${color}">1</div></div>`;
 }
 
 
