@@ -209,11 +209,11 @@
         "bruce"
       ],
       "points": {
-        "front9": 0,
+        "front9": 0.5,
         "back9": null,
         "holes": {
-          "1": 0,
-          "2": 0,
+          "1": 0.5,
+          "2": 0.5,
           "3": null,
           "4": null,
           "5": null,
@@ -268,7 +268,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-09-05T14:41:05.336Z",
+    "lastUpdated": "2026-09-05T14:45:36.611Z",
     "tournamentDate": "2026-09-06",
     "venue": "Farm D' Allie Golf Club"
   },
