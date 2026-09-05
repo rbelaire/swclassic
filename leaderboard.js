@@ -199,6 +199,19 @@ function playerAvatar(name) {
   return `<img class="lb-avatar" src="images/players/${slug}.jpg" alt="${safe}" title="${safe}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'player-name',textContent:this.alt}))">`;
 }
 
+// Running match-play margin from the per-hole winners (1 = p1, 0 = p2, 0.5 tie).
+function matchPlayStatus(match) {
+  const holes = (match.points && match.points.holes) || {};
+  let p1 = 0, p2 = 0, played = 0;
+  for (let h = 1; h <= 18; h++) {
+    const v = holes[h];
+    if (v === 1) { p1++; played++; }
+    else if (v === 0) { p2++; played++; }
+    else if (v === 0.5) { played++; }
+  }
+  return { p1, p2, played, diff: p1 - p2, remaining: 18 - played };
+}
+
 function buildMatch(match, data) {
   const div = document.createElement("article");
   div.className = "matchup";
@@ -210,22 +223,52 @@ function buildMatch(match, data) {
   const p2team = p2 ? data.players[p2].team : null;
   const p1name = p1 ? data.players[p1].name : "TBD";
   const p2name = p2 ? data.players[p2].name : "TBD";
+  const teamColor = (team, id) => (team === "brock" || id === "brock") ? "#d4af37" : "#006747";
+
+  // Match-play status shown in the center, leader indicated by an arrow + color.
+  const st = matchPlayStatus(match);
+  let statusText, statusStyle, statusClass = "mp-status";
+  if (st.played === 0) {
+    statusText = "—";
+    statusClass += " mp-status--none";
+    statusStyle = "";
+  } else if (st.diff === 0) {
+    statusText = "AS";
+    statusClass += " mp-status--as";
+    statusStyle = "";
+  } else {
+    const margin = Math.abs(st.diff);
+    const leaderIsP1 = st.diff > 0;
+    const color = leaderIsP1 ? teamColor(p1team, p1) : teamColor(p2team, p2);
+    statusStyle = `color:${color};`;
+    const closed = margin > st.remaining && st.remaining >= 0 && st.played > 0;
+    const label = (st.remaining === 0 || closed) && margin > 0
+      ? `${margin} UP`   // final margin
+      : `${margin} UP`;
+    statusText = leaderIsP1 ? `◂ ${label}` : `${label} ▸`;
+  }
+  const thru = st.played === 0 ? "Not started"
+    : st.remaining === 0 ? "Final"
+    : `${st.played}/18`;
 
   div.innerHTML = `
     <div class="matchup-row">
       <div class="matchup-player matchup-player--left">
         ${playerAvatar(p1name)}
       </div>
-      <div class="matchup-scores">
-        ${buildNineInline("F9", match.points.front9)}
-        ${buildNineInline("B9", match.points.back9)}
+      <div class="matchup-center">
+        <div class="${statusClass}" style="${statusStyle}">${statusText}</div>
+        <div class="matchup-scores">
+          ${buildNineInline("F9", match.points.front9)}
+          ${buildNineInline("B9", match.points.back9)}
+        </div>
+        <div class="mp-thru">${thru}</div>
       </div>
       <div class="matchup-player matchup-player--right">
         ${playerAvatar(p2name)}
       </div>
     </div>
   `;
-  const teamColor = (team, id) => (team === "brock" || id === "brock") ? "#d4af37" : "#006747";
   if (p1team) div.style.borderLeft = `4px solid ${teamColor(p1team, p1)}`;
   if (p2team) div.style.borderRight = `4px solid ${teamColor(p2team, p2)}`;
   return div;
