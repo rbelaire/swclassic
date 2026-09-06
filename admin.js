@@ -26,6 +26,7 @@ function escapeHTML(str) {
 }
 
 let expandedMatches = new Set();
+let grossMatches = new Set(); // matches showing optional gross-score inputs
 let loadedLastUpdated = null;
 let activeTab = "draft";
 let adminUser = "";
@@ -876,6 +877,67 @@ const COURSE_PARS = {
   10: 4, 11: 5, 12: 4, 13: 3, 14: 4, 15: 4, 16: 4, 17: 3, 18: 5
 };
 
+// Which holes the underdog receives a pop on (hardest holes, par 3s excluded),
+// and which side (1 = p1, 2 = p2) is the underdog. Uses the course handicaps.
+function strokeHolesForMatch(match) {
+  const [p1, p2] = match.playerIds;
+  if (!p1 || !p2 || !data.players[p1] || !data.players[p2]) {
+    return { holes: new Set(), underdog: 0, diff: 0 };
+  }
+  const pops1 = data.players[p1].pops || 0;
+  const pops2 = data.players[p2].pops || 0;
+  const diff = Math.abs(pops1 - pops2);
+  if (diff === 0) return { holes: new Set(), underdog: 0, diff: 0 };
+  const underdog = pops1 > pops2 ? 1 : 2;
+  const rows = [];
+  const course = (data.course) || {};
+  ["front9", "back9"].forEach(nine => {
+    const c = course[nine] || {};
+    Object.keys(c).forEach(h => rows.push({ hole: +h, par: c[h].par, hcp: c[h].handicap }));
+  });
+  const eligible = rows.filter(r => r.par !== 3).sort((a, b) => a.hcp - b.hcp).slice(0, diff);
+  return { holes: new Set(eligible.map(r => r.hole)), underdog, diff };
+}
+
+// Derive the hole winner from gross strokes + pops: 1 = p1, 0 = p2, 0.5 tie.
+function winnerFromGross(match, holeNum, g1, g2) {
+  if (g1 == null || g2 == null || g1 === "" || g2 === "") return null;
+  const sh = strokeHolesForMatch(match);
+  let net1 = Number(g1), net2 = Number(g2);
+  if (sh.holes.has(holeNum)) {
+    if (sh.underdog === 1) net1 -= 1; else net2 -= 1;
+  }
+  return net1 < net2 ? 1 : net2 < net1 ? 0 : 0.5;
+}
+
+function toggleGross(matchIndex) {
+  if (grossMatches.has(matchIndex)) grossMatches.delete(matchIndex);
+  else grossMatches.add(matchIndex);
+  render();
+}
+
+function setHoleGross(matchIndex, holeNum, playerIndex, value) {
+  const match = data.matches[matchIndex];
+  if (!match.points.gross) match.points.gross = {};
+  const pair = match.points.gross[holeNum] || [null, null];
+  const v = value === "" ? null : Math.max(1, Math.min(20, parseInt(value, 10) || 0));
+  pair[playerIndex] = v;
+  match.points.gross[holeNum] = pair;
+
+  // If both strokes are in, auto-set the hole winner (net, with pops).
+  const derived = winnerFromGross(match, holeNum, pair[0], pair[1]);
+  if (derived !== null) {
+    if (!match.points.holes) { match.points.holes = {}; for (let i = 1; i <= 18; i++) match.points.holes[i] = null; }
+    match.points.holes[holeNum] = derived;
+    match.points.front9 = calculateNineFromHoles(match.points.holes, 1, 9);
+    match.points.back9 = calculateNineFromHoles(match.points.holes, 10, 18);
+    const f = match.points.front9, b = match.points.back9;
+    match.status = (f !== null && b !== null) ? "complete" : (f !== null || b !== null) ? "in_progress" : "not_started";
+  }
+  markUnsaved();
+  updateMatchInPlace(matchIndex);
+}
+
 function buildHoleByHoleGrid(match, matchIndex) {
   const [p1Id, p2Id] = match.playerIds;
   const p1Name = p1Id ? escapeHTML(data.players[p1Id].name) : "P1";
@@ -904,12 +966,29 @@ function buildHoleByHoleGrid(match, matchIndex) {
     </div>
   </div>`;
 
+  // Optional gross-score mode + pops note
+  const grossMode = grossMatches.has(matchIndex);
+  const sh = strokeHolesForMatch(match);
+  let popsNote = "Even — no pops";
+  if (sh.diff > 0) {
+    const uId = match.playerIds[sh.underdog - 1];
+    const uName = uId && data.players[uId] ? escapeHTML(data.players[uId].name) : "Underdog";
+    popsNote = `${uName} gets ${sh.diff} (hardest non-par-3 holes)`;
+  }
+  html += `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin:8px 0; flex-wrap:wrap;">
+    <label style="font-size:0.85em; color:#0d3d1f; font-weight:600; display:flex; align-items:center; gap:6px; cursor:pointer;">
+      <input type="checkbox" onchange="toggleGross(${matchIndex})" ${grossMode ? "checked" : ""}> Gross scoring (auto-scores holes)
+    </label>
+    <span style="font-size:0.78em; color:#006747; font-weight:600;">${popsNote}</span>
+  </div>`;
+  const gross = match.points.gross || {};
+
   // Front 9 grid
   html += `<div class="hole-grid-section">
     <div class="hole-grid-label">Front 9</div>
     <div class="hole-grid">`;
   for (let h = 1; h <= 9; h++) {
-    html += buildHoleRow(h, holes[h], p1Name, p2Name, matchIndex);
+    html += buildHoleRow(h, holes[h], p1Name, p2Name, matchIndex, grossMode, gross, sh);
   }
   html += `</div></div>`;
 
@@ -918,7 +997,7 @@ function buildHoleByHoleGrid(match, matchIndex) {
     <div class="hole-grid-label">Back 9</div>
     <div class="hole-grid">`;
   for (let h = 10; h <= 18; h++) {
-    html += buildHoleRow(h, holes[h], p1Name, p2Name, matchIndex);
+    html += buildHoleRow(h, holes[h], p1Name, p2Name, matchIndex, grossMode, gross, sh);
   }
   html += `</div></div>`;
 
@@ -926,11 +1005,24 @@ function buildHoleByHoleGrid(match, matchIndex) {
   return html;
 }
 
-function buildHoleRow(holeNum, value, p1Name, p2Name, matchIndex) {
+function buildHoleRow(holeNum, value, p1Name, p2Name, matchIndex, grossMode, gross, sh) {
   const par = COURSE_PARS[holeNum];
   const isP1 = value === 1;
   const isHalved = value === 0.5;
   const isP2 = value === 0;
+
+  let grossRow = "";
+  if (grossMode) {
+    const g = (gross && gross[holeNum]) || [null, null];
+    const dot = sh && sh.holes && sh.holes.has(holeNum)
+      ? `<span class="g-net" title="Pop hole">● pop</span>` : `<span class="g-net"></span>`;
+    grossRow = `
+      <div class="hole-gross">
+        <input type="number" inputmode="numeric" min="1" max="20" aria-label="${p1Name} strokes" placeholder="${p1Name.slice(0, 3)}" value="${g[0] == null ? "" : g[0]}" onchange="setHoleGross(${matchIndex}, ${holeNum}, 0, this.value)">
+        ${dot}
+        <input type="number" inputmode="numeric" min="1" max="20" aria-label="${p2Name} strokes" placeholder="${p2Name.slice(0, 3)}" value="${g[1] == null ? "" : g[1]}" onchange="setHoleGross(${matchIndex}, ${holeNum}, 1, this.value)">
+      </div>`;
+  }
 
   return `
     <div class="hole-row">
@@ -943,6 +1035,7 @@ function buildHoleRow(holeNum, value, p1Name, p2Name, matchIndex) {
         <button class="hole-btn hole-btn-halved ${isHalved ? 'active' : ''}" data-hole="${holeNum}" data-res="0.5" onclick="setHoleResult(${matchIndex}, ${holeNum}, 0.5)">Tie</button>
         <button class="hole-btn hole-btn-p2 ${isP2 ? 'active' : ''}" data-hole="${holeNum}" data-res="0" onclick="setHoleResult(${matchIndex}, ${holeNum}, 0)">${p2Name}</button>
       </div>
+      ${grossRow}
     </div>`;
 }
 
@@ -1338,6 +1431,7 @@ function buildHistoryMatches() {
       pops1: pl1 ? pl1.pops : null,
       pops2: pl2 ? pl2.pops : null,
       holes: Object.assign({}, m.points.holes),
+      gross: m.points.gross ? Object.assign({}, m.points.gross) : undefined,
       front9: f,
       back9: b,
       result: { p1: p1pts, p2: p2pts }
