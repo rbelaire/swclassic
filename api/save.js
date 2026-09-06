@@ -19,6 +19,11 @@ const GITHUB_BRANCH = "main";
 const ALLOWED_FILES = { "data.json": true, "history-data.json": true };
 const MAX_ATTEMPTS = 4;
 
+const crypto = require("crypto");
+function sha256hex(s) {
+  return crypto.createHash("sha256").update(String(s), "utf8").digest("hex");
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -32,11 +37,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { password, data, foursome, expectedLastUpdated, file } = req.body || {};
-
-  if (password !== ADMIN_PASSWORD_HASH) {
-    return res.status(401).json({ error: "Invalid password" });
-  }
+  const { password, adminPassword, foursomeToken, data, foursome, expectedLastUpdated, file } = req.body || {};
 
   if (!data || typeof data !== "object") {
     return res.status(400).json({ error: "No valid data provided" });
@@ -47,15 +48,28 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: "File not allowed" });
   }
 
-  const token = process.env.GITHUB_TOKEN;
-  if (!token) {
-    return res.status(500).json({ error: "GitHub token not configured" });
-  }
-
   // Per-foursome merge only applies to live scoring in data.json.
   const isFoursome =
     targetFile === "data.json" &&
     Number.isInteger(foursome) && foursome >= 0 && foursome <= 2;
+
+  // Admin (full-document) writes are authenticated up front. If ADMIN_PASSWORD_HASH
+  // is configured in the environment, the real password must be supplied (its hash
+  // is never in client code); otherwise fall back to the legacy shared hash so
+  // nothing breaks before the env var is set. Foursome writes are authorized by
+  // their token, validated against the live data inside the write loop below.
+  if (!isFoursome) {
+    const envHash = process.env.ADMIN_PASSWORD_HASH;
+    const ok = envHash
+      ? (!!adminPassword && sha256hex(adminPassword) === envHash)
+      : (password === ADMIN_PASSWORD_HASH);
+    if (!ok) return res.status(401).json({ error: "Invalid admin credentials" });
+  }
+
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) {
+    return res.status(500).json({ error: "GitHub token not configured" });
+  }
 
   const apiBase = `https://api.github.com/repos/${GITHUB_REPO}/contents/${targetFile}`;
   const headers = {
@@ -83,6 +97,15 @@ module.exports = async function handler(req, res) {
       currentData = JSON.parse(Buffer.from(fileInfo.content, "base64").toString("utf8"));
     } catch (e) {
       return res.status(500).json({ error: "Current data.json is not valid JSON" });
+    }
+
+    // Authorize a foursome write: its token must match this foursome in the
+    // live data (tokens rotate each season).
+    if (isFoursome) {
+      const tokMap = (currentData.meta && currentData.meta.foursomeTokens) || {};
+      if (!foursomeToken || tokMap[foursomeToken] !== foursome + 1) {
+        return res.status(401).json({ error: "Invalid or expired foursome token" });
+      }
     }
 
     // 2. Build the document to write
