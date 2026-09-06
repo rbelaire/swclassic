@@ -59,6 +59,8 @@ async function handleLogin(e) {
   localStorage.setItem("adminAuth", "true");
   localStorage.setItem("adminUser", userLower);
   localStorage.setItem("adminLoginTime", Date.now().toString());
+  // Keep the plaintext on this device to authenticate saves server-side.
+  try { localStorage.setItem("adminPass", pass); } catch (e) {}
   applyRole();
   showAdmin();
 }
@@ -174,6 +176,7 @@ async function tryTokenLogin() {
   localStorage.setItem("adminAuth", "true");
   localStorage.setItem("adminUser", adminUser);
   localStorage.setItem("adminLoginTime", Date.now().toString());
+  try { localStorage.setItem("foursomeToken", token); } catch (e) {}
   applyRole();
   data = json;
   loadedLastUpdated = json.meta && json.meta.lastUpdated ? json.meta.lastUpdated : null;
@@ -1231,6 +1234,8 @@ function saveData() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         password: ADMIN_PASSWORD_HASH,
+        adminPassword: localStorage.getItem("adminPass") || "",
+        foursomeToken: localStorage.getItem("foursomeToken") || "",
         expectedLastUpdated: loadedLastUpdated,
         foursome: foursomeMode ? userFoursome : null,
         data: data
@@ -1389,6 +1394,7 @@ function archiveToHistory() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           password: ADMIN_PASSWORD_HASH,
+          adminPassword: localStorage.getItem("adminPass") || "",
           file: "history-data.json",
           data: hist
         })
@@ -1425,6 +1431,7 @@ function saveFullData() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       password: ADMIN_PASSWORD_HASH,
+      adminPassword: localStorage.getItem("adminPass") || "",
       expectedLastUpdated: loadedLastUpdated,
       data: data
     })
