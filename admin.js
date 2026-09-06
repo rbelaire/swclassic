@@ -297,6 +297,10 @@ function loadData() {
         console.error("Data validation errors:", errors);
         return;
       }
+      // Don't clobber in-progress edits that haven't been saved yet.
+      let hasLocalUnsaved = false;
+      try { hasLocalUnsaved = localStorage.getItem("classicUnsaved") === "1"; } catch (e) {}
+      if (data && hasLocalUnsaved) return;
       if (!data || isNewerData(json, data)) {
         data = json;
         loadedLastUpdated = json.meta?.lastUpdated || null;
@@ -1141,6 +1145,10 @@ function toggleMatch(index) {
  *************************/
 function markUnsaved() {
   hasUnsavedChanges = true;
+  // Persist in-progress edits to this device so a reload or dead-zone doesn't
+  // lose them; the flag tells loadData not to overwrite them from the server.
+  try { if (typeof data !== "undefined" && data) saveCachedData(data); } catch (e) {}
+  try { localStorage.setItem("classicUnsaved", "1"); } catch (e) {}
   document.getElementById("save-reminder").style.display = "block";
   const btn = document.getElementById("save-btn");
   if (btn) {
@@ -1154,6 +1162,7 @@ function markUnsaved() {
 
 function markSaved() {
   hasUnsavedChanges = false;
+  try { localStorage.removeItem("classicUnsaved"); } catch (e) {}
   document.getElementById("save-reminder").style.display = "none";
   const btn = document.getElementById("save-btn");
   if (btn) {
@@ -1184,6 +1193,14 @@ window.addEventListener('beforeunload', (e) => {
   if (hasUnsavedChanges) {
     e.preventDefault();
     e.returnValue = '';
+  }
+});
+
+// When the connection returns, push any scores entered while offline.
+window.addEventListener('online', () => {
+  if (hasUnsavedChanges) {
+    showToast("Back online — uploading scores…");
+    saveData();
   }
 });
 
@@ -1252,7 +1269,9 @@ function saveData() {
   if (foursomeMode) {
     postSave().catch(err => {
       console.error(err);
-      showToast(err.message || "Save failed — check your connection.", "error");
+      showToast(!navigator.onLine
+        ? "Offline — scores are saved on this phone and will upload when you reconnect."
+        : (err.message || "Save failed — check your connection."), "error");
       if (saveBtn) { saveBtn.textContent = originalText; saveBtn.disabled = false; }
     });
     return;
@@ -1271,7 +1290,9 @@ function saveData() {
     })
     .catch(err => {
       console.error(err);
-      showToast(err.message || "Save failed — check your connection.", "error");
+      showToast(!navigator.onLine
+        ? "Offline — scores are saved on this phone and will upload when you reconnect."
+        : (err.message || "Save failed — check your connection."), "error");
       if (saveBtn) { saveBtn.textContent = originalText; saveBtn.disabled = false; }
     });
 }
