@@ -2326,8 +2326,6 @@ select:focus {
 .player-card.captain .rank-badge {
   background: var(--masters-green);
   color: var(--color-bg);
-};
-  color: var(--masters-green);
 }
 
 .player-card.new-player .rank-badge {

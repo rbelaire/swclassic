@@ -55,6 +55,19 @@ function isNewerData(nextData, currentData) {
   return Date.parse(nextData.meta.lastUpdated) >= Date.parse(currentData.meta.lastUpdated);
 }
 
+// Read from /api/data (GitHub-backed, seconds-fresh) so draft picks appear
+// almost immediately on draft night; fall back to the static ./data.json.
+function fetchLiveData() {
+  return fetch(`/api/data?t=${Date.now()}`, { cache: "no-store" })
+    .then(res => {
+      if (!res.ok) return Promise.reject(new Error("api/data " + res.status));
+      return res.json();
+    })
+    .catch(() =>
+      fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" }).then(res => res.json())
+    );
+}
+
 function loadData() {
   const cached = getCachedData();
   if (cached) {
@@ -62,8 +75,7 @@ function loadData() {
     render();
   }
 
-  fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
-    .then(res => res.json())
+  fetchLiveData()
     .then(json => {
       if (!data || isNewerData(json, data)) {
         data = json;
