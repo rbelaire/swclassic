@@ -1334,6 +1334,8 @@ function archiveToHistory() {
     `You can run it again to update the archive.`
   )) return;
 
+  const mvpInput = (prompt("MVP for the history page? (optional — leave blank to skip)", "") || "").trim();
+
   const archiveBtn = document.getElementById("archive-btn");
   const orig = archiveBtn ? archiveBtn.textContent : "";
   if (archiveBtn) { archiveBtn.textContent = "Archiving..."; archiveBtn.disabled = true; }
@@ -1354,7 +1356,7 @@ function archiveToHistory() {
         captains: { brock: brockName, jared: jaredName },
         finalScore: { brock: totals.brock, jared: totals.jared },
         matches: buildHistoryMatches(),
-        mvp: existing?.mvp || null,
+        mvp: mvpInput || existing?.mvp || null,
         notes: existing?.notes || ""
       };
 
