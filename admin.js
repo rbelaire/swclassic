@@ -1,6 +1,6 @@
 /*************************
  * ADMIN CONSOLE
- * The Classic 2026
+ * The Classic
  * Tabs: Draft | Matchups | Score Entry
  *************************/
 
@@ -946,6 +946,11 @@ function setHoleResult(matchIndex, holeNum, value) {
   // Auto-calculate front9 and back9
   match.points.front9 = calculateNineFromHoles(match.points.holes, 1, 9);
   match.points.back9 = calculateNineFromHoles(match.points.holes, 10, 18);
+
+  // Keep the stored status in step with the scores
+  const f = match.points.front9, b = match.points.back9;
+  match.status = (f !== null && b !== null) ? "complete"
+    : (f !== null || b !== null) ? "in_progress" : "not_started";
 
   markUnsaved();
   updateMatchInPlace(matchIndex);
