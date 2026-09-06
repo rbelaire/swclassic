@@ -110,7 +110,26 @@ window.addEventListener("storage", event => {
 /*************************
  * RENDER
  *************************/
+function fmtEventDate(iso) {
+  if (!iso) return "";
+  const parts = String(iso).split("-").map(Number);
+  const [y, m, d] = parts;
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  if (!y || !m || !d) return String(iso);
+  return `${months[m - 1]} ${d}, ${y}`;
+}
+
 function render() {
+  const meta = data.meta || {};
+  const sub = document.getElementById("event-subtitle");
+  if (sub && meta.eventName) sub.textContent = meta.eventName;
+  const dv = document.getElementById("event-datevenue");
+  if (dv) {
+    const datePart = meta.tournamentDate ? fmtEventDate(meta.tournamentDate) : "";
+    const venuePart = meta.venue || "Course Pending";
+    dv.textContent = datePart ? `${datePart} | ${venuePart}` : venuePart;
+  }
+
   const players = Object.values(data.players);
 
   const coaches = players.filter(p => p.team === "coach");

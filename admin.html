@@ -68,6 +68,25 @@
 
     <!-- TAB: Draft -->
     <div class="tab-content active" id="tab-draft">
+
+      <!-- Event Setup (admin) -->
+      <div id="event-setup" style="background:#fff; border:2px solid #006747; border-radius:10px; padding:16px 18px; margin-bottom:20px;">
+        <div style="font-weight:800; color:#006747; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Event Setup</div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:12px;">
+          <label style="font-size:0.8em; color:#0d3d1f; font-weight:700;">Event name<br><input id="es-name" type="text" placeholder="The Classic 2027" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
+          <label style="font-size:0.8em; color:#0d3d1f; font-weight:700;">Date<br><input id="es-date" type="date" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
+          <label style="font-size:0.8em; color:#0d3d1f; font-weight:700;">Venue<br><input id="es-venue" type="text" placeholder="Course" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
+          <label style="font-size:0.8em; color:#0d3d1f; font-weight:700;">First tee<br><input id="es-teetime" type="time" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
+          <label style="font-size:0.8em; color:#0d3d1f; font-weight:700;">TZ offset<br><input id="es-tz" type="text" placeholder="-05:00" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
+          <label style="font-size:0.8em; color:#0d3d1f; font-weight:700;">Tee times (comma sep)<br><input id="es-tees" type="text" placeholder="9:15, 9:24, 9:33" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; align-items:center;">
+          <button class="btn-primary" type="button" onclick="saveEventInfo()">Save Event Info</button>
+          <button class="btn-danger" type="button" onclick="startNewSeason()">Start New Season</button>
+          <span id="es-status" style="font-size:0.85em; color:#006747; font-weight:600;"></span>
+        </div>
+      </div>
+
       <div class="draft-status draft-status--waiting" id="admin-draft-status">
         Loading draft data...
       </div>

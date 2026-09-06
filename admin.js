@@ -6,13 +6,8 @@
 
 const ADMIN_PASSWORD_HASH = "5a40d95d61e29d6665ff382de6e0b0cc6a3bbb546aeececa59911e08d597587b";
 const VALID_USERS = ["admin", "foursome1", "foursome2", "foursome3"];
-// Per-foursome scan-to-score tokens (from the printed QR cards). Each token
-// maps to a foursome number and logs that group straight into live scoring.
-const FOURSOME_TOKENS = {
-  "yV1JnmlDCdqU": 1,
-  "KG1rvuXke98L": 2,
-  "gproOkos4EEl": 3
-};
+// Scan-to-score tokens now live in data.json (meta.foursomeTokens) so they can
+// be rotated each season from the admin console without a code change.
 let hasUnsavedChanges = false;
 const TEAM_PICK_LIMIT = 5;
 
@@ -164,17 +159,24 @@ function isSessionExpired() {
   return elapsed > EIGHT_HOURS;
 }
 
-// Scan-to-score: log a foursome in directly from its QR token (no password)
-function tryTokenLogin() {
+// Scan-to-score: log a foursome in directly from its QR token (no password).
+// Tokens are read from the live data (meta.foursomeTokens) so they rotate each
+// season. Async because it needs the current data to validate the token.
+async function tryTokenLogin() {
   const token = new URLSearchParams(window.location.search).get("s");
   if (!token) return false;
-  const num = FOURSOME_TOKENS[token];
+  let json;
+  try { json = await fetchLiveData(); } catch (e) { return false; }
+  const num = json && json.meta && json.meta.foursomeTokens
+    ? json.meta.foursomeTokens[token] : null;
   if (!num) return false;
   adminUser = "foursome" + num;
   localStorage.setItem("adminAuth", "true");
   localStorage.setItem("adminUser", adminUser);
   localStorage.setItem("adminLoginTime", Date.now().toString());
   applyRole();
+  data = json;
+  loadedLastUpdated = json.meta && json.meta.lastUpdated ? json.meta.lastUpdated : null;
   showAdmin();
   // Strip the token from the URL so it isn't bookmarked or shared onward
   try {
@@ -184,17 +186,20 @@ function tryTokenLogin() {
 }
 
 // On load: QR token first, otherwise restore an existing session
-if (!tryTokenLogin() && localStorage.getItem("adminAuth") === "true") {
-  if (isSessionExpired()) {
-    localStorage.removeItem("adminAuth");
-    localStorage.removeItem("adminUser");
-    localStorage.removeItem("adminLoginTime");
-  } else {
-    adminUser = localStorage.getItem("adminUser") || "";
-    applyRole();
-    showAdmin();
+(async () => {
+  if (await tryTokenLogin()) return;
+  if (localStorage.getItem("adminAuth") === "true") {
+    if (isSessionExpired()) {
+      localStorage.removeItem("adminAuth");
+      localStorage.removeItem("adminUser");
+      localStorage.removeItem("adminLoginTime");
+    } else {
+      adminUser = localStorage.getItem("adminUser") || "";
+      applyRole();
+      showAdmin();
+    }
   }
-}
+})();
 
 /*************************
  * LOAD DATA
@@ -391,6 +396,7 @@ function render() {
  * DRAFT TAB
  *************************/
 function renderDraft() {
+  renderEventSetup();
   const players = Object.entries(data.players);
   const teamBrock = players.filter(([, p]) => p.team === "brock").sort((a, b) => a[1].rank - b[1].rank);
   const teamJared = players.filter(([, p]) => p.team === "jared").sort((a, b) => a[1].rank - b[1].rank);
@@ -1375,4 +1381,121 @@ function archiveToHistory() {
       showToast("Archive failed — " + (err.message || "try again."), "error");
       restore();
     });
+}
+
+/*************************
+ * EVENT SETUP + NEW SEASON
+ *************************/
+function genToken() {
+  const bytes = new Uint8Array(9);
+  crypto.getRandomValues(bytes);
+  return btoa(String.fromCharCode.apply(null, bytes))
+    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+// Full-document admin save of the current `data` to data.json. Returns a promise.
+function saveFullData() {
+  data.meta = data.meta || {};
+  data.meta.lastUpdated = new Date().toISOString();
+  return fetch("/api/save", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      password: ADMIN_PASSWORD_HASH,
+      expectedLastUpdated: loadedLastUpdated,
+      data: data
+    })
+  })
+    .then(async res => {
+      const text = await res.text();
+      let resp; try { resp = JSON.parse(text); } catch (e) { resp = { error: `HTTP ${res.status}` }; }
+      if (!resp.success) throw new Error(resp.error || "Save failed");
+      loadedLastUpdated = resp.lastUpdated || data.meta.lastUpdated;
+      data.meta.lastUpdated = loadedLastUpdated;
+      saveCachedData(data);
+      saveLeaderboardCache(data);
+      return resp;
+    });
+}
+
+// Populate the Event Setup fields from the current meta (once, so it doesn't
+// clobber the admin while they're typing).
+function renderEventSetup() {
+  if (renderEventSetup._done) return;
+  const m = (data && data.meta) || {};
+  const set = (id, v) => { const el = document.getElementById(id); if (el != null && el.value === "") el.value = v; };
+  set("es-name", m.eventName || "");
+  set("es-date", m.tournamentDate || "");
+  set("es-venue", m.venue && m.venue !== "Pending" ? m.venue : "");
+  set("es-teetime", m.teeTime || "");
+  set("es-tz", m.timezoneOffset || "-05:00");
+  set("es-tees", Array.isArray(m.teeTimes) ? m.teeTimes.join(", ") : "");
+  renderEventSetup._done = true;
+}
+
+function readEventInputs() {
+  const val = id => { const el = document.getElementById(id); return el ? el.value.trim() : ""; };
+  const tees = val("es-tees").split(",").map(s => s.trim()).filter(Boolean);
+  return {
+    eventName: val("es-name") || "The Classic",
+    tournamentDate: val("es-date") || null,
+    venue: val("es-venue") || "Pending",
+    teeTime: val("es-teetime") || "08:00",
+    timezoneOffset: val("es-tz") || "-05:00",
+    teeTimes: tees
+  };
+}
+
+function saveEventInfo() {
+  if (!data) return;
+  const statusEl = document.getElementById("es-status");
+  const info = readEventInputs();
+  data.meta = Object.assign({}, data.meta, info);
+  if (statusEl) statusEl.textContent = "Saving…";
+  saveFullData()
+    .then(() => { if (statusEl) statusEl.textContent = "Event info saved ✓"; showToast("Event info saved!"); })
+    .catch(err => { if (statusEl) statusEl.textContent = ""; showToast("Save failed: " + err.message, "error"); });
+}
+
+function startNewSeason() {
+  if (!data) return;
+  const hasScores = data.matches.some(m => m.points && (m.points.front9 !== null || m.points.back9 !== null));
+  const warn = "START A NEW SEASON?\n\n" +
+    (hasScores ? "⚠ There are scores in the current event. Click \"Archive Round → History\" FIRST if you haven't.\n\n" : "") +
+    "This will:\n" +
+    "• Clear all teams, matchups, and scores\n" +
+    "• Generate NEW scan-to-score tokens (old QR cards stop working)\n" +
+    "• Keep the Event Setup info above\n\n" +
+    "This cannot be undone. Continue?";
+  if (!confirm(warn)) return;
+
+  // Apply any edited event info first.
+  data.meta = Object.assign({}, data.meta, readEventInputs());
+  // Undraft everyone except coaches.
+  Object.values(data.players).forEach(p => { if (p.team !== "coach") p.team = null; });
+  // Clear matchups + scores.
+  data.matches.forEach(m => {
+    m.playerIds = [null, null];
+    m.points = { front9: null, back9: null, holes: {} };
+    for (let i = 1; i <= 18; i++) m.points.holes[i] = null;
+    m.status = "not_started";
+  });
+  // Rotate scan-to-score tokens.
+  data.meta.foursomeTokens = { [genToken()]: 1, [genToken()]: 2, [genToken()]: 3 };
+
+  const statusEl = document.getElementById("es-status");
+  if (statusEl) statusEl.textContent = "Starting new season…";
+  saveFullData()
+    .then(() => {
+      render();
+      showToast("New season started ✓");
+      const toks = Object.entries(data.meta.foursomeTokens)
+        .sort((a, b) => a[1] - b[1])
+        .map(([t, n]) => `Foursome ${n}:  ${location.origin}/admin.html?s=${t}`)
+        .join("\n");
+      if (statusEl) statusEl.textContent = "New season ready — new QR links generated.";
+      alert("NEW scan-to-score links (regenerate the foursome cards with these):\n\n" + toks +
+        "\n\nOld cards no longer work.");
+    })
+    .catch(err => { if (statusEl) statusEl.textContent = ""; showToast("Failed: " + err.message, "error"); });
 }
