@@ -3953,9 +3953,34 @@ RESULT:
 .hole-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   padding: 4px 0;
   border-bottom: 1px solid rgba(0, 103, 71, 0.06);
+}
+
+/* Optional gross-score inputs (wrap onto their own line under the buttons) */
+.hole-gross {
+  flex-basis: 100%;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding-bottom: 4px;
+}
+.hole-gross input {
+  width: 4.5em;
+  padding: 6px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1em;
+}
+.hole-gross .g-net {
+  align-self: center;
+  font-size: 0.8em;
+  color: var(--masters-green);
+  font-weight: 700;
+  min-width: 5.5em;
 }
 
 .hole-row:last-child {
