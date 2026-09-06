@@ -21,7 +21,7 @@
     </nav>
 
 <div class="hero">
-    <h1>THE CLASSIC 2027</h1>
+    <h1 id="event-title">THE CLASSIC 2027</h1>
     <div class="quick-stats">
         <div class="stat-box">
             <span class="number">6v6</span>
@@ -67,9 +67,10 @@
         <div class="event-header__divider" aria-hidden="true"></div>
         <div class="event-header__course" aria-labelledby="event-header-course">
             <p class="event-header__label" id="event-header-course">Course</p>
-            <h2 class="event-header__course-name">Pending</h2>
+            <h2 class="event-header__course-name" id="event-course">Pending</h2>
             <p class="event-header__label" style="margin-top:12px;">Date</p>
-            <div style="color:var(--masters-green); font-weight:800; font-size:clamp(1rem, 2.4vw, 1.35rem); letter-spacing:0.04em;">Sat, Sep 4, 2027</div>
+            <div id="event-date" style="color:var(--masters-green); font-weight:800; font-size:clamp(1rem, 2.4vw, 1.35rem); letter-spacing:0.04em;">Sat, Sep 4, 2027</div>
+            <div id="event-tees" style="color:var(--masters-green); font-weight:700; font-size:0.95rem; margin-top:6px;"></div>
         </div>
     </div>
     </div>
@@ -190,7 +191,8 @@
             minutes: countdownElement.querySelector('[data-unit="minutes"]'),
             seconds: countdownElement.querySelector('[data-unit="seconds"]')
         };
-        const targetTime = new Date('2027-09-04T08:00:00-05:00');
+        // Fallback target; overwritten from the live event data below.
+        let targetTime = new Date('2027-09-04T08:00:00-05:00');
 
         const updateCountdown = () => {
             const now = new Date();
@@ -215,6 +217,40 @@
             void countdownValues.seconds.offsetWidth;
             countdownValues.seconds.classList.add('countdown__number--pulse');
         };
+
+        // Populate event name, course, date, tee times, and the countdown
+        // target from the live data (meta) so nothing here is hardcoded.
+        const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+        const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+        const fmtDate = (iso) => {
+            if (!iso) return "";
+            const [y, m, d] = String(iso).split("-").map(Number);
+            if (!y || !m || !d) return iso;
+            const dt = new Date(Date.UTC(y, m - 1, d));
+            return `${DOW[dt.getUTCDay()]}, ${MONTHS[m - 1]} ${d}, ${y}`;
+        };
+        const applyEventConfig = (meta) => {
+            if (!meta) return;
+            const name = meta.eventName || "The Classic";
+            const titleEl = document.getElementById('event-title');
+            if (titleEl) titleEl.textContent = name.toUpperCase();
+            document.title = name + " - Tournament Format";
+            const courseEl = document.getElementById('event-course');
+            if (courseEl && meta.venue) courseEl.textContent = meta.venue;
+            const dateEl = document.getElementById('event-date');
+            if (dateEl && meta.tournamentDate) dateEl.textContent = fmtDate(meta.tournamentDate);
+            const teesEl = document.getElementById('event-tees');
+            if (teesEl) teesEl.textContent = (meta.teeTimes && meta.teeTimes.length) ? ("Tee " + meta.teeTimes.join(" · ")) : "";
+            if (meta.tournamentDate) {
+                const t = new Date(`${meta.tournamentDate}T${meta.teeTime || "08:00"}:00${meta.timezoneOffset || "-05:00"}`);
+                if (!isNaN(t.getTime())) targetTime = t;
+            }
+        };
+        fetch(`/api/data?t=${Date.now()}`, { cache: "no-store" })
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .catch(() => fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" }).then(r => r.json()))
+            .then(d => applyEventConfig(d && d.meta))
+            .catch(() => {});
 
         updateCountdown();
         setInterval(updateCountdown, 1000);

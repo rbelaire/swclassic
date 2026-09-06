@@ -95,6 +95,8 @@ window.addEventListener("storage", event => {
  * RENDER
  *************************/
 function render() {
+  const sub = document.getElementById("event-subtitle");
+  if (sub && data.meta && data.meta.eventName) sub.textContent = data.meta.eventName;
   renderTotals(data);
   renderMatches(data);
   renderLastUpdated(data);
@@ -193,9 +195,10 @@ function renderMatches(data) {
 // Round headshot for a player. The name is kept as alt/title text for
 // accessibility and hover. If the photo is missing, falls back to the name.
 function playerAvatar(name) {
-  const safe = escapeHTML(name || "");
+  const safe = escapeHTML(name || "TBD");
   const slug = String(name || "").toLowerCase().replace(/[^a-z]/g, "");
-  if (!slug) return "";
+  // Undrafted/placeholder slots have no photo — show the label, skip the image.
+  if (!slug || slug === "tbd") return `<span class="player-name">${safe}</span>`;
   return `<img class="lb-avatar" src="images/players/${slug}.jpg" alt="${safe}" title="${safe}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'player-name',textContent:this.alt}))">`;
 }
 
