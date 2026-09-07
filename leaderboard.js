@@ -98,6 +98,7 @@ function render() {
   const sub = document.getElementById("event-subtitle");
   if (sub && data.meta && data.meta.eventName) sub.textContent = data.meta.eventName;
   renderTotals(data);
+  renderTimeline(data);
   renderMatches(data);
   renderLastUpdated(data);
   // Add fade-in animation
@@ -296,6 +297,126 @@ function buildNineInline(label, val, c1, c2) {
   }
   const color = val === 1 ? c1 : c2; // 1 = left player won, 0 = right player won
   return `<div class="nine-score" style="border-color:${color}; background:${color}1f;"><div class="nine-label">${label}</div><div class="nine-result" style="color:${color}">1</div></div>`;
+}
+
+/* ======================
+   SCORE TIMELINE
+   - Live snapshot line: team totals over the day (from meta.scoreLog)
+   - Hole-by-hole momentum: cumulative holes-won differential 1..18
+   ====================== */
+function renderTimeline(data) {
+  const wrap = document.getElementById("score-timeline");
+  if (!wrap) return;
+  const T = ClassicTeams(data);
+  const log = (data.meta && Array.isArray(data.meta.scoreLog)) ? data.meta.scoreLog : [];
+  const momentum = computeMomentum(data);
+  const anyHoles = momentum.some(m => m.played);
+
+  if (!anyHoles && log.length === 0) { wrap.style.display = "none"; wrap.innerHTML = ""; return; }
+  wrap.style.display = "";
+
+  let html = `<div class="section-header"><h2>How It's Unfolding</h2></div>`;
+  html += `<div class="timeline-grid">`;
+  html += `<div class="tl-card">
+      <div class="tl-title">Team Score Over Time</div>
+      <div class="tl-sub"><b class="g">${escapeHTML(T.green.name)}</b> vs <b class="r">${escapeHTML(T.red.name)}</b> &middot; running points</div>
+      ${log.length ? snapshotChartSVG(log, T) : '<div class="tl-empty">No saved scores yet.</div>'}
+    </div>`;
+  html += `<div class="tl-card">
+      <div class="tl-title">Hole-by-Hole Momentum</div>
+      <div class="tl-sub"><b class="g">${escapeHTML(T.green.name)}</b> up top, <b class="r">${escapeHTML(T.red.name)}</b> below &middot; holes won</div>
+      ${anyHoles ? momentumChartSVG(momentum, T) : '<div class="tl-empty">No holes scored yet.</div>'}
+    </div>`;
+  html += `</div>`;
+  wrap.innerHTML = html;
+}
+
+function computeMomentum(data) {
+  const out = [];
+  let cum = 0;
+  for (let h = 1; h <= 18; h++) {
+    let played = false;
+    data.matches.forEach(match => {
+      const [p1, p2] = match.playerIds;
+      if (!p1 || !p2) return;
+      const holes = (match.points && match.points.holes) || {};
+      const v = holes[h];
+      if (v === 1 || v === 0 || v === 0.5) played = true;
+      const t1 = data.players[p1] ? data.players[p1].team : null;
+      if (t1 !== 'green' && t1 !== 'red') return;
+      const greenIsP1 = t1 === 'green';
+      if (v === 1) cum += greenIsP1 ? 1 : -1;
+      else if (v === 0) cum += greenIsP1 ? -1 : 1;
+    });
+    out.push({ hole: h, diff: cum, played });
+  }
+  return out;
+}
+
+function snapshotChartSVG(log, T) {
+  const W = 320, H = 150, L = 22, Tp = 12, R = 10, B = 22;
+  const iw = W - L - R, ih = H - Tp - B;
+  const pts = [{ g: 0, r: 0, t: null }].concat(log.map(e => ({ g: +e.g || 0, r: +e.r || 0, t: e.t })));
+  const n = pts.length;
+  const maxY = Math.max(1, ...pts.map(p => Math.max(p.g, p.r)));
+  const x = i => L + (n === 1 ? iw / 2 : (i / (n - 1)) * iw);
+  const y = v => Tp + ih - (v / maxY) * ih;
+  const line = key => pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(p[key]).toFixed(1)}`).join(' ');
+  const step = Math.ceil(maxY / 4) || 1;
+  let grid = '';
+  for (let v = 0; v <= maxY; v += step) {
+    grid += `<line class="tl-grid-line" x1="${L}" y1="${y(v).toFixed(1)}" x2="${W - R}" y2="${y(v).toFixed(1)}"/>`
+      + `<text class="tl-axis" x="${L - 4}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end">${v}</text>`;
+  }
+  const fmtT = iso => { if (!iso) return 'Start'; const d = new Date(iso); return isNaN(d.getTime()) ? '' : d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); };
+  const gc = T.green.color, rc = T.red.color;
+  const dot = (i, key, c) => `<circle cx="${x(i).toFixed(1)}" cy="${y(pts[i][key]).toFixed(1)}" r="3.2" fill="${c}"/>`;
+  return `<svg class="tl-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Team score over time">
+    ${grid}
+    <path d="${line('g')}" fill="none" stroke="${gc}" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="${line('r')}" fill="none" stroke="${rc}" stroke-width="2.5" stroke-linejoin="round"/>
+    ${dot(n - 1, 'g', gc)}${dot(n - 1, 'r', rc)}
+    <text class="tl-axis" x="${L}" y="${H - 6}" text-anchor="start">${escapeHTML(fmtT(pts[1] && pts[1].t))}</text>
+    <text class="tl-axis" x="${W - R}" y="${H - 6}" text-anchor="end">${escapeHTML(fmtT(pts[n - 1] && pts[n - 1].t))}</text>
+  </svg>`;
+}
+
+function momentumChartSVG(momentum, T) {
+  const W = 320, H = 150, L = 20, Tp = 14, R = 10, B = 20;
+  const iw = W - L - R, ih = H - Tp - B;
+  let last = -1; momentum.forEach((m, i) => { if (m.played) last = i; });
+  const series = [{ x: 0, v: 0 }];
+  for (let i = 0; i <= last; i++) series.push({ x: i + 1, v: momentum[i].diff });
+  const maxAbs = Math.max(1, ...series.map(s => Math.abs(s.v)));
+  const x = h => L + (h / 18) * iw;
+  const zeroY = Tp + ih / 2;
+  const y = v => zeroY - (v / maxAbs) * (ih / 2);
+  const gc = T.green.color, rc = T.red.color;
+  const areaPath = sign => {
+    let d = `M${x(series[0].x).toFixed(1)},${zeroY.toFixed(1)}`;
+    series.forEach(s => {
+      const vv = sign > 0 ? Math.max(s.v, 0) : Math.min(s.v, 0);
+      d += ` L${x(s.x).toFixed(1)},${y(vv).toFixed(1)}`;
+    });
+    d += ` L${x(series[series.length - 1].x).toFixed(1)},${zeroY.toFixed(1)} Z`;
+    return d;
+  };
+  const linePath = series.map((s, i) => `${i === 0 ? 'M' : 'L'}${x(s.x).toFixed(1)},${y(s.v).toFixed(1)}`).join(' ');
+  let xl = '';
+  [1, 9, 18].forEach(h => { xl += `<text class="tl-axis" x="${x(h).toFixed(1)}" y="${H - 5}" text-anchor="middle">${h}</text>`; });
+  const finalDiff = series[series.length - 1].v;
+  const leadName = finalDiff > 0 ? T.green.name : finalDiff < 0 ? T.red.name : '';
+  const leadTxt = finalDiff === 0 ? 'All square' : `${Math.abs(finalDiff)} up &middot; ${escapeHTML(leadName)}`;
+  const endC = finalDiff >= 0 ? gc : rc;
+  return `<svg class="tl-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Hole-by-hole momentum">
+    <path d="${areaPath(1)}" fill="${gc}" fill-opacity="0.15"/>
+    <path d="${areaPath(-1)}" fill="${rc}" fill-opacity="0.15"/>
+    <line class="tl-grid-line" x1="${L}" y1="${zeroY.toFixed(1)}" x2="${W - R}" y2="${zeroY.toFixed(1)}"/>
+    <path d="${linePath}" fill="none" stroke="${endC}" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="${x(series[series.length - 1].x).toFixed(1)}" cy="${y(finalDiff).toFixed(1)}" r="3.4" fill="${endC}"/>
+    ${xl}
+    <text class="tl-axis" x="${W - R}" y="${Tp - 2}" text-anchor="end" style="font-weight:800; fill:${endC};">${leadTxt}</text>
+  </svg>`;
 }
 
 

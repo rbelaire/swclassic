@@ -91,6 +91,36 @@
     .matchup-center { gap: 4px; }
     .matchup-center .nine-score { padding: 2px 7px; }
   }
+
+  /* ===== Score timeline ===== */
+  .timeline-wrap { margin-bottom: var(--gap-section); }
+  .timeline-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: clamp(12px, 2.5vw, 18px);
+  }
+  .tl-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px 10px;
+    box-shadow: var(--shadow-sm);
+  }
+  .tl-title {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: var(--color-muted);
+    margin-bottom: 4px;
+  }
+  .tl-sub { font-size: 0.72rem; color: var(--color-muted); margin-bottom: 8px; }
+  .tl-sub b.g { color: var(--team-green); }
+  .tl-sub b.r { color: var(--team-red); }
+  .tl-chart { width: 100%; height: auto; display: block; }
+  .tl-empty { color: var(--color-muted); font-size: 0.85rem; text-align: center; padding: 24px 0; }
+  .tl-axis { fill: var(--color-muted); font-size: 9px; font-weight: 600; }
+  .tl-grid-line { stroke: var(--color-line); stroke-width: 1; }
   </style>
 </head>
 
@@ -128,6 +158,9 @@
       <span class="scorebug-score" id="team-red-score">0.0</span>
     </div>
   </div>
+
+  <!-- SCORE TIMELINE (live snapshots + hole-by-hole momentum) -->
+  <div id="score-timeline" class="timeline-wrap" style="display:none;"></div>
 
   <div class="section-header">
     <h2>Individual Matches</h2>

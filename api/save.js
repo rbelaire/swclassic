@@ -24,6 +24,27 @@ function sha256hex(s) {
   return crypto.createHash("sha256").update(String(s), "utf8").digest("hex");
 }
 
+// Team totals from a full document (green vs red), used to log score
+// snapshots for the live timeline.
+function computeTeamTotals(doc) {
+  const totals = { green: 0, red: 0 };
+  const players = (doc && doc.players) || {};
+  ((doc && doc.matches) || []).forEach((m) => {
+    const ids = m.playerIds || [];
+    const p1 = ids[0], p2 = ids[1];
+    if (!p1 || !p2 || !players[p1] || !players[p2]) return;
+    const s1 = players[p1].team, s2 = players[p2].team;
+    if ((s1 !== "green" && s1 !== "red") || (s2 !== "green" && s2 !== "red")) return;
+    ["front9", "back9"].forEach((k) => {
+      const v = m.points ? m.points[k] : null;
+      if (v === null || v === undefined) return;
+      totals[s1] += v;
+      totals[s2] += 1 - v;
+    });
+  });
+  return totals;
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -51,7 +72,7 @@ module.exports = async function handler(req, res) {
   // Per-foursome merge only applies to live scoring in data.json.
   const isFoursome =
     targetFile === "data.json" &&
-    Number.isInteger(foursome) && foursome >= 0 && foursome <= 2;
+    Number.isInteger(foursome) && foursome >= 0 && foursome <= 3;
 
   // Admin (full-document) writes are authenticated up front. If ADMIN_PASSWORD_HASH
   // is configured in the environment, the real password must be supplied (its hash
@@ -133,6 +154,23 @@ module.exports = async function handler(req, res) {
         toWrite.meta = toWrite.meta || {};
         if (!toWrite.meta.lastUpdated) toWrite.meta.lastUpdated = new Date().toISOString();
       }
+    }
+
+    // 2b. Record a score snapshot for the live timeline. Server-authored so
+    // concurrent foursome saves all append against the merged truth. A point
+    // is added only when the team totals actually change.
+    if (targetFile === "data.json") {
+      try {
+        const totals = computeTeamTotals(toWrite);
+        toWrite.meta = toWrite.meta || {};
+        const log = Array.isArray(toWrite.meta.scoreLog) ? toWrite.meta.scoreLog : [];
+        const last = log[log.length - 1];
+        if (!last || last.g !== totals.green || last.r !== totals.red) {
+          log.push({ t: toWrite.meta.lastUpdated || new Date().toISOString(), g: totals.green, r: totals.red });
+          if (log.length > 300) log.splice(0, log.length - 300);
+          toWrite.meta.scoreLog = log;
+        }
+      } catch (e) { /* snapshot is best-effort */ }
     }
 
     // 3. Commit it
