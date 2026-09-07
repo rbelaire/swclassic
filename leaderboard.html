@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Classic 2026 - Live Leaderboard</title>
-  <link rel="stylesheet" href="css/styles.css?v=20260223">
+  <link rel="stylesheet" href="css/styles.css?v=20270907">
   <link rel="icon" href="/favicon.ico">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#006747">
+  <meta name="theme-color" content="#0b6b3a">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="The Classic">
@@ -48,10 +48,19 @@
   }
   .lb-avatar {
     width: 58px; height: 58px; border-radius: 50%; object-fit: cover;
-    border: 2px solid var(--masters-gold); background: #e9e6d8; flex-shrink: 0;
+    border: 3px solid var(--team-green); background: var(--color-surface); flex-shrink: 0;
   }
+  .matchup-player--left .lb-avatar { border-color: var(--team-green); }
+  .matchup-player--right .lb-avatar { border-color: var(--team-red); }
   @media (max-width: 480px) {
     .lb-avatar { width: 48px; height: 48px; }
+  }
+
+  /* Team color runs across the row: green in from the left (Team one),
+     red in from the right (Team two) — instant team identification. */
+  .foursome .matchup {
+    background: linear-gradient(90deg,
+      var(--green-tint) 0%, #ffffff 30%, #ffffff 70%, var(--red-tint) 100%);
   }
 
   /* Center column: match-play status (hero) + point pills + holes played */
@@ -109,14 +118,14 @@
 
   <!-- TEAM TOTALS SCOREBUG -->
   <div class="scorebug" id="scorebug">
-    <div class="scorebug-team scorebug-team--brock" id="team-brock">
-      <span class="scorebug-name">BROCK</span>
-      <span class="scorebug-score" id="team-brock-score">0.0</span>
+    <div class="scorebug-team scorebug-team--green" id="team-green">
+      <span class="scorebug-name" id="team-green-name">GREEN</span>
+      <span class="scorebug-score" id="team-green-score">0.0</span>
     </div>
-    <div class="scorebug-divider"></div>
-    <div class="scorebug-team scorebug-team--jared" id="team-jared">
-      <span class="scorebug-score" id="team-jared-score">0.0</span>
-      <span class="scorebug-name">JARED</span>
+    <div class="scorebug-divider">VS</div>
+    <div class="scorebug-team scorebug-team--red" id="team-red">
+      <span class="scorebug-name" id="team-red-name">RED</span>
+      <span class="scorebug-score" id="team-red-score">0.0</span>
     </div>
   </div>
 
@@ -147,6 +156,7 @@
 </div>
 
 <script src="weather.js"></script>
+<script src="teams.js"></script>
 <script src="matchup-modal.js"></script>
 <script src="leaderboard.js"></script>
 </body>

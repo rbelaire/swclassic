@@ -66,19 +66,26 @@
   function renderCompleteTournament(t) {
     let html = '';
 
-    // Winner banner
-    const brockScore = t.finalScore.brock || 0;
-    const jaredScore = t.finalScore.jared || 0;
-    const winner = brockScore > jaredScore ? t.captains.brock : t.captains.jared;
-    const brockWins = brockScore > jaredScore;
-    const jaredWins = jaredScore > brockScore;
+    // Resolve the two teams. New records use teams:{green,red}; legacy 2026
+    // records use captains/finalScore keyed brock/jared.
+    let gName, rName, gScore, rScore;
+    if (t.teams) {
+      gName = t.teams.green.name; rName = t.teams.red.name;
+      gScore = t.teams.green.score || 0; rScore = t.teams.red.score || 0;
+    } else {
+      gName = t.captains.brock; rName = t.captains.jared;
+      gScore = t.finalScore.brock || 0; rScore = t.finalScore.jared || 0;
+    }
+    const winner = gScore > rScore ? gName : rName;
+    const greenWins = gScore > rScore;
+    const redWins = rScore > gScore;
 
     html += `<div class="result-banner">`;
     html += `<h3>Team ${winner} Wins!</h3>`;
     html += `<div class="final-score">`;
-    html += `<span class="${brockWins ? 'winner-score' : ''}">Team ${t.captains.brock}: ${brockScore}</span>`;
+    html += `<span class="hsc-green-text ${greenWins ? 'winner-score' : ''}">Team ${gName}: ${gScore}</span>`;
     html += ` &mdash; `;
-    html += `<span class="${jaredWins ? 'winner-score' : ''}">Team ${t.captains.jared}: ${jaredScore}</span>`;
+    html += `<span class="hsc-red-text ${redWins ? 'winner-score' : ''}">Team ${rName}: ${rScore}</span>`;
     html += `</div>`;
     html += `</div>`;
 
@@ -122,7 +129,9 @@
     if (!played) return '';
 
     const sideClass = side =>
-      side === 'brock' ? 'hsc-brock' : side === 'jared' ? 'hsc-jared' : 'hsc-none';
+      (side === 'green' || side === 'brock') ? 'hsc-green'
+        : (side === 'red' || side === 'jared') ? 'hsc-red'
+        : 'hsc-none';
 
     const nine = (start, end, label, nineVal) => {
       let cells = '';

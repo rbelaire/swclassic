@@ -7,22 +7,23 @@ const REFRESH_INTERVAL = 10000; // 10 seconds for draft night
 let autoRefreshEnabled = true;
 let lastUpdateTime = Date.now();
 let refreshTimer = null;
+// Snake-style ownership of the 10 draft picks (green = team one, red = team two).
 const FINAL_DRAFT_ORDER = [
-  "brock",
-  "jared",
-  "jared",
-  "brock",
-  "jared",
-  "jared",
-  "brock",
-  "brock",
-  "brock",
-  "jared"
+  "green",
+  "red",
+  "red",
+  "green",
+  "red",
+  "red",
+  "green",
+  "green",
+  "green",
+  "red"
 ];
 
 const TEAM_PICK_SLOTS = {
-  brock: FINAL_DRAFT_ORDER.map((team, index) => ({ pick: index + 1, team })).filter(slot => slot.team === "brock"),
-  jared: FINAL_DRAFT_ORDER.map((team, index) => ({ pick: index + 1, team })).filter(slot => slot.team === "jared")
+  green: FINAL_DRAFT_ORDER.map((team, index) => ({ pick: index + 1, team })).filter(slot => slot.team === "green"),
+  red: FINAL_DRAFT_ORDER.map((team, index) => ({ pick: index + 1, team })).filter(slot => slot.team === "red")
 };
 
 /*************************
@@ -130,19 +131,24 @@ function render() {
     dv.textContent = datePart ? `${datePart} | ${venuePart}` : venuePart;
   }
 
+  const T = ClassicTeams(data);
+  const gh = document.getElementById("team-green-header");
+  const rh = document.getElementById("team-red-header");
+  if (gh) gh.textContent = "Team " + T.green.name;
+  if (rh) rh.textContent = "Team " + T.red.name;
+
   const players = Object.values(data.players);
 
-  const coaches = players.filter(p => p.team === "coach");
-  const teamBrock = players.filter(p => p.team === "brock").sort((a, b) => a.rank - b.rank);
-  const teamJared = players.filter(p => p.team === "jared").sort((a, b) => a.rank - b.rank);
-  const undrafted = players.filter(p => !p.team || p.team === null).sort((a, b) => a.rank - b.rank);
+  const teamGreen = players.filter(p => p.team === "green" && !p.captain).sort((a, b) => a.rank - b.rank);
+  const teamRed = players.filter(p => p.team === "red" && !p.captain).sort((a, b) => a.rank - b.rank);
+  const undrafted = players.filter(p => (!p.team || p.team === null) && !p.captain).sort((a, b) => a.rank - b.rank);
 
-  const totalDraftable = players.filter(p => p.team !== "coach").length;
-  const totalDrafted = teamBrock.length + teamJared.length;
+  const totalDraftable = players.filter(p => !p.captain).length;
+  const totalDrafted = teamGreen.length + teamRed.length;
 
   renderStatus(totalDrafted, totalDraftable);
-  renderTeam("brock", teamBrock, TEAM_PICK_SLOTS.brock);
-  renderTeam("jared", teamJared, TEAM_PICK_SLOTS.jared);
+  renderTeam("green", teamGreen, TEAM_PICK_SLOTS.green);
+  renderTeam("red", teamRed, TEAM_PICK_SLOTS.red);
   renderPool(undrafted);
 }
 
@@ -167,11 +173,14 @@ function renderTeam(team, players, slots) {
   const el = document.getElementById(`team-${team}-slots`);
   if (!el) return;
 
+  const T = ClassicTeams(data);
+  const ownerName = team === "red" ? T.red.name : T.green.name;
+
   let html = "";
   for (let i = 0; i < slots.length; i++) {
     const slot = slots[i];
     const p = players[i];
-    const owner = slot.team === "brock" ? "Brock" : "Jared";
+    const owner = ownerName;
     if (p) {
       html += `
         <div class="draft-slot draft-slot--filled" style="animation-delay: ${i * 0.08}s">

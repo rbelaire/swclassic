@@ -1,35 +1,48 @@
 /* =====================================================
-   THE CLASSIC 2026 - MASTERS-THEMED STYLESHEET
-   Full Augusta National Aesthetic Across All Pages
+   THE CLASSIC - STYLESHEET
+   Modern palette: white, green, black, red
+   Green = one team, Red = the other. Green is the brand.
    ===================================================== */
 
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap');
+
 /* =====================
-   DESIGN TOKENS - MASTERS PALETTE
+   DESIGN TOKENS
    ===================== */
 :root {
-  --color-bg: #f5f3e8;
+  --color-bg: #ffffff;
   --color-card: #ffffff;
-  
-  /* Masters Green (Primary) */
-  --color-primary: #006747;
-  --masters-green: #006747;
-  --masters-dark-green: #004d35;
-  --masters-light-green: #00854d;
-  
-  /* Masters Accent Colors */
-  --color-accent: #d4af37;
-  --masters-gold: #d4af37;
-  --masters-red: #c8102e;
-  --masters-black: #1a1a1a;
-  
+  --color-surface: #f4f7f5;   /* subtle green-tinted panel */
+  --color-line: #e2e8e4;      /* hairline */
+
+  /* Green (Primary / brand / Team one) */
+  --color-primary: #0b6b3a;
+  --masters-green: #0b6b3a;
+  --masters-dark-green: #075130;
+  --masters-light-green: #0e8043;
+  --green-tint: #eaf4ee;
+
+  /* Team colors */
+  --team-green: #0b6b3a;
+  --team-red: #c22e2e;
+  --red-tint: #fbebea;
+
+  /* Accents — gold retired; accent is now green.
+     --masters-gold kept as a legacy alias so any stray
+     reference stays on-brand (green) instead of breaking. */
+  --color-accent: #0b6b3a;
+  --masters-gold: #0b6b3a;
+  --masters-red: #c22e2e;
+  --masters-black: #0d1512;
+
   /* Text Colors */
-  --color-text: #1a1a1a;
-  --color-muted: #6b6b6b;
+  --color-text: #0d1512;
+  --color-muted: #5c6a63;
 
   /* Utility Colors */
-  --color-warning: #c62828;
-  --color-success: #2e7d32;
-  --color-highlight: #fff8e1;
+  --color-warning: #c22e2e;
+  --color-success: #0b6b3a;
+  --color-highlight: #eef4f0;
 
   /* Spacing */
   --max-width: 1400px;
@@ -40,9 +53,9 @@
   --gap-small: clamp(12px, 2vw, 16px);
   --radius-lg: 14px;
   --radius-md: 8px;
-  --shadow-sm: 0 4px 15px rgba(0, 103, 71, 0.08);
-  --shadow-md: 0 8px 20px rgba(0, 103, 71, 0.15);
-  --shadow-lg: 0 12px 30px rgba(0, 103, 71, 0.2);
+  --shadow-sm: 0 4px 15px rgba(13, 21, 18, 0.06);
+  --shadow-md: 0 8px 20px rgba(13, 21, 18, 0.10);
+  --shadow-lg: 0 12px 30px rgba(13, 21, 18, 0.14);
 }
 
 /* =====================
@@ -55,7 +68,7 @@
 }
 
 body {
-  font-family: 'Copperplate', 'Copperplate Gothic', Georgia, serif;
+  font-family: 'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background: var(--color-bg);
   color: var(--masters-black);
   overflow-x: hidden;
@@ -149,30 +162,30 @@ body {
   border-color: var(--masters-green);
 }
 
-/* Admin Link - Gold Accent */
+/* Admin Link - Red Accent */
 .nav-link.admin-link {
-  background: var(--masters-gold);
-  color: var(--masters-green);
-  border-color: var(--masters-gold);
+  background: var(--team-red);
+  color: #fff;
+  border-color: var(--team-red);
   font-size: 0.85em;
   padding: 8px 20px;
   animation: subtlePulse 3s ease-in-out infinite;
 }
 
 .nav-link.admin-link:hover {
-  background: var(--masters-green);
-  color: var(--masters-gold);
-  border-color: var(--masters-green);
+  background: #fff;
+  color: var(--team-red);
+  border-color: var(--team-red);
   transform: translateY(-2px);
   animation: none;
 }
 
 @keyframes subtlePulse {
   0%, 100% {
-    box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 0 5px rgba(194, 46, 46, 0.3);
   }
   50% {
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+    box-shadow: 0 0 15px rgba(194, 46, 46, 0.55);
   }
 }
 
@@ -184,9 +197,9 @@ body {
   padding: clamp(50px, 10vw, 80px) var(--pad-page) clamp(40px, 8vw, 60px);
   background: linear-gradient(135deg, var(--masters-dark-green) 0%, var(--masters-green) 100%);
   color: var(--color-card);
-  border-bottom: 4px solid var(--masters-gold);
+  border-bottom: 4px solid var(--team-red);
   margin-bottom: var(--gap-section);
-  box-shadow: 0 4px 20px rgba(0, 103, 71, 0.3);
+  box-shadow: 0 4px 20px rgba(13, 21, 18, 0.18);
 }
 
 .hero h1 {
@@ -683,10 +696,10 @@ body {
 }
 
 .team-card.winning {
-  border: 3px solid var(--masters-gold);
-  background: linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(212,175,55,0.06) 100%);
+  border: 3px solid var(--masters-green);
+  background: linear-gradient(135deg, rgba(11,107,58,0.12) 0%, rgba(11,107,58,0.05) 100%);
   transform: scale(1.02);
-  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.25);
+  box-shadow: 0 8px 24px rgba(13, 21, 18, 0.14);
 }
 
 .team-card h2 {
@@ -699,8 +712,7 @@ body {
 }
 
 .team-card.winning h2 {
-  color: var(--masters-gold);
-  text-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);
+  color: var(--masters-green);
 }
 
 /* MASTERS RED NUMBERS FOR WINNING TEAM */
@@ -734,73 +746,71 @@ body {
    SCOREBUG
    ====================== */
 .scorebug {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: stretch;
   position: sticky;
   top: 75px;
   z-index: 900;
-  background: #ffffff;
-  border-radius: var(--radius-md);
+  background: var(--masters-black);
+  border-radius: 12px;
   overflow: hidden;
   margin-bottom: var(--gap-section);
-  border: 1px solid rgba(0, 77, 53, 0.15);
-  box-shadow: 0 2px 8px rgba(0, 103, 71, 0.1);
+  box-shadow: 0 6px 20px rgba(13, 21, 18, 0.14);
 }
 
 .scorebug-team {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex: 1;
-  padding: 12px 20px;
-  transition: background 0.3s ease;
+  gap: 14px;
+  padding: 16px 20px;
+  color: #fff;
 }
 
-.scorebug-team--brock {
-  justify-content: flex-end;
-  border-left: 4px solid #d4af37;
+.scorebug-team--green {
+  justify-content: space-between;
+  background: linear-gradient(135deg, var(--team-green), var(--masters-dark-green));
 }
 
-.scorebug-team--jared {
-  justify-content: flex-start;
-  border-right: 4px solid #006747;
+.scorebug-team--red {
+  justify-content: space-between;
+  flex-direction: row-reverse;
+  background: linear-gradient(225deg, var(--team-red), #9c2020);
 }
 
 .scorebug-team.winning {
-  background: rgba(0, 103, 71, 0.04);
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.35);
 }
 
 .scorebug-name {
-  font-family: 'Copperplate Gothic', Copperplate, 'Copperplate Gothic Light', serif;
-  font-size: clamp(0.85em, 3.5vw, 1.1em);
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: rgba(0, 50, 30, 0.6);
+  font-size: clamp(0.9em, 3.5vw, 1.2em);
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.95);
   text-transform: uppercase;
 }
 
-.scorebug-team.winning .scorebug-name {
-  color: var(--masters-dark-green);
-}
-
 .scorebug-score {
-  font-family: 'Copperplate Gothic', Copperplate, 'Copperplate Gothic Light', serif;
-  font-size: clamp(1.6em, 6vw, 2.4em);
-  font-weight: 800;
-  color: var(--masters-dark-green);
+  font-size: clamp(1.8em, 7vw, 2.6em);
+  font-weight: 900;
+  color: #fff;
   line-height: 1;
   min-width: 2.2ch;
   text-align: center;
-}
-
-.scorebug-team.winning .scorebug-score {
-  color: var(--masters-dark-green);
+  font-variant-numeric: tabular-nums;
 }
 
 .scorebug-divider {
-  width: 2px;
-  background: rgba(0, 77, 53, 0.15);
-  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  background: var(--masters-black);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.72em;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 /* Matches Grid */
@@ -970,8 +980,8 @@ body {
 }
 
 .nine-score.tied {
-  background: rgba(212, 175, 55, 0.1);
-  border-color: rgba(212, 175, 55, 0.4);
+  background: rgba(13, 21, 18, 0.06);
+  border-color: rgba(13, 21, 18, 0.18);
 }
 
 .nine-score.lost {
@@ -1105,16 +1115,16 @@ body {
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: 'Copperplate', 'Copperplate Gothic', Georgia, serif;
+  font-family: inherit;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
 .refresh-btn:hover {
-  background: var(--masters-gold);
-  border-color: var(--masters-gold);
-  color: var(--masters-green);
+  background: var(--masters-dark-green);
+  border-color: var(--masters-dark-green);
+  color: #fff;
   transform: translateY(-2px);
 }
 
@@ -1322,13 +1332,13 @@ body {
   border-radius: 10px;
 }
 
-.compact-nine-result.result-brock {
-  background: var(--masters-gold);
-  color: var(--masters-black);
+.compact-nine-result.result-green {
+  background: var(--team-green);
+  color: #fff;
 }
 
-.compact-nine-result.result-jared {
-  background: var(--masters-green);
+.compact-nine-result.result-red {
+  background: var(--team-red);
   color: #fff;
 }
 
@@ -1365,13 +1375,13 @@ body {
   line-height: 1;
 }
 
-.compact-hole.hole-brock {
-  background: var(--masters-gold);
-  color: var(--masters-black);
+.compact-hole.hole-green {
+  background: var(--team-green);
+  color: #fff;
 }
 
-.compact-hole.hole-jared {
-  background: var(--masters-green);
+.compact-hole.hole-red {
+  background: var(--team-red);
   color: #fff;
 }
 
@@ -1754,17 +1764,17 @@ button {
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0, 103, 71, 0.3);
   margin: 10px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 2px;
-  font-family: 'Copperplate', 'Copperplate Gothic', Georgia, serif;
+  font-family: inherit;
 }
 
 button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 103, 71, 0.4);
-  background: var(--masters-gold);
-  color: var(--masters-green);
+  box-shadow: 0 6px 20px rgba(13, 21, 18, 0.22);
+  background: var(--masters-dark-green);
+  color: #fff;
 }
 
 button:active {
@@ -1955,37 +1965,40 @@ button:active {
 }
 
 .total-card {
-  border: 1px solid rgba(0, 103, 71, 0.2);
+  border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
-  padding: 10px 12px;
+  padding: 12px 12px;
   text-align: center;
   background: #fff;
+  border-top: 4px solid var(--color-line);
 }
 
-.total-card.winning {
-  border-color: var(--masters-gold);
-  background: #fff8e7;
-}
+.total-card.green { border-top-color: var(--team-green); }
+.total-card.red { border-top-color: var(--team-red); }
+
+.total-card.green.winning { background: var(--green-tint); border-color: var(--team-green); }
+.total-card.red.winning { background: var(--red-tint); border-color: var(--team-red); }
 
 .total-team {
   display: block;
   font-size: 0.8em;
   text-transform: uppercase;
   letter-spacing: 1px;
+  font-weight: 700;
   color: var(--color-muted);
 }
 
 .total-score {
   display: block;
   font-size: 2em;
-  font-weight: 700;
-  color: var(--masters-green);
+  font-weight: 800;
+  color: var(--masters-black);
   margin-top: 4px;
+  font-variant-numeric: tabular-nums;
 }
 
-.total-card.winning .total-score {
-  color: var(--masters-red);
-}
+.total-card.green .total-score { color: var(--team-green); }
+.total-card.red .total-score { color: var(--team-red); }
 
 .foursomes {
   display: grid;
@@ -2177,7 +2190,7 @@ select {
   border: 2px solid var(--masters-green);
   border-radius: var(--radius-md);
   background: var(--color-card);
-  font-family: 'Copperplate', 'Copperplate Gothic', Georgia, serif;
+  font-family: inherit;
 }
 
 select:focus {
@@ -2399,8 +2412,8 @@ select:focus {
 }
 
 .badge.captain-badge {
-  background: var(--masters-gold);
-  color: var(--masters-green);
+  background: var(--masters-green);
+  color: #fff;
   display: inline-block;
 }
 
@@ -2556,10 +2569,10 @@ select:focus {
 
 .cta-button:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 103, 71, 0.4);
-  background: var(--masters-gold);
-  color: var(--masters-green);
-  border-color: var(--masters-gold);
+  box-shadow: 0 8px 25px rgba(13, 21, 18, 0.22);
+  background: var(--masters-dark-green);
+  color: #fff;
+  border-color: var(--masters-dark-green);
 }
 
 /* =====================================================
@@ -3479,7 +3492,7 @@ RESULT:
   text-align: center;
   padding: 14px 20px;
   border-radius: 8px;
-  font-family: 'Copperplate', Georgia, serif;
+  font-family: inherit;
   font-weight: 700;
   font-size: 1.1em;
   letter-spacing: 1px;
@@ -3497,9 +3510,9 @@ RESULT:
   animation: pulse-border 2s ease-in-out infinite;
 }
 .draft-status--complete {
-  background: rgba(212, 175, 55, 0.15);
-  color: #d4af37;
-  border: 2px solid #d4af37;
+  background: var(--green-tint);
+  color: var(--masters-green);
+  border: 2px solid var(--masters-green);
 }
 
 @keyframes pulse-border {
@@ -3510,16 +3523,19 @@ RESULT:
 /* Team column header */
 .team-column-header {
   text-align: center;
-  font-family: 'Copperplate', Georgia, serif;
+  font-family: inherit;
   font-size: clamp(1.3em, 2.8vw, 1.7em);
-  font-weight: 700;
-  color: var(--masters-green);
+  font-weight: 800;
+  color: var(--masters-black);
   margin-bottom: 18px;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
   text-transform: uppercase;
   padding-bottom: 10px;
-  border-bottom: 2px solid var(--masters-gold);
+  border-bottom: 3px solid var(--color-line);
 }
+
+.team-column-header--green { color: var(--team-green); border-bottom-color: var(--team-green); }
+.team-column-header--red { color: var(--team-red); border-bottom-color: var(--team-red); }
 
 /* Draft slots */
 .draft-slots {
@@ -3536,13 +3552,16 @@ RESULT:
   transition: transform 0.2s, box-shadow 0.2s;
 }
 .draft-slot--filled {
-  background: linear-gradient(135deg, rgba(0, 103, 71, 0.08) 0%, rgba(0, 103, 71, 0.03) 100%);
-  border: 2px solid var(--masters-gold);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-left: 4px solid var(--masters-green);
   animation: slot-fill-in 0.4s ease-out both;
 }
+.draft-slots--green .draft-slot--filled { border-left-color: var(--team-green); }
+.draft-slots--red .draft-slot--filled { border-left-color: var(--team-red); }
 .draft-slot--filled:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+  box-shadow: 0 4px 12px rgba(13, 21, 18, 0.10);
 }
 .draft-slot--empty {
   background: linear-gradient(135deg, rgba(0, 103, 71, 0.06) 0%, rgba(0, 103, 71, 0.02) 100%);
@@ -3557,7 +3576,7 @@ RESULT:
   min-width: 30px;
 }
 .draft-slot__name {
-  font-family: 'Copperplate', Georgia, serif;
+  font-family: inherit;
   font-size: 1.1em;
   font-weight: 700;
   color: var(--color-text);
@@ -3572,7 +3591,7 @@ RESULT:
   color: rgba(0, 103, 71, 0.5);
   font-style: italic;
   font-size: 0.95em;
-  font-family: 'Copperplate', Georgia, serif;
+  font-family: inherit;
   letter-spacing: 2px;
   text-transform: uppercase;
 }
@@ -3612,7 +3631,7 @@ RESULT:
 }
 
 .admin-login-header {
-  font-family: 'Copperplate', Georgia, serif;
+  font-family: inherit;
   font-size: clamp(1.8em, 5vw, 2.4em);
   font-weight: 700;
   color: var(--masters-green);
@@ -3621,7 +3640,7 @@ RESULT:
 }
 
 .admin-login-subtitle {
-  font-family: 'Copperplate', Georgia, serif;
+  font-family: inherit;
   font-size: 0.85em;
   color: var(--color-muted);
   letter-spacing: 2px;
@@ -3635,7 +3654,7 @@ RESULT:
 
 .admin-login-field label {
   display: block;
-  font-family: 'Copperplate', Georgia, serif;
+  font-family: inherit;
   font-size: 0.78em;
   color: var(--masters-green);
   text-transform: uppercase;
@@ -3648,7 +3667,7 @@ RESULT:
   padding: 12px 14px;
   border: 2px solid rgba(0, 103, 71, 0.25);
   border-radius: 8px;
-  font-family: 'Copperplate', Georgia, serif;
+  font-family: inherit;
   font-size: 1em;
   color: var(--color-text);
   background: var(--color-bg);
@@ -3676,7 +3695,7 @@ RESULT:
   color: var(--color-bg);
   border: none;
   border-radius: 8px;
-  font-family: 'Copperplate', Georgia, serif;
+  font-family: inherit;
   font-size: 1em;
   font-weight: 700;
   letter-spacing: 2px;
@@ -3727,7 +3746,7 @@ RESULT:
   border: 2px solid var(--masters-green);
   border-bottom: none;
   border-radius: 8px 8px 0 0;
-  font-family: 'Copperplate', Georgia, serif;
+  font-family: inherit;
   font-weight: 700;
   font-size: clamp(0.85em, 2vw, 1em);
   letter-spacing: 1.5px;
@@ -3783,7 +3802,7 @@ RESULT:
 }
 
 .draft-pool-card .pool-player-name {
-  font-family: 'Copperplate', Georgia, serif;
+  font-family: inherit;
   font-weight: 700;
   font-size: 1.1em;
   color: var(--masters-green);
@@ -3809,15 +3828,19 @@ RESULT:
   letter-spacing: 1px;
 }
 
-.btn-brock {
-  background: var(--masters-green) !important;
-  color: var(--color-bg) !important;
+.btn-green {
+  background: var(--team-green) !important;
+  color: #fff !important;
 }
 
-.btn-jared {
-  background: var(--masters-dark-green) !important;
-  color: var(--color-bg) !important;
-  border: 2px solid var(--masters-gold) !important;
+.btn-red {
+  background: var(--team-red) !important;
+  color: #fff !important;
+}
+
+.btn-green:disabled,
+.btn-red:disabled {
+  opacity: 0.55;
 }
 
 /* Admin draft slot with undraft button */
@@ -4022,7 +4045,7 @@ RESULT:
   background: var(--color-card);
   cursor: pointer;
   font-size: 0.75em;
-  font-family: 'Copperplate', 'Copperplate Gothic', Georgia, serif;
+  font-family: inherit;
   transition: all 0.15s ease;
   text-align: center;
   min-height: 36px;
@@ -4037,21 +4060,21 @@ RESULT:
 }
 
 .hole-btn-p1.active {
-  background: var(--masters-green);
+  background: var(--team-green);
   color: #fff;
-  border-color: var(--masters-green);
+  border-color: var(--team-green);
 }
 
 .hole-btn-halved.active {
-  background: var(--masters-gold);
+  background: var(--masters-black);
   color: #fff;
-  border-color: var(--masters-gold);
+  border-color: var(--masters-black);
 }
 
 .hole-btn-p2.active {
-  background: var(--masters-dark-green);
+  background: var(--team-red);
   color: #fff;
-  border-color: var(--masters-dark-green);
+  border-color: var(--team-red);
 }
 
 /* =====================================================
@@ -4680,7 +4703,7 @@ RESULT:
   color: #fff;
   padding: 12px 24px;
   border-radius: var(--radius-md);
-  font-family: 'Copperplate', 'Copperplate Gothic', Georgia, serif;
+  font-family: inherit;
   font-size: 0.85em;
   letter-spacing: 0.5px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.25);
@@ -4704,14 +4727,14 @@ RESULT:
 
 /* Save button unsaved state */
 #save-btn.unsaved {
-  background: var(--masters-gold);
-  color: #1a1a1a;
+  background: var(--team-red);
+  color: #fff;
   animation: pulse-unsaved 1.8s ease-in-out infinite;
 }
 
 @keyframes pulse-unsaved {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.5); }
-  50%       { box-shadow: 0 0 0 6px rgba(212, 175, 55, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(194, 46, 46, 0.5); }
+  50%       { box-shadow: 0 0 0 6px rgba(194, 46, 46, 0); }
 }
 
 /* ==========================================
@@ -4735,15 +4758,15 @@ RESULT:
    WEATHER WIDGET
    ======================== */
 .weather-strip {
-    background: linear-gradient(135deg, #004d35 0%, #006747 100%);
-    border: 2px solid #d4af37;
-    border-radius: 8px;
+    background: linear-gradient(135deg, var(--masters-dark-green) 0%, var(--masters-green) 100%);
+    border: 1px solid var(--masters-dark-green);
+    border-radius: 12px;
     padding: 12px 16px;
     margin: 16px auto;
     max-width: 900px;
-    color: #f5f3e8;
-    font-family: 'Copperplate', Georgia, serif;
-    box-shadow: 0 4px 12px rgba(0, 103, 71, 0.2);
+    color: #fff;
+    font-family: inherit;
+    box-shadow: 0 4px 12px rgba(13, 21, 18, 0.12);
 }
 .weather-strip-content {
     display: flex;
@@ -4758,12 +4781,12 @@ RESULT:
 }
 .weather-strip-icon { font-size: 3em; line-height: 1; }
 .weather-strip-main { display: flex; flex-direction: column; gap: 2px; }
-.weather-strip-degrees { font-size: 2.4em; font-weight: 800; line-height: 1; color: #f5f3e8; }
+.weather-strip-degrees { font-size: 2.4em; font-weight: 800; line-height: 1; color: #fff; }
 .weather-strip-desc { font-size: 0.85em; opacity: 0.85; text-transform: capitalize; }
 .weather-strip-stats { display: flex; gap: 24px; align-items: center; }
 .weather-strip-stat { display: flex; flex-direction: row; align-items: center; gap: 8px; }
 .weather-strip-stat-icon { font-size: 1.6em; line-height: 1; }
-.weather-strip-stat-value { font-size: 1.1em; font-weight: 700; color: #d4af37; line-height: 1; }
+.weather-strip-stat-value { font-size: 1.1em; font-weight: 700; color: #fff; line-height: 1; }
 .weather-strip-stat-label { font-size: 0.75em; text-transform: uppercase; opacity: 0.7; letter-spacing: 0.5px; }
 .weather-strip-condition {
     padding: 6px 14px;
