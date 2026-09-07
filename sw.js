@@ -4,7 +4,7 @@
      the pages keep their own localStorage copy for offline display and queue
      unsaved score edits until the connection returns.
    Bump CACHE_VERSION to force a fresh precache after a shell change. */
-const CACHE_VERSION = "classic-v3";
+const CACHE_VERSION = "classic-v4";
 const SHELL = [
   "/index.html", "/draft.html", "/leaderboard.html", "/history.html", "/admin.html", "/classic-2026.html",
   "/css/styles.css?v=20270907",

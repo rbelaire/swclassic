@@ -5,11 +5,11 @@
  *************************/
 
 const ADMIN_PASSWORD_HASH = "2d9a49b4c204c1cc6171bc0c0475dd15199036e1dc179884a301744a2672954d";
-const VALID_USERS = ["admin", "foursome1", "foursome2", "foursome3"];
+const VALID_USERS = ["admin", "foursome1", "foursome2", "foursome3", "foursome4"];
 // Scan-to-score tokens now live in data.json (meta.foursomeTokens) so they can
 // be rotated each season from the admin console without a code change.
 let hasUnsavedChanges = false;
-const TEAM_PICK_LIMIT = 5;
+const TEAM_PICK_LIMIT = 6;
 
 async function hashPassword(password) {
   const encoder = new TextEncoder();
@@ -256,8 +256,8 @@ function validateData(d) {
   if (!Array.isArray(d.matches)) {
     errors.push("Matches array is missing.");
   } else {
-    if (d.matches.length !== 6) {
-      errors.push(`Expected 6 matches, found ${d.matches.length}.`);
+    if (d.matches.length !== 7) {
+      errors.push(`Expected 7 matches, found ${d.matches.length}.`);
     }
     d.matches.forEach((m, i) => {
       if (!Array.isArray(m.playerIds)) {
@@ -585,13 +585,15 @@ function renderMatchupBuilder() {
     }
   }
 
-  // Build foursomes (2 matches each)
+  // Build foursomes (2 matches each; the last group may hold a single match).
   let html = "";
-  for (let f = 0; f < 3; f++) {
+  const groupCount = Math.ceil(data.matches.length / 2);
+  for (let f = 0; f < groupCount; f++) {
     html += `<div class="matchup-builder-foursome"><h3>Foursome ${f + 1}</h3>`;
 
     for (let m = 0; m < 2; m++) {
       const matchIndex = f * 2 + m;
+      if (matchIndex >= data.matches.length) break;
       const match = data.matches[matchIndex];
 
       html += `<div class="matchup-builder-match">`;
@@ -1216,6 +1218,7 @@ function clearAll() {
     }
     match.status = "not_started";
   });
+  if (data.meta) data.meta.scoreLog = [];
 
   markUnsaved();
   render._initialized = false;
@@ -1615,8 +1618,10 @@ function startNewSeason() {
     for (let i = 1; i <= 18; i++) m.points.holes[i] = null;
     m.status = "not_started";
   });
-  // Rotate scan-to-score tokens.
-  data.meta.foursomeTokens = { [genToken()]: 1, [genToken()]: 2, [genToken()]: 3 };
+  // Rotate scan-to-score tokens (4 playing groups for a 7v7 field).
+  data.meta.foursomeTokens = { [genToken()]: 1, [genToken()]: 2, [genToken()]: 3, [genToken()]: 4 };
+  // Clear last season's live score timeline.
+  data.meta.scoreLog = [];
 
   const statusEl = document.getElementById("es-status");
   if (statusEl) statusEl.textContent = "Starting new season…";
