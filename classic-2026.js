@@ -127,29 +127,9 @@
     return log;
   }
 
-  function computeMomentum(t) {
-    const matches = t.matches || [];
-    const out = [];
-    let cum = 0;
-    for (let h = 1; h <= 18; h++) {
-      let played = false;
-      matches.forEach(m => {
-        const v = (m.holes || {})[h];
-        if (v === 1 || v === 0 || v === 0.5) played = true;
-        const greenIsP1 = sideKey(m.side1) === 'green';
-        if (v === 1) cum += greenIsP1 ? 1 : -1;
-        else if (v === 0) cum += greenIsP1 ? -1 : 1;
-      });
-      out.push({ hole: h, diff: cum, played });
-    }
-    return out;
-  }
-
   function timelineSection(t, ti) {
     const log = buildScoreLog(t);
-    const momentum = computeMomentum(t);
-    const anyHoles = momentum.some(m => m.played);
-    if ((!log || log.length < 2) && !anyHoles) return '';
+    if (!log || log.length < 2) return '';
 
     let html = `<div class="section-header"><h2>How It Unfolded</h2></div>`;
     html += `<p class="tl-caption">Reconstructed from the tee sheet &mdash; groups off at ${esc((t.teeTimes || []).join(', '))}, one hole apart (~9 min a hole). Points land as each group finishes a nine.</p>`;
@@ -157,12 +137,7 @@
     html += `<div class="tl-card">
         <div class="tl-title">Team Score Over Time</div>
         <div class="tl-sub"><b class="g">${esc(ti.green.name)}</b> vs <b class="r">${esc(ti.red.name)}</b> &middot; running points</div>
-        ${log && log.length > 1 ? snapshotChartSVG(log) : '<div class="tl-empty">No timing data.</div>'}
-      </div>`;
-    html += `<div class="tl-card">
-        <div class="tl-title">Hole-by-Hole Momentum</div>
-        <div class="tl-sub"><b class="g">${esc(ti.green.name)}</b> up top, <b class="r">${esc(ti.red.name)}</b> below &middot; holes won</div>
-        ${anyHoles ? momentumChartSVG(momentum, ti) : '<div class="tl-empty">No holes scored.</div>'}
+        ${snapshotChartSVG(log)}
       </div>`;
     html += `</div>`;
     return html;
@@ -195,40 +170,6 @@
     </svg>`;
   }
 
-  function momentumChartSVG(momentum, ti) {
-    const W = 340, H = 150, L = 20, Tp = 14, R = 12, B = 20;
-    const iw = W - L - R, ih = H - Tp - B;
-    let last = -1; momentum.forEach((m, i) => { if (m.played) last = i; });
-    const series = [{ x: 0, v: 0 }];
-    for (let i = 0; i <= last; i++) series.push({ x: i + 1, v: momentum[i].diff });
-    const maxAbs = Math.max(1, ...series.map(s => Math.abs(s.v)));
-    const x = h => L + (h / 18) * iw;
-    const zeroY = Tp + ih / 2;
-    const y = v => zeroY - (v / maxAbs) * (ih / 2);
-    const gc = COLORS.green, rc = COLORS.red;
-    const areaPath = sign => {
-      let d = `M${x(series[0].x).toFixed(1)},${zeroY.toFixed(1)}`;
-      series.forEach(s => { const vv = sign > 0 ? Math.max(s.v, 0) : Math.min(s.v, 0); d += ` L${x(s.x).toFixed(1)},${y(vv).toFixed(1)}`; });
-      d += ` L${x(series[series.length - 1].x).toFixed(1)},${zeroY.toFixed(1)} Z`;
-      return d;
-    };
-    const linePath = series.map((s, i) => `${i === 0 ? 'M' : 'L'}${x(s.x).toFixed(1)},${y(s.v).toFixed(1)}`).join(' ');
-    let xl = '';
-    [1, 9, 18].forEach(h => { xl += `<text class="tl-axis" x="${x(h).toFixed(1)}" y="${H - 5}" text-anchor="middle">${h}</text>`; });
-    const finalDiff = series[series.length - 1].v;
-    const leadName = finalDiff > 0 ? ti.green.name : finalDiff < 0 ? ti.red.name : '';
-    const leadTxt = finalDiff === 0 ? 'All square' : `${Math.abs(finalDiff)} up &middot; ${esc(leadName)}`;
-    const endC = finalDiff >= 0 ? gc : rc;
-    return `<svg class="tl-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Hole-by-hole momentum">
-      <path d="${areaPath(1)}" fill="${gc}" fill-opacity="0.15"/>
-      <path d="${areaPath(-1)}" fill="${rc}" fill-opacity="0.15"/>
-      <line class="tl-grid-line" x1="${L}" y1="${zeroY.toFixed(1)}" x2="${W - R}" y2="${zeroY.toFixed(1)}"/>
-      <path d="${linePath}" fill="none" stroke="${endC}" stroke-width="2.5" stroke-linejoin="round"/>
-      <circle cx="${x(series[series.length - 1].x).toFixed(1)}" cy="${y(finalDiff).toFixed(1)}" r="3.4" fill="${endC}"/>
-      ${xl}
-      <text class="tl-axis" x="${W - R}" y="${Tp - 2}" text-anchor="end" style="font-weight:800; fill:${endC};">${leadTxt}</text>
-    </svg>`;
-  }
 
   function resultBanner(ti) {
     const gWins = ti.green.score > ti.red.score;
