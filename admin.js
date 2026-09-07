@@ -4,7 +4,7 @@
  * Tabs: Draft | Matchups | Score Entry
  *************************/
 
-const ADMIN_PASSWORD_HASH = "5a40d95d61e29d6665ff382de6e0b0cc6a3bbb546aeececa59911e08d597587b";
+const ADMIN_PASSWORD_HASH = "2d9a49b4c204c1cc6171bc0c0475dd15199036e1dc179884a301744a2672954d";
 const VALID_USERS = ["admin", "foursome1", "foursome2", "foursome3"];
 // Scan-to-score tokens now live in data.json (meta.foursomeTokens) so they can
 // be rotated each season from the admin console without a code change.
