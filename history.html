@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Classic - Tournament History</title>
-  <link rel="stylesheet" href="css/styles.css?v=20260223">
+  <link rel="stylesheet" href="css/styles.css?v=20270907">
   <link rel="icon" href="/favicon.ico">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#006747">
+  <meta name="theme-color" content="#0b6b3a">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="The Classic">
@@ -27,8 +27,9 @@
       padding: 24px 20px;
       border-radius: var(--radius-lg);
       margin-bottom: 24px;
-      background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
-      border: 3px solid var(--masters-gold);
+      background: var(--green-tint);
+      border: 1px solid var(--color-line);
+      border-top: 4px solid var(--masters-green);
     }
 
     .result-banner h3 {
@@ -40,14 +41,22 @@
     }
 
     .result-banner .final-score {
-      font-size: clamp(2em, 5vw, 3em);
+      font-size: clamp(1.6em, 4.4vw, 2.6em);
       font-weight: 800;
-      color: var(--masters-green);
+      color: var(--masters-black);
       margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
+    .final-score .hsc-green-text { color: var(--team-green); }
+    .final-score .hsc-red-text { color: var(--team-red); }
+
     .result-banner .final-score .winner-score {
-      color: var(--masters-red);
+      font-weight: 900;
     }
 
     .upcoming-banner {
@@ -75,8 +84,9 @@
       text-align: center;
       padding: 20px;
       margin-top: 20px;
-      background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(212, 175, 55, 0.04) 100%);
-      border: 2px solid var(--masters-gold);
+      background: var(--color-surface);
+      border: 1px solid var(--color-line);
+      border-left: 4px solid var(--masters-green);
       border-radius: var(--radius-md);
     }
 
@@ -84,7 +94,7 @@
       font-size: 0.85em;
       text-transform: uppercase;
       letter-spacing: 2px;
-      color: var(--masters-gold);
+      color: var(--masters-green);
       margin-bottom: 6px;
     }
 
@@ -129,8 +139,8 @@
       height: 46px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid var(--masters-gold);
-      background: #e9e6d8;
+      border: 2px solid var(--masters-green);
+      background: var(--color-surface);
       flex-shrink: 0;
     }
 
@@ -431,10 +441,10 @@
     }
     .hsc-h { font-size: 0.78em; }
     .hsc-p { font-size: 0.62em; opacity: 0.7; font-weight: 600; }
-    .hsc-brock { background: var(--masters-green); color: #fff; }
-    .hsc-jared { background: var(--masters-gold); color: #1a1a1a; }
+    .hsc-green { background: var(--team-green); color: #fff; }
+    .hsc-red { background: var(--team-red); color: #fff; }
     .hsc-tie { background: #d8d8d8; color: #333; }
-    .hsc-empty { background: #f2f0e6; color: #bbb; }
+    .hsc-empty { background: #f1f4f2; color: #bbb; }
     .hsc-none { background: #888; color: #fff; }
     @media (max-width: 480px) {
       .hsc-p { display: none; }

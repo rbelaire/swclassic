@@ -5,14 +5,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Classic 2027 - Tournament Format</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260223">
+    <link rel="stylesheet" href="css/styles.css?v=20270907">
     <link rel="icon" href="/favicon.ico">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#006747">
+    <meta name="theme-color" content="#0b6b3a">
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="The Classic">
     <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
+    <style>
+      /* 2027 Captains face-off */
+      .cap-faceoff {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: stretch;
+        gap: clamp(10px, 3vw, 24px);
+        max-width: 760px;
+        margin: 0 auto;
+      }
+      .cap-side {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+        background: var(--color-card);
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-lg);
+        padding: clamp(18px, 3vw, 26px) clamp(14px, 3vw, 22px);
+      }
+      .cap-side--green { border-top: 5px solid var(--team-green); }
+      .cap-side--red { border-top: 5px solid var(--team-red); }
+      .cap-photo {
+        width: clamp(84px, 22vw, 120px);
+        height: clamp(84px, 22vw, 120px);
+        border-radius: 50%;
+        object-fit: cover;
+        background: var(--color-surface);
+      }
+      .cap-side--green .cap-photo { border: 4px solid var(--team-green); }
+      .cap-side--red .cap-photo { border: 4px solid var(--team-red); }
+      .cap-role {
+        font-size: 0.72em;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 700;
+        color: var(--color-muted);
+      }
+      .cap-name {
+        font-size: clamp(1.4em, 4vw, 2em);
+        font-weight: 900;
+        line-height: 1;
+        color: var(--masters-black);
+      }
+      .cap-team {
+        font-size: 0.85em;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .cap-side--green .cap-team { color: var(--team-green); }
+      .cap-side--red .cap-team { color: var(--team-red); }
+      .cap-vs {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(1.4em, 4vw, 2.2em);
+        font-weight: 900;
+        color: var(--masters-black);
+      }
+      .cap-draftnote {
+        text-align: center;
+        margin: clamp(16px, 3vw, 22px) auto 0;
+        max-width: 560px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-size: 0.82em;
+        color: var(--masters-green);
+        background: var(--green-tint);
+        border: 1px solid var(--color-line);
+        border-radius: 999px;
+        padding: 10px 18px;
+      }
+      @media (max-width: 480px) {
+        .cap-faceoff { gap: 8px; }
+        .cap-side { padding: 16px 10px; }
+      }
+    </style>
 </head>
 <body class="homepage">
     <nav class="navbar">
@@ -83,6 +163,27 @@
 <div id="weatherWidget"></div>
 <script src="weather.js"></script>
 
+<div class="container" id="captains-container" style="display:none;">
+    <div class="section-header">
+        <h2>2027 Captains</h2>
+    </div>
+    <div class="cap-faceoff">
+        <div class="cap-side cap-side--green">
+            <img class="cap-photo" id="cap-green-photo" alt="" onerror="this.style.visibility='hidden'">
+            <div class="cap-role">Captain</div>
+            <div class="cap-name" id="cap-green-name">&mdash;</div>
+            <div class="cap-team" id="cap-green-team">Team Green</div>
+        </div>
+        <div class="cap-vs">VS</div>
+        <div class="cap-side cap-side--red">
+            <img class="cap-photo" id="cap-red-photo" alt="" onerror="this.style.visibility='hidden'">
+            <div class="cap-role">Captain</div>
+            <div class="cap-name" id="cap-red-name">&mdash;</div>
+            <div class="cap-team" id="cap-red-team">Team Red</div>
+        </div>
+    </div>
+    <div class="cap-draftnote" id="cap-draftnote">Draft date to be announced</div>
+</div>
 
 <div class="container">
     <div class="section-header">
@@ -94,11 +195,11 @@
             <h2>The Setup</h2>
             <div class="card-content">
                 <div style="display:flex; gap:10px; margin-bottom:14px;">
-                    <div style="background:#006747; color:#d4af37; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.1em; flex-shrink:0;">6</div>
+                    <div style="background:#0b6b3a; color:#ffffff; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.1em; flex-shrink:0;">6</div>
                     <div style="display:flex; align-items:center; color:#0d3d1f; font-weight:600;">1v1 matches across 3 groups</div>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <div style="background:#d4af37; color:#0d3d1f; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-size:1.2em; flex-shrink:0;">⛳</div>
+                    <div style="background:#eaf4ee; color:#0b6b3a; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-size:1.2em; flex-shrink:0;">⛳</div>
                     <div style="display:flex; flex-direction:column; justify-content:center; color:#0d3d1f; font-weight:600; line-height:1.5;">
                         <div>Pick the best drive, play your own ball — no help after the tee</div>
                         <div style="font-size:0.85em; opacity:0.75; font-weight:500;">Par 3s: no teammate tee shot — everyone plays their own</div>
@@ -111,11 +212,11 @@
             <h2>The Pops System</h2>
             <div class="card-content">
                 <div style="display:flex; gap:10px; margin-bottom:14px;">
-                    <div style="background:#006747; color:#d4af37; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-size:1.2em; flex-shrink:0;">⛳</div>
+                    <div style="background:#0b6b3a; color:#ffffff; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-size:1.2em; flex-shrink:0;">⛳</div>
                     <div style="display:flex; align-items:center; color:#0d3d1f; font-weight:600;">Pops are handicap strokes applied on the hardest holes — par 3s excluded</div>
                 </div>
                 <div style="display:flex; gap:10px; margin-bottom:20px;">
-                    <div style="background:#d4af37; color:#0d3d1f; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.2em; flex-shrink:0;">−</div>
+                    <div style="background:#eaf4ee; color:#0b6b3a; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.2em; flex-shrink:0;">−</div>
                     <div style="display:flex; flex-direction:column; justify-content:center; color:#0d3d1f; font-weight:600; line-height:1.5;">
                         <div>Lower handicap gives strokes to the higher</div>
                         <div style="font-size:0.85em; opacity:0.75; font-weight:500;">Difference = strokes received</div>
@@ -124,20 +225,20 @@
 
                 <button onclick="document.getElementById('pops-example').style.display = document.getElementById('pops-example').style.display === 'none' ? 'block' : 'none'" class="btn-primary" style="cursor:pointer; width:100%;">See Example</button>
 
-                <div id="pops-example" style="display:none; margin-top:16px; background:#006747; border:2px solid #d4af37; border-radius:8px; padding:20px; text-align:center;">
+                <div id="pops-example" style="display:none; margin-top:16px; background:#006747; border:2px solid #a7e8c4; border-radius:8px; padding:20px; text-align:center;">
                     <div style="display:flex; justify-content:center; align-items:center; gap:20px; flex-wrap:wrap; margin-bottom:16px;">
                         <div>
-                            <div style="font-size:1.2em; font-weight:700; color:#f5f3e8;">Austin</div>
-                            <div style="font-size:0.85em; color:#d4af37;">4 Pops</div>
+                            <div style="font-size:1.2em; font-weight:700; color:#ffffff;">Austin</div>
+                            <div style="font-size:0.85em; color:#a7e8c4;">4 Pops</div>
                         </div>
-                        <div style="font-size:1.4em; font-weight:700; color:#d4af37;">VS</div>
+                        <div style="font-size:1.4em; font-weight:700; color:#a7e8c4;">VS</div>
                         <div>
-                            <div style="font-size:1.2em; font-weight:700; color:#f5f3e8;">Colby</div>
-                            <div style="font-size:0.85em; color:#d4af37;">16 Pops</div>
+                            <div style="font-size:1.2em; font-weight:700; color:#ffffff;">Colby</div>
+                            <div style="font-size:0.85em; color:#a7e8c4;">16 Pops</div>
                         </div>
                     </div>
-                    <div style="background:#004d35; border-radius:6px; padding:14px; color:#f5f3e8; line-height:1.8;">
-                        <strong style="color:#d4af37; font-size:1.1em;">16 − 4 = 12 pops for Colby</strong><br>
+                    <div style="background:#004d35; border-radius:6px; padding:14px; color:#ffffff; line-height:1.8;">
+                        <strong style="color:#a7e8c4; font-size:1.1em;">16 − 4 = 12 pops for Colby</strong><br>
                         12 hardest holes (par 3s excluded) — Colby gets a one shot advantage
                     </div>
                 </div>
@@ -148,14 +249,14 @@
             <h2>Scoring Breakdown</h2>
             <div class="card-content">
                 <div style="display:flex; gap:10px; margin-bottom:14px;">
-                    <div style="background:#006747; color:#d4af37; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.1em; flex-shrink:0;">2</div>
+                    <div style="background:#0b6b3a; color:#ffffff; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.1em; flex-shrink:0;">2</div>
                     <div style="display:flex; flex-direction:column; justify-content:center; color:#0d3d1f; font-weight:600; line-height:1.5;">
                         <div>Points per match</div>
                         <div style="font-size:0.85em; opacity:0.75; font-weight:500;">1 pt · Front 9 &nbsp;|&nbsp; 1 pt · Back 9</div>
                     </div>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <div style="background:#d4af37; color:#0d3d1f; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.1em; flex-shrink:0;">½</div>
+                    <div style="background:#eaf4ee; color:#0b6b3a; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.1em; flex-shrink:0;">½</div>
                     <div style="display:flex; align-items:center; color:#0d3d1f; font-weight:600;">Ties split the point (0.5 each)</div>
                 </div>
             </div>
@@ -165,18 +266,18 @@
             <h2>Course Rules</h2>
             <div class="card-content">
                 <div style="display:flex; gap:10px; margin-bottom:14px;">
-                    <div style="background:#006747; color:#d4af37; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-size:1.2em; flex-shrink:0;">⛳</div>
+                    <div style="background:#0b6b3a; color:#ffffff; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-size:1.2em; flex-shrink:0;">⛳</div>
                     <div style="display:flex; flex-direction:column; justify-content:center; color:#0d3d1f; font-weight:600; line-height:1.5;">
                         <div>Lift, clean &amp; place — one club length</div>
                         <div style="font-size:0.85em; opacity:0.75; font-weight:500;">No closer to the hole · no rough to fairway, out of a bunker (unless called that day), or fringe to green</div>
                     </div>
                 </div>
                 <div style="display:flex; gap:10px; margin-bottom:14px;">
-                    <div style="background:#d4af37; color:#0d3d1f; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-size:1.2em; flex-shrink:0;">⛳</div>
+                    <div style="background:#eaf4ee; color:#0b6b3a; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-size:1.2em; flex-shrink:0;">⛳</div>
                     <div style="display:flex; align-items:center; color:#0d3d1f; font-weight:600;">Play the Silver tee boxes</div>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <div style="background:#006747; color:#d4af37; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.1em; flex-shrink:0;">1</div>
+                    <div style="background:#0b6b3a; color:#ffffff; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.1em; flex-shrink:0;">1</div>
                     <div style="display:flex; flex-direction:column; justify-content:center; color:#0d3d1f; font-weight:600; line-height:1.5;">
                         <div>One mulligan per nine</div>
                         <div style="font-size:0.85em; opacity:0.75; font-weight:500;">Per player · one front, one back</div>
@@ -252,10 +353,34 @@
                 if (!isNaN(t.getTime())) targetTime = t;
             }
         };
+        // Show the two captains (green vs red) pulled from the live roster.
+        const slugify = (n) => String(n || "").toLowerCase().replace(/[^a-z]/g, "");
+        const applyCaptains = (d) => {
+            if (!d || !d.players) return;
+            let green = null, red = null;
+            Object.values(d.players).forEach(p => {
+                if (p && p.captain && p.team === "green" && !green) green = p;
+                if (p && p.captain && p.team === "red" && !red) red = p;
+            });
+            if (!green && !red) return;
+            const setSide = (side, p) => {
+                if (!p) return;
+                const nameEl = document.getElementById(`cap-${side}-name`);
+                const teamEl = document.getElementById(`cap-${side}-team`);
+                const photoEl = document.getElementById(`cap-${side}-photo`);
+                if (nameEl) nameEl.textContent = p.name;
+                if (teamEl) teamEl.textContent = "Team " + p.name;
+                if (photoEl) { photoEl.src = `images/players/${slugify(p.name)}.jpg`; photoEl.alt = p.name; }
+            };
+            setSide("green", green);
+            setSide("red", red);
+            const wrap = document.getElementById("captains-container");
+            if (wrap) wrap.style.display = "";
+        };
         fetch(`/api/data?t=${Date.now()}`, { cache: "no-store" })
             .then(r => r.ok ? r.json() : Promise.reject())
             .catch(() => fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" }).then(r => r.json()))
-            .then(d => applyEventConfig(d && d.meta))
+            .then(d => { applyEventConfig(d && d.meta); applyCaptains(d); })
             .catch(() => {});
 
         updateCountdown();

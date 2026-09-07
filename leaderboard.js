@@ -114,40 +114,45 @@ function render() {
 
 function renderTotals(data) {
   const totals = calculateTotals(data);
+  const T = ClassicTeams(data);
 
-  document.getElementById("team-brock-score").textContent =
-    (totals.brock || 0).toFixed(1);
+  const gName = document.getElementById("team-green-name");
+  const rName = document.getElementById("team-red-name");
+  if (gName) gName.textContent = T.green.name.toUpperCase();
+  if (rName) rName.textContent = T.red.name.toUpperCase();
 
-  document.getElementById("team-jared-score").textContent =
-    (totals.jared || 0).toFixed(1);
+  document.getElementById("team-green-score").textContent =
+    (totals.green || 0).toFixed(1);
+  document.getElementById("team-red-score").textContent =
+    (totals.red || 0).toFixed(1);
 
-  const brockEl = document.getElementById("team-brock");
-  const jaredEl = document.getElementById("team-jared");
+  const greenEl = document.getElementById("team-green");
+  const redEl = document.getElementById("team-red");
 
-  brockEl.classList.remove("winning");
-  jaredEl.classList.remove("winning");
+  greenEl.classList.remove("winning");
+  redEl.classList.remove("winning");
 
-  if (totals.brock > totals.jared) brockEl.classList.add("winning");
-  if (totals.jared > totals.brock) jaredEl.classList.add("winning");
+  if (totals.green > totals.red) greenEl.classList.add("winning");
+  if (totals.red > totals.green) redEl.classList.add("winning");
 }
 
 function calculateTotals(data) {
-  const totals = { brock: 0, jared: 0 };
+  const T = ClassicTeams(data);
+  const totals = { green: 0, red: 0 };
 
   data.matches.forEach(match => {
     const [p1, p2] = match.playerIds;
     if (!p1 || !p2) return;
 
-    const t1raw = data.players[p1].team;
-    const t2raw = data.players[p2].team;
-    const t1 = t1raw === 'coach' ? p1 : t1raw;
-    const t2 = t2raw === 'coach' ? p2 : t2raw;
+    const s1 = T.sideOf(data.players[p1]);
+    const s2 = T.sideOf(data.players[p2]);
+    if (!s1 || !s2) return;
 
     ["front9", "back9"].forEach(key => {
       const v = match.points[key];
       if (v === null) return;
-      totals[t1] += v;
-      totals[t2] += 1 - v;
+      totals[s1] += v;
+      totals[s2] += 1 - v;
     });
   });
 
@@ -221,12 +226,13 @@ function buildMatch(match, data) {
   div.style.cursor = "pointer";
   div.onclick = () => showMatchupModal(match, data);
 
+  const T = ClassicTeams(data);
   const [p1, p2] = match.playerIds;
-  const p1team = p1 ? data.players[p1].team : null;
-  const p2team = p2 ? data.players[p2].team : null;
+  const p1team = p1 ? T.sideOf(data.players[p1]) : null;
+  const p2team = p2 ? T.sideOf(data.players[p2]) : null;
   const p1name = p1 ? data.players[p1].name : "TBD";
   const p2name = p2 ? data.players[p2].name : "TBD";
-  const teamColor = (team, id) => (team === "brock" || id === "brock") ? "#d4af37" : "#006747";
+  const teamColor = (team) => T.color(team);
 
   // Match-play status shown in the center, leader indicated by an arrow + color.
   const st = matchPlayStatus(match);
@@ -242,7 +248,7 @@ function buildMatch(match, data) {
   } else {
     const margin = Math.abs(st.diff);
     const leaderIsP1 = st.diff > 0;
-    const color = leaderIsP1 ? teamColor(p1team, p1) : teamColor(p2team, p2);
+    const color = leaderIsP1 ? teamColor(p1team) : teamColor(p2team);
     statusStyle = `color:${color};`;
     const closed = margin > st.remaining && st.remaining >= 0 && st.played > 0;
     const label = (st.remaining === 0 || closed) && margin > 0
@@ -262,8 +268,8 @@ function buildMatch(match, data) {
       <div class="matchup-center">
         <div class="${statusClass}" style="${statusStyle}">${statusText}</div>
         <div class="matchup-scores">
-          ${buildNineInline("F9", match.points.front9, teamColor(p1team, p1), teamColor(p2team, p2))}
-          ${buildNineInline("B9", match.points.back9, teamColor(p1team, p1), teamColor(p2team, p2))}
+          ${buildNineInline("F9", match.points.front9, teamColor(p1team), teamColor(p2team))}
+          ${buildNineInline("B9", match.points.back9, teamColor(p1team), teamColor(p2team))}
         </div>
         <div class="mp-thru">${thru}</div>
       </div>
@@ -272,8 +278,8 @@ function buildMatch(match, data) {
       </div>
     </div>
   `;
-  if (p1team) div.style.borderLeft = `4px solid ${teamColor(p1team, p1)}`;
-  if (p2team) div.style.borderRight = `4px solid ${teamColor(p2team, p2)}`;
+  if (p1team) div.style.borderLeft = `4px solid ${teamColor(p1team)}`;
+  if (p2team) div.style.borderRight = `4px solid ${teamColor(p2team)}`;
   return div;
 }
 

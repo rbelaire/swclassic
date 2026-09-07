@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Admin - The Classic</title>
-  <link rel="stylesheet" href="css/styles.css?v=20260223">
+  <link rel="stylesheet" href="css/styles.css?v=20270907">
   <link rel="icon" href="/favicon.ico">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#006747">
+  <meta name="theme-color" content="#0b6b3a">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="The Classic">
@@ -99,13 +99,13 @@
 
       <div class="captains-grid">
         <div>
-          <div class="team-column-header">Team Brock</div>
-          <div class="draft-slots" id="admin-team-brock-slots"></div>
+          <div class="team-column-header team-column-header--green" id="admin-team-green-header">Team Green</div>
+          <div class="draft-slots draft-slots--green" id="admin-team-green-slots"></div>
         </div>
         <div class="captains-vs">VS</div>
         <div>
-          <div class="team-column-header">Team Jared</div>
-          <div class="draft-slots" id="admin-team-jared-slots"></div>
+          <div class="team-column-header team-column-header--red" id="admin-team-red-header">Team Red</div>
+          <div class="draft-slots draft-slots--red" id="admin-team-red-slots"></div>
         </div>
       </div>
 
@@ -150,13 +150,13 @@
           <p>Auto-calculated from current match scores.</p>
         </div>
         <div class="totals-grid">
-          <div class="total-card brock">
-            <span class="total-team">Team Brock</span>
-            <span class="total-score" id="total-brock">0.0</span>
+          <div class="total-card green">
+            <span class="total-team" id="total-green-name">Team Green</span>
+            <span class="total-score" id="total-green">0.0</span>
           </div>
-          <div class="total-card jared">
-            <span class="total-team">Team Jared</span>
-            <span class="total-score" id="total-jared">0.0</span>
+          <div class="total-card red">
+            <span class="total-team" id="total-red-name">Team Red</span>
+            <span class="total-score" id="total-red">0.0</span>
           </div>
         </div>
       </section>
@@ -167,11 +167,12 @@
   </div><!-- end #admin-app -->
 
   <!-- Sticky save bar for foursome users -->
-  <div id="foursome-save-bar" style="display:none; position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:2px solid #d4af37; padding:12px 20px; padding-bottom:calc(12px + env(safe-area-inset-bottom)); align-items:center; justify-content:space-between; z-index:1000; box-shadow:0 -2px 12px rgba(0,0,0,0.1); will-change:bottom;">
-    <span id="foursome-save-status" style="font-family:'Copperplate',Georgia,serif; font-size:0.85em; color:#006747;"></span>
-    <button id="foursome-save-btn" class="btn-primary" type="button" onclick="saveData()" style="background:#006747; color:#f5f3e8; border:none; padding:10px 28px; border-radius:6px; font-size:1em; font-weight:700; cursor:pointer; min-width:150px;">Save Scores</button>
+  <div id="foursome-save-bar" style="display:none; position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:3px solid #0b6b3a; padding:12px 20px; padding-bottom:calc(12px + env(safe-area-inset-bottom)); align-items:center; justify-content:space-between; z-index:1000; box-shadow:0 -2px 12px rgba(13,21,18,0.1); will-change:bottom;">
+    <span id="foursome-save-status" style="font-size:0.85em; font-weight:600; color:#0b6b3a;"></span>
+    <button id="foursome-save-btn" class="btn-primary" type="button" onclick="saveData()" style="background:#0b6b3a; color:#fff; border:none; padding:10px 28px; border-radius:6px; font-size:1em; font-weight:700; cursor:pointer; min-width:150px;">Save Scores</button>
   </div>
 
+  <script src="teams.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>

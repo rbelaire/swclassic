@@ -140,9 +140,9 @@ function buildCompactScorecard(match, p1, p2) {
 }
 
 function buildCompactNine(holes, startHole, endHole, p1, p2, p1Wins, p2Wins, label, nineResult) {
-  // Map p1/p2 to team
-  const p1Team = p1.team === 'brock' ? 'brock' : 'jared';
-  const p2Team = p2.team === 'brock' ? 'brock' : 'jared';
+  // Map p1/p2 to their color team (green/red)
+  const p1Team = p1.team === 'red' ? 'red' : 'green';
+  const p2Team = p2.team === 'red' ? 'red' : 'green';
 
   // Nine result text
   let resultText = '';

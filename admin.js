@@ -343,8 +343,8 @@ function detectDefaultTab() {
   if (!data) return "draft";
 
   const players = Object.values(data.players);
-  const draftable = players.filter(p => p.team !== "coach");
-  const drafted = draftable.filter(p => p.team === "brock" || p.team === "jared");
+  const draftable = players.filter(p => !p.captain);
+  const drafted = draftable.filter(p => p.team === "green" || p.team === "red");
 
   // Not all drafted yet -> Draft tab
   if (drafted.length < draftable.length) return "draft";
@@ -405,19 +405,25 @@ function render() {
  *************************/
 function renderDraft() {
   renderEventSetup();
+  const T = ClassicTeams(data);
+  const gh = document.getElementById("admin-team-green-header");
+  const rh = document.getElementById("admin-team-red-header");
+  if (gh) gh.textContent = "Team " + T.green.name;
+  if (rh) rh.textContent = "Team " + T.red.name;
+
   const players = Object.entries(data.players);
-  const teamBrock = players.filter(([, p]) => p.team === "brock").sort((a, b) => a[1].rank - b[1].rank);
-  const teamJared = players.filter(([, p]) => p.team === "jared").sort((a, b) => a[1].rank - b[1].rank);
-  const pool = players.filter(([, p]) => p.team === null).sort((a, b) => a[1].rank - b[1].rank);
-  const totalDraftable = players.filter(([, p]) => p.team !== "coach").length;
-  const totalDrafted = teamBrock.length + teamJared.length;
+  const teamGreen = players.filter(([, p]) => p.team === "green" && !p.captain).sort((a, b) => a[1].rank - b[1].rank);
+  const teamRed = players.filter(([, p]) => p.team === "red" && !p.captain).sort((a, b) => a[1].rank - b[1].rank);
+  const pool = players.filter(([, p]) => p.team === null && !p.captain).sort((a, b) => a[1].rank - b[1].rank);
+  const totalDraftable = players.filter(([, p]) => !p.captain).length;
+  const totalDrafted = teamGreen.length + teamRed.length;
 
   // Status banner
   renderDraftStatus(totalDrafted, totalDraftable);
 
   // Team columns
-  renderAdminTeamColumn("admin-team-brock-slots", teamBrock, TEAM_PICK_LIMIT);
-  renderAdminTeamColumn("admin-team-jared-slots", teamJared, TEAM_PICK_LIMIT);
+  renderAdminTeamColumn("admin-team-green-slots", teamGreen, TEAM_PICK_LIMIT);
+  renderAdminTeamColumn("admin-team-red-slots", teamRed, TEAM_PICK_LIMIT);
 
   // Player pool
   renderDraftPool(pool);
@@ -477,14 +483,10 @@ function renderDraftPool(pool) {
   }
   header.style.display = "";
 
+  const T = ClassicTeams(data);
   grid.innerHTML = pool.map(([id, p]) => {
-    const isCaptain = p.team === "coach";
-    const brockBtn = isCaptain
-      ? `<button class="btn-brock" disabled>Team Brock</button>`
-      : `<button class="btn-brock" onclick="draftPlayer('${id}', 'brock')">Team Brock</button>`;
-    const jaredBtn = isCaptain
-      ? `<button class="btn-jared" disabled>Team Jared</button>`
-      : `<button class="btn-jared" onclick="draftPlayer('${id}', 'jared')">Team Jared</button>`;
+    const greenBtn = `<button class="btn-green" onclick="draftPlayer('${id}', 'green')">Team ${escapeHTML(T.green.name)}</button>`;
+    const redBtn = `<button class="btn-red" onclick="draftPlayer('${id}', 'red')">Team ${escapeHTML(T.red.name)}</button>`;
 
     return `
       <div class="draft-pool-card player-card">
@@ -492,8 +494,8 @@ function renderDraftPool(pool) {
         <div class="pool-player-name">${escapeHTML(p.name)}</div>
         <div class="pool-player-info">${p.pops} pops</div>
         <div class="pool-actions">
-          ${brockBtn}
-          ${jaredBtn}
+          ${greenBtn}
+          ${redBtn}
         </div>
       </div>
     `;
@@ -503,10 +505,11 @@ function renderDraftPool(pool) {
 function draftPlayer(id, team) {
   if (!data.players[id]) return;
 
-  // Check team isn't full (captain + 5 picks = team of 6)
-  const teamCount = Object.values(data.players).filter(p => p.team === team).length;
+  // Count drafted players on the team (captains don't count toward the 5 picks).
+  const teamCount = Object.values(data.players).filter(p => p.team === team && !p.captain).length;
   if (teamCount >= TEAM_PICK_LIMIT) {
-    alert(`Team ${team === 'brock' ? 'Brock' : 'Jared'} is full (${TEAM_PICK_LIMIT} players).`);
+    const T = ClassicTeams(data);
+    alert(`Team ${T.name(team)} is full (${TEAM_PICK_LIMIT} players).`);
     return;
   }
 
@@ -538,15 +541,16 @@ function renderMatchupBuilder() {
   const statusEl = document.getElementById("matchup-status");
   if (!container) return;
 
-  const brockPlayers = Object.entries(data.players)
-    .filter(([id, p]) => p.team === "brock" || (p.team === "coach" && id === "brock"))
+  const T = ClassicTeams(data);
+  const greenPlayers = Object.entries(data.players)
+    .filter(([id, p]) => p.team === "green")
     .sort((a, b) => a[1].rank - b[1].rank);
-  const jaredPlayers = Object.entries(data.players)
-    .filter(([id, p]) => p.team === "jared" || (p.team === "coach" && id === "jared"))
+  const redPlayers = Object.entries(data.players)
+    .filter(([id, p]) => p.team === "red")
     .sort((a, b) => a[1].rank - b[1].rank);
 
-  // Check draft completeness
-  if (brockPlayers.length < TEAM_PICK_LIMIT || jaredPlayers.length < TEAM_PICK_LIMIT) {
+  // Check draft completeness (each team needs 5 picks + captain = 6)
+  if (greenPlayers.length <= TEAM_PICK_LIMIT || redPlayers.length <= TEAM_PICK_LIMIT) {
     if (statusEl) {
       statusEl.className = "draft-status draft-status--waiting";
       statusEl.textContent = `Draft not complete. Assign all ${TEAM_PICK_LIMIT * 2} players before building matchups.`;
@@ -556,28 +560,28 @@ function renderMatchupBuilder() {
   }
 
   // Find which players are already assigned to matches
-  const assignedBrock = new Set();
-  const assignedJared = new Set();
+  const assignedGreen = new Set();
+  const assignedRed = new Set();
   data.matches.forEach(match => {
     [0, 1].forEach(i => {
       const id = match.playerIds[i];
       if (!id) return;
       const p = data.players[id];
       if (!p) return;
-      if (p.team === "brock" || (p.team === "coach" && id === "brock")) assignedBrock.add(id);
-      if (p.team === "jared" || (p.team === "coach" && id === "jared")) assignedJared.add(id);
+      if (p.team === "green") assignedGreen.add(id);
+      if (p.team === "red") assignedRed.add(id);
     });
   });
 
-  const matchSlots = TEAM_PICK_LIMIT + 1; // drafted players + coach
-  const allAssigned = assignedBrock.size === matchSlots && assignedJared.size === matchSlots;
+  const matchSlots = TEAM_PICK_LIMIT + 1; // drafted players + captain
+  const allAssigned = assignedGreen.size === matchSlots && assignedRed.size === matchSlots;
   if (statusEl) {
     if (allAssigned) {
       statusEl.className = "draft-status draft-status--complete";
       statusEl.textContent = "All matchups set! Switch to Score Entry to enter results.";
     } else {
       statusEl.className = "draft-status draft-status--live";
-      statusEl.textContent = `Assign players to match slots (${assignedBrock.size + assignedJared.size}/${matchSlots * 2} assigned)`;
+      statusEl.textContent = `Assign players to match slots (${assignedGreen.size + assignedRed.size}/${matchSlots * 2} assigned)`;
     }
   }
 
@@ -592,18 +596,18 @@ function renderMatchupBuilder() {
 
       html += `<div class="matchup-builder-match">`;
 
-      // Team Brock dropdown
+      // Team Green dropdown
       html += `<div>
-        <label>Team Brock</label>
-        ${buildMatchupSelect(match, 0, matchIndex, "brock", brockPlayers, assignedBrock)}
+        <label>Team ${escapeHTML(T.green.name)}</label>
+        ${buildMatchupSelect(match, 0, matchIndex, "green", greenPlayers, assignedGreen)}
       </div>`;
 
       html += `<div class="matchup-builder-vs">VS</div>`;
 
-      // Team Jared dropdown
+      // Team Red dropdown
       html += `<div>
-        <label>Team Jared</label>
-        ${buildMatchupSelect(match, 1, matchIndex, "jared", jaredPlayers, assignedJared)}
+        <label>Team ${escapeHTML(T.red.name)}</label>
+        ${buildMatchupSelect(match, 1, matchIndex, "red", redPlayers, assignedRed)}
       </div>`;
 
       html += `</div>`; // end match
@@ -682,40 +686,46 @@ function renderStats() {
 
 function renderTotals() {
   const totals = calculateTotals();
+  const T = ClassicTeams(data);
 
-  document.getElementById("total-brock").textContent = totals.brock.toFixed(1);
-  document.getElementById("total-jared").textContent = totals.jared.toFixed(1);
+  const gName = document.getElementById("total-green-name");
+  const rName = document.getElementById("total-red-name");
+  if (gName) gName.textContent = "Team " + T.green.name;
+  if (rName) rName.textContent = "Team " + T.red.name;
 
-  const brockCard = document.querySelector(".total-card.brock");
-  const jaredCard = document.querySelector(".total-card.jared");
+  document.getElementById("total-green").textContent = totals.green.toFixed(1);
+  document.getElementById("total-red").textContent = totals.red.toFixed(1);
 
-  brockCard.classList.remove("winning");
-  jaredCard.classList.remove("winning");
+  const greenCard = document.querySelector(".total-card.green");
+  const redCard = document.querySelector(".total-card.red");
 
-  if (totals.brock > totals.jared) {
-    brockCard.classList.add("winning");
-  } else if (totals.jared > totals.brock) {
-    jaredCard.classList.add("winning");
+  greenCard.classList.remove("winning");
+  redCard.classList.remove("winning");
+
+  if (totals.green > totals.red) {
+    greenCard.classList.add("winning");
+  } else if (totals.red > totals.green) {
+    redCard.classList.add("winning");
   }
 }
 
 function calculateTotals() {
-  const totals = { brock: 0, jared: 0 };
+  const T = ClassicTeams(data);
+  const totals = { green: 0, red: 0 };
 
   data.matches.forEach(match => {
     const [p1, p2] = match.playerIds;
     if (!p1 || !p2) return;
 
-    const t1raw = data.players[p1].team;
-    const t2raw = data.players[p2].team;
-    const t1 = t1raw === 'coach' ? p1 : t1raw;
-    const t2 = t2raw === 'coach' ? p2 : t2raw;
+    const s1 = T.sideOf(data.players[p1]);
+    const s2 = T.sideOf(data.players[p2]);
+    if (!s1 || !s2) return;
 
     ["front9", "back9"].forEach(key => {
       const v = match.points[key];
       if (v === null) return;
-      totals[t1] += v;
-      totals[t2] += 1 - v;
+      totals[s1] += v;
+      totals[s2] += 1 - v;
     });
   });
 
@@ -783,8 +793,8 @@ function buildMatch(match, matchIndex) {
   }
 
   const [p1, p2] = match.playerIds;
-  const p1Name = p1 ? escapeHTML(data.players[p1].name) + (data.players[p1].team === 'coach' ? ' (Coach)' : '') : "Not Selected";
-  const p2Name = p2 ? escapeHTML(data.players[p2].name) + (data.players[p2].team === 'coach' ? ' (Coach)' : '') : "Not Selected";
+  const p1Name = p1 ? escapeHTML(data.players[p1].name) + (data.players[p1].captain ? ' (Capt)' : '') : "Not Selected";
+  const p2Name = p2 ? escapeHTML(data.players[p2].name) + (data.players[p2].captain ? ' (Capt)' : '') : "Not Selected";
 
   const header = `
     <div class="match-header" onclick="toggleMatch(${matchIndex})">
@@ -802,14 +812,14 @@ function buildMatch(match, matchIndex) {
 
   const playerSelects = isFoursomeUser() ? '' : `
       <div class="teams-row">
-        <div class="team-select-box team-brock">
-          <label>Team Brock Player</label>
-          ${buildTeamSelect(match, 0, matchIndex, 'brock')}
+        <div class="team-select-box team-green">
+          <label>Team ${escapeHTML(ClassicTeams(data).green.name)} Player</label>
+          ${buildTeamSelect(match, 0, matchIndex, 'green')}
         </div>
         <div class="vs-text">VS</div>
-        <div class="team-select-box team-jared">
-          <label>Team Jared Player</label>
-          ${buildTeamSelect(match, 1, matchIndex, 'jared')}
+        <div class="team-select-box team-red">
+          <label>Team ${escapeHTML(ClassicTeams(data).red.name)} Player</label>
+          ${buildTeamSelect(match, 1, matchIndex, 'red')}
         </div>
       </div>`;
 
@@ -836,12 +846,12 @@ function buildTeamSelect(match, playerIndex, matchIndex, team) {
   html += '<option value="">-- Select Player --</option>';
 
   const sortedPlayers = Object.entries(data.players)
-    .filter(([id, p]) => p.team === team || (p.team === 'coach' && id === team))
+    .filter(([id, p]) => p.team === team)
     .sort((a, b) => a[1].rank - b[1].rank);
 
   sortedPlayers.forEach(([id, p]) => {
     const selected = match.playerIds[playerIndex] === id ? 'selected' : '';
-    const label = p.team === 'coach' ? `${escapeHTML(p.name)} (Coach)` : `${escapeHTML(p.name)} (${p.pops} pops)`;
+    const label = p.captain ? `${escapeHTML(p.name)} (Capt)` : `${escapeHTML(p.name)} (${p.pops} pops)`;
     html += `<option value="${id}" ${selected}>${label}</option>`;
   });
 
@@ -853,9 +863,10 @@ function buildScoreSelect(match, key, matchIndex, valid) {
   const selectId = `score-${matchIndex}-${key}`;
   const disabled = !valid ? 'disabled' : '';
 
+  const T = ClassicTeams(data);
   const [p1Id, p2Id] = match.playerIds;
-  const p1Name = p1Id ? escapeHTML(data.players[p1Id].name) : "Team Brock Player";
-  const p2Name = p2Id ? escapeHTML(data.players[p2Id].name) : "Team Jared Player";
+  const p1Name = p1Id ? escapeHTML(data.players[p1Id].name) : `Team ${T.green.name} Player`;
+  const p2Name = p2Id ? escapeHTML(data.players[p2Id].name) : `Team ${T.red.name} Player`;
 
   let html = `<select id="${selectId}" onchange="updateScore(${matchIndex}, '${key}', this.value)" ${disabled}>`;
   html += '<option value="">-- Select Winner --</option>';
@@ -1166,12 +1177,9 @@ function formatNineResult(result, p1Name, p2Name, holesPlayed) {
 function isValidMatchup(match) {
   const [p1, p2] = match.playerIds;
   if (!p1 || !p2) return false;
-  const t1 = data.players[p1].team;
-  const t2 = data.players[p2].team;
-  // Coaches count as their team (brock coach -> brock side, jared coach -> jared side)
-  const side1 = t1 === 'coach' ? p1 : t1;
-  const side2 = t2 === 'coach' ? p2 : t2;
-  return side1 !== side2;
+  const side1 = data.players[p1].team; // "green" | "red" | null
+  const side2 = data.players[p2].team;
+  return !!side1 && !!side2 && side1 !== side2;
 }
 
 /*************************
@@ -1193,9 +1201,9 @@ function clearAll() {
   if (!confirm("Reset EVERYTHING? This will undo the draft, matchups, and all scores.")) return;
   if (!confirm("Are you sure? This cannot be undone without re-drafting.")) return;
 
-  // Reset all players to undrafted (except coaches)
+  // Reset all players to undrafted (except captains, who keep their team slot)
   Object.values(data.players).forEach(p => {
-    if (p.team !== "coach") p.team = null;
+    if (!p.captain) p.team = null;
   });
 
   // Reset all matches
@@ -1249,8 +1257,8 @@ function markUnsaved() {
   const btn = document.getElementById("save-btn");
   if (btn) {
     btn.classList.add("unsaved");
-    btn.style.background = "#d4af37";
-    btn.style.color = "#1a1a1a";
+    btn.style.background = "#c22e2e";
+    btn.style.color = "#fff";
   }
   const status = document.getElementById("foursome-save-status");
   if (status) status.textContent = "Unsaved changes";
@@ -1415,9 +1423,9 @@ function buildHistoryMatches() {
     const [p1, p2] = m.playerIds;
     const pl1 = p1 ? data.players[p1] : null;
     const pl2 = p2 ? data.players[p2] : null;
-    // Resolve which team side each player counts for (coaches count as themselves).
-    const side1 = pl1 ? (pl1.team === "coach" ? p1 : pl1.team) : null;
-    const side2 = pl2 ? (pl2.team === "coach" ? p2 : pl2.team) : null;
+    // Team side each player counts for: "green" | "red".
+    const side1 = pl1 ? pl1.team : null;
+    const side2 = pl2 ? pl2.team : null;
     const f = m.points.front9;
     const b = m.points.back9;
     const p1pts = (f === null ? 0 : f) + (b === null ? 0 : b);
@@ -1443,13 +1451,14 @@ function archiveToHistory() {
   if (!data) { showToast("No data loaded yet.", "error"); return; }
 
   const totals = calculateTotals();
+  const T = ClassicTeams(data);
   const year = parseInt(String(data.meta?.tournamentDate || "").slice(0, 4), 10) || new Date().getFullYear();
-  const brockName = data.players.brock?.name || "Brock";
-  const jaredName = data.players.jared?.name || "Jared";
+  const greenName = T.green.name;
+  const redName = T.red.name;
 
   if (!confirm(
     `Archive the current round to History as ${year}?\n\n` +
-    `Team ${brockName} ${totals.brock} — Team ${jaredName} ${totals.jared}\n\n` +
+    `Team ${greenName} ${totals.green} — Team ${redName} ${totals.red}\n\n` +
     `This saves a hole-by-hole record and marks the tournament complete. ` +
     `You can run it again to update the archive.`
   )) return;
@@ -1473,8 +1482,10 @@ function archiveToHistory() {
         date: formatTournamentDate(data.meta?.tournamentDate),
         venue: data.meta?.venue || "Farm D' Allie Golf Club",
         status: "complete",
-        captains: { brock: brockName, jared: jaredName },
-        finalScore: { brock: totals.brock, jared: totals.jared },
+        teams: {
+          green: { name: greenName, score: totals.green },
+          red: { name: redName, score: totals.red }
+        },
         matches: buildHistoryMatches(),
         mvp: mvpInput || existing?.mvp || null,
         notes: existing?.notes || ""
@@ -1595,8 +1606,8 @@ function startNewSeason() {
 
   // Apply any edited event info first.
   data.meta = Object.assign({}, data.meta, readEventInputs());
-  // Undraft everyone except coaches.
-  Object.values(data.players).forEach(p => { if (p.team !== "coach") p.team = null; });
+  // Undraft everyone except captains (they keep their team slot).
+  Object.values(data.players).forEach(p => { if (!p.captain) p.team = null; });
   // Clear matchups + scores.
   data.matches.forEach(m => {
     m.playerIds = [null, null];
