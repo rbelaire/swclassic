@@ -257,8 +257,21 @@ function buildMatch(match, data) {
       : `${margin} UP`;
     statusText = leaderIsP1 ? `◂ ${label}` : `${label} ▸`;
   }
+  // A nine is settled once its lead exceeds the holes left in it (clinched)
+  // or all 9 are played; a match is Final when closed out or both nines settle.
+  const holesObj = (match.points && match.points.holes) || {};
+  const nineSettled = (a, b) => {
+    let w1 = 0, w2 = 0, pl = 0;
+    for (let h = a; h <= b; h++) {
+      const v = holesObj[h];
+      if (v === 1) { w1++; pl++; } else if (v === 0) { w2++; pl++; } else if (v === 0.5) { pl++; }
+    }
+    const rem = (b - a + 1) - pl;
+    return pl > 0 && (Math.abs(w1 - w2) > rem || pl === (b - a + 1));
+  };
+  const isFinal = !!match.closed || (nineSettled(1, 9) && nineSettled(10, 18));
   const thru = st.played === 0 ? "Not started"
-    : st.remaining === 0 ? "Final"
+    : isFinal ? "Final"
     : `${st.played}/18`;
 
   div.innerHTML = `
