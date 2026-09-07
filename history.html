@@ -201,8 +201,29 @@
     }
 
     .record-card:hover {
-      border-color: var(--masters-gold);
-      box-shadow: 0 8px 24px rgba(0, 103, 71, 0.12);
+      border-color: var(--masters-green);
+      box-shadow: 0 8px 24px rgba(13, 21, 18, 0.12);
+    }
+
+    /* 2026 card links through to the full recap page */
+    .record-card--link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+    }
+    .record-card--link:hover {
+      transform: translateY(-2px);
+    }
+    .record-cta {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--color-line);
+      font-size: 0.8em;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--team-red);
     }
 
     .record-card--rained {
@@ -471,10 +492,6 @@
   <div class="date">Year-by-Year Results</div>
 </div>
 
-<div class="container" id="history-container">
-  <p style="text-align: center; opacity: 0.7;">Loading tournament history...</p>
-</div>
-
 <!-- Classic History: The Official Record -->
 <div class="container classic-history">
   <div class="section-header">
@@ -484,8 +501,8 @@
     The official record of every Classic. Winners listed are the members of the winning team for that year.
   </p>
 
-  <!-- 2026 -->
-  <div class="record-card">
+  <!-- 2026 (click through for the full recap + hole-by-hole matches) -->
+  <a href="classic-2026.html" class="record-card record-card--link">
     <div class="record-year-bar">
       <div class="record-year">2026</div>
       <div class="record-venue">Farm D'Allie Golf Club</div>
@@ -495,8 +512,9 @@
       <div class="record-winners">
         <span>Gavin</span><span class="name-separator"> &middot; </span><span>Bel</span><span class="name-separator"> &middot; </span><span>Lane</span><span class="name-separator"> &middot; </span><span>Alex</span><span class="name-separator"> &middot; </span><span>Jordan</span><span class="name-separator"> &middot; </span><span>Brock</span>
       </div>
+      <div class="record-cta">View recap &amp; hole-by-hole matches &rarr;</div>
     </div>
-  </div>
+  </a>
 
   <!-- 2025 -->
   <div class="record-card">
@@ -596,6 +614,5 @@
 
 </div>
 
-<script src="history.js"></script>
 </body>
 </html>
