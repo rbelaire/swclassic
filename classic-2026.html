@@ -167,8 +167,9 @@
       line-height: 1.5;
     }
     .timeline-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: clamp(12px, 2.5vw, 18px);
       margin-bottom: 8px;
     }
@@ -177,6 +178,8 @@
       border: 1px solid var(--color-line);
       border-radius: var(--radius-lg);
       padding: 14px 16px 10px;
+      flex: 1 1 320px;
+      max-width: 560px;
     }
     .tl-title {
       font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
