@@ -300,7 +300,23 @@
     });
     if (!played) return '';
 
+    // Find where a nine was clinched (lead > holes remaining in it) so we can
+    // show the closeout margin and fade the holes that no longer mattered.
+    const clinchOf = (start, end) => {
+      let w1 = 0, w2 = 0, clinchHole = null, up = 0, rem = 0;
+      for (let h = start; h <= end; h++) {
+        const v = m.holes[h];
+        if (v === 1) w1++; else if (v === 0) w2++;
+        if (clinchHole === null && (v === 1 || v === 0 || v === 0.5)) {
+          const lead = Math.abs(w1 - w2), left = end - h;
+          if (lead > 0 && lead > left) { clinchHole = h; up = lead; rem = left; }
+        }
+      }
+      return { clinchHole, up, rem };
+    };
+
     const nine = (start, end, label, nineVal) => {
+      const cl = clinchOf(start, end);
       let cells = '';
       for (let h = start; h <= end; h++) {
         const v = m.holes[h];
@@ -309,11 +325,15 @@
         else if (v === 0) cls += ' ' + sideClass(m.side2);
         else if (v === 0.5) cls += ' hsc-tie';
         else cls += ' hsc-empty';
+        if (cl.clinchHole !== null && h > cl.clinchHole) cls += ' hsc-dead';
         cells += `<div class="${cls}"><span class="hsc-h">${h}</span><span class="hsc-p">${COURSE_PARS[h]}</span></div>`;
       }
-      const res = nineVal === 1 ? m.player1
-        : nineVal === 0 ? m.player2
-        : nineVal === 0.5 ? 'Halved' : '&mdash;';
+      const winner = nineVal === 1 ? m.player1 : nineVal === 0 ? m.player2 : null;
+      const res = (cl.clinchHole !== null && cl.rem > 0 && winner)
+        ? `${winner} won ${cl.up}&${cl.rem}`
+        : nineVal === 1 ? `${m.player1} wins`
+          : nineVal === 0 ? `${m.player2} wins`
+            : nineVal === 0.5 ? 'Halved' : '&mdash;';
       return `<div class="hsc-nine">
         <div class="hsc-nine-label">${label}<span class="hsc-nine-res">${esc(res)}</span></div>
         <div class="hsc-row">${cells}</div>
