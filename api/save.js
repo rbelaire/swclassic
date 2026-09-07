@@ -11,7 +11,7 @@
 //   - Every write retries on a GitHub SHA conflict (two writers racing on the
 //     same commit), re-reading and re-merging before giving up.
 
-const ADMIN_PASSWORD_HASH = "5a40d95d61e29d6665ff382de6e0b0cc6a3bbb546aeececa59911e08d597587b";
+const ADMIN_PASSWORD_HASH = "2d9a49b4c204c1cc6171bc0c0475dd15199036e1dc179884a301744a2672954d";
 const GITHUB_REPO = "rbelaire/swclassic";
 const GITHUB_BRANCH = "main";
 // Only these files may be written. "data.json" is live scoring; the admin can
