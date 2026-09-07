@@ -777,17 +777,22 @@ function buildMatch(match, matchIndex) {
 
   const front = match.points.front9;
   const back = match.points.back9;
+  const holes = match.points.holes || {};
+  const bothDecided = nineState(holes, 1, 9).decided && nineState(holes, 10, 18).decided;
+  const closed = !!match.closed;
+  const anyPlayed = front !== null || back !== null;
+
   let status = "not-started";
   let statusText = "Not Started";
-
-  if (front !== null && back !== null) {
+  if (closed || bothDecided) {
     status = "complete";
-    statusText = "Complete";
+    statusText = "Final";
     div.classList.add("complete");
-  } else if (front !== null || back !== null) {
+  } else if (anyPlayed) {
     status = "in-progress";
     statusText = "In Progress";
   }
+  if (closed) div.classList.add("closed");
 
   const valid = isValidMatchup(match);
   if (!valid && (match.playerIds[0] || match.playerIds[1])) {
@@ -825,12 +830,16 @@ function buildMatch(match, matchIndex) {
         </div>
       </div>`;
 
+  const closeBtn = valid
+    ? `<button class="match-btn ${closed ? 'match-btn--reopen' : 'match-btn--close'}" onclick="toggleCloseMatch(${matchIndex})">${closed ? 'Reopen Match' : 'Close Out — Final'}</button>`
+    : '';
   const details = `
     <div class="match-details">
       ${!valid && (p1 || p2) ? '<div class="error-message">Invalid matchup: Both players must be from different teams.</div>' : ''}
       ${playerSelects}
       ${valid ? buildHoleByHoleGrid(match, matchIndex) : ''}
       <div class="match-actions">
+        ${closeBtn}
         <button class="match-btn" onclick="clearMatch(${matchIndex})">
           Clear Scores
         </button>
@@ -951,33 +960,61 @@ function setHoleGross(matchIndex, holeNum, playerIndex, value) {
   updateMatchInPlace(matchIndex);
 }
 
+// Per-nine standing: who leads, and whether the nine is mathematically
+// clinched (the lead exceeds the holes left in that nine), which makes the
+// remaining holes dead — no need to score them.
+function nineState(holes, start, end) {
+  let w1 = 0, w2 = 0, played = 0;
+  for (let h = start; h <= end; h++) {
+    const v = holes ? holes[h] : null;
+    if (v === 1) { w1++; played++; }
+    else if (v === 0) { w2++; played++; }
+    else if (v === 0.5) { played++; }
+  }
+  const total = end - start + 1;
+  const remaining = total - played;
+  const lead = w1 - w2;
+  const clinched = played > 0 && Math.abs(lead) > remaining;
+  const decided = clinched || played === total; // full play (incl. a halved nine) also decides it
+  const leader = lead > 0 ? 1 : lead < 0 ? 0 : 0.5; // 1 = p1, 0 = p2, 0.5 = level
+  return { w1, w2, played, remaining, lead, clinched, decided, leader };
+}
+
+function nineSummaryText(st, p1Name, p2Name) {
+  if (st.played === 0) return "Not started";
+  const winner = st.leader === 1 ? p1Name : p2Name;
+  if (st.clinched && st.remaining > 0) return `${winner} won ${Math.abs(st.lead)}&${st.remaining}`;
+  if (st.remaining === 0) return st.lead === 0 ? "Halved" : `${winner} wins`;
+  if (st.lead === 0) return `All square (thru ${st.played})`;
+  return `${winner} ${Math.abs(st.lead)} up (thru ${st.played})`;
+}
+
 function buildHoleByHoleGrid(match, matchIndex) {
   const [p1Id, p2Id] = match.playerIds;
   const p1Name = p1Id ? escapeHTML(data.players[p1Id].name) : "P1";
   const p2Name = p2Id ? escapeHTML(data.players[p2Id].name) : "P2";
   const holes = match.points.holes || {};
 
-  // Calculate nine results for display
-  const front9Result = calculateNineFromHoles(holes, 1, 9);
-  const back9Result = calculateNineFromHoles(holes, 10, 18);
-
-  // Count holes played per nine
-  const front9Played = countHolesPlayed(holes, 1, 9);
-  const back9Played = countHolesPlayed(holes, 10, 18);
+  const f9 = nineState(holes, 1, 9);
+  const b9 = nineState(holes, 10, 18);
 
   let html = `<div class="hole-scoring-section">`;
 
-  // Nine result summary bar
+  // Nine result summary bar (clinch-aware)
   html += `<div class="nine-results-bar">
     <div class="nine-result-item">
       <span class="nine-result-label">Front 9</span>
-      <span class="nine-result-value ${front9Result === null ? 'pending' : ''}">${formatNineResult(front9Result, p1Name, p2Name, front9Played)}</span>
+      <span class="nine-result-value ${f9.played === 0 ? 'pending' : ''} ${f9.clinched ? 'clinched' : ''}">${nineSummaryText(f9, p1Name, p2Name)}</span>
     </div>
     <div class="nine-result-item">
       <span class="nine-result-label">Back 9</span>
-      <span class="nine-result-value ${back9Result === null ? 'pending' : ''}">${formatNineResult(back9Result, p1Name, p2Name, back9Played)}</span>
+      <span class="nine-result-value ${b9.played === 0 ? 'pending' : ''} ${b9.clinched ? 'clinched' : ''}">${nineSummaryText(b9, p1Name, p2Name)}</span>
     </div>
   </div>`;
+
+  // "Match decided" nudge toward Close Out.
+  const bothDecided = f9.decided && b9.decided;
+  html += `<div class="match-decided-note" id="decided-note-${matchIndex}" ${bothDecided && !match.closed ? '' : 'style="display:none;"'}>Match decided &mdash; tap <b>Close Out &mdash; Final</b> below to lock it. Remaining holes are optional.</div>`;
 
   // Optional gross-score mode + pops note
   const grossMode = grossMatches.has(matchIndex);
@@ -1001,7 +1038,8 @@ function buildHoleByHoleGrid(match, matchIndex) {
     <div class="hole-grid-label">Front 9</div>
     <div class="hole-grid">`;
   for (let h = 1; h <= 9; h++) {
-    html += buildHoleRow(h, holes[h], p1Name, p2Name, matchIndex, grossMode, gross, sh);
+    const redundant = f9.clinched && (holes[h] === null || holes[h] === undefined);
+    html += buildHoleRow(h, holes[h], p1Name, p2Name, matchIndex, grossMode, gross, sh, redundant);
   }
   html += `</div></div>`;
 
@@ -1010,7 +1048,8 @@ function buildHoleByHoleGrid(match, matchIndex) {
     <div class="hole-grid-label">Back 9</div>
     <div class="hole-grid">`;
   for (let h = 10; h <= 18; h++) {
-    html += buildHoleRow(h, holes[h], p1Name, p2Name, matchIndex, grossMode, gross, sh);
+    const redundant = b9.clinched && (holes[h] === null || holes[h] === undefined);
+    html += buildHoleRow(h, holes[h], p1Name, p2Name, matchIndex, grossMode, gross, sh, redundant);
   }
   html += `</div></div>`;
 
@@ -1018,7 +1057,7 @@ function buildHoleByHoleGrid(match, matchIndex) {
   return html;
 }
 
-function buildHoleRow(holeNum, value, p1Name, p2Name, matchIndex, grossMode, gross, sh) {
+function buildHoleRow(holeNum, value, p1Name, p2Name, matchIndex, grossMode, gross, sh, redundant) {
   const par = COURSE_PARS[holeNum];
   const isP1 = value === 1;
   const isHalved = value === 0.5;
@@ -1038,7 +1077,7 @@ function buildHoleRow(holeNum, value, p1Name, p2Name, matchIndex, grossMode, gro
   }
 
   return `
-    <div class="hole-row">
+    <div class="hole-row${redundant ? ' hole-row--redundant' : ''}" data-hole="${holeNum}">
       <div class="hole-info">
         <span class="hole-num">${holeNum}</span>
         <span class="hole-par">Par ${par}</span>
@@ -1097,28 +1136,38 @@ function updateMatchInPlace(matchIndex) {
     btn.classList.toggle('active', v !== null && v !== undefined && v === res);
   });
 
-  // Update the nine-result summary bar
-  const front9Result = calculateNineFromHoles(holes, 1, 9);
-  const back9Result = calculateNineFromHoles(holes, 10, 18);
-  const front9Played = countHolesPlayed(holes, 1, 9);
-  const back9Played = countHolesPlayed(holes, 10, 18);
+  // Update the nine-result summary bar (clinch-aware) and dim dead holes.
+  const f9 = nineState(holes, 1, 9);
+  const b9 = nineState(holes, 10, 18);
 
   const nineValues = matchEl.querySelectorAll('.nine-result-value');
   if (nineValues[0]) {
-    nineValues[0].textContent = formatNineResult(front9Result, p1Name, p2Name, front9Played);
-    nineValues[0].classList.toggle('pending', front9Result === null);
+    nineValues[0].textContent = nineSummaryText(f9, p1Name, p2Name);
+    nineValues[0].classList.toggle('pending', f9.played === 0);
+    nineValues[0].classList.toggle('clinched', f9.clinched);
   }
   if (nineValues[1]) {
-    nineValues[1].textContent = formatNineResult(back9Result, p1Name, p2Name, back9Played);
-    nineValues[1].classList.toggle('pending', back9Result === null);
+    nineValues[1].textContent = nineSummaryText(b9, p1Name, p2Name);
+    nineValues[1].classList.toggle('pending', b9.played === 0);
+    nineValues[1].classList.toggle('clinched', b9.clinched);
   }
 
-  // Update match header status badge
+  // Dim now-redundant (unplayed) holes in a clinched nine.
+  matchEl.querySelectorAll('.hole-row[data-hole]').forEach(row => {
+    const h = Number(row.getAttribute('data-hole'));
+    const st = h <= 9 ? f9 : b9;
+    const v = holes[h];
+    row.classList.toggle('hole-row--redundant', st.clinched && (v === null || v === undefined));
+  });
+
+  // Update match header status badge (Final once both nines are decided).
   const front = match.points.front9;
   const back = match.points.back9;
+  const bothDecided = f9.decided && b9.decided;
+  const closed = !!match.closed;
   let status = 'not-started';
   let statusText = 'Not Started';
-  if (front !== null && back !== null) { status = 'complete'; statusText = 'Complete'; }
+  if (closed || bothDecided) { status = 'complete'; statusText = 'Final'; }
   else if (front !== null || back !== null) { status = 'in-progress'; statusText = 'In Progress'; }
 
   const badge = matchEl.querySelector('.match-status-badge');
@@ -1126,7 +1175,11 @@ function updateMatchInPlace(matchIndex) {
     badge.className = `match-status-badge ${status}`;
     badge.textContent = statusText;
   }
-  matchEl.classList.toggle('complete', front !== null && back !== null);
+  matchEl.classList.toggle('complete', closed || bothDecided);
+
+  // Toggle the "match decided" nudge.
+  const note = document.getElementById(`decided-note-${matchIndex}`);
+  if (note) note.style.display = (bothDecided && !closed) ? '' : 'none';
 
   // Update match preview F9/B9 line
   const preview = matchEl.querySelector('.match-preview div:last-child');
@@ -1245,6 +1298,18 @@ function toggleMatch(index) {
   }
   const match = document.getElementById(`match-${index}`);
   if (match) match.classList.toggle("expanded", expandedMatches.has(index));
+}
+
+// Close a match out (lock it Final) or reopen it for edits. The per-nine
+// point results already stand from the holes entered, so closing simply
+// stops further scoring of dead holes.
+function toggleCloseMatch(matchIndex) {
+  const match = data.matches[matchIndex];
+  if (!match) return;
+  match.closed = !match.closed;
+  expandedMatches.add(matchIndex); // keep it open so the change is visible
+  markUnsaved();
+  render();
 }
 
 /*************************
