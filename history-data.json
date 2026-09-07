@@ -6,6 +6,7 @@
       "date": "September 6, 2026",
       "venue": "Farm D' Allie Golf Club",
       "status": "complete",
+      "teeTimes": ["9:15", "9:24", "9:33"],
       "captains": {
         "brock": "Brock",
         "jared": "Jared"

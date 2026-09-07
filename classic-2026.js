@@ -67,8 +67,167 @@
     let html = '';
     html += resultBanner(ti);
     html += summary(t, ti);
+    html += timelineSection(t, ti);
     html += matchDetail(t);
     document.getElementById('recap').innerHTML = html;
+  }
+
+  /* ---------- Simulated timeline (from tee times) ---------- */
+  var COLORS = { green: '#0b6b3a', red: '#c22e2e' };
+
+  function parseClock(s) {
+    const m = String(s || '').match(/(\d{1,2}):(\d{2})/);
+    if (!m) return null;
+    return (+m[1]) * 60 + (+m[2]);
+  }
+  function fmtClock(minute) {
+    let hh = Math.floor(minute / 60) % 24, mm = Math.round(minute % 60);
+    const ap = hh >= 12 ? 'PM' : 'AM';
+    let h12 = hh % 12; if (h12 === 0) h12 = 12;
+    return `${h12}:${String(mm).padStart(2, '0')} ${ap}`;
+  }
+
+  // Points are decided when a group finishes a nine. Each foursome tees at its
+  // listed time; with groups one hole apart, the tee gap is the per-hole pace,
+  // so front nine lands at tee + 9*pace and the back nine at tee + 18*pace.
+  function buildScoreLog(t) {
+    const matches = t.matches || [];
+    const tees = (Array.isArray(t.teeTimes) && t.teeTimes.length ? t.teeTimes : ['9:15', '9:24', '9:33', '9:42'])
+      .map(parseClock).filter(v => v != null);
+    if (!tees.length) return null;
+    const pace = tees.length >= 2 ? Math.max(4, tees[1] - tees[0]) : 9;
+
+    const events = [];
+    matches.forEach((m, idx) => {
+      const f = Math.floor(idx / 2);
+      const tee = tees[f] != null ? tees[f] : tees[0] + f * pace;
+      const greenIsP1 = sideKey(m.side1) === 'green';
+      const addNine = (val, holeDone) => {
+        if (val === null || val === undefined) return;
+        let g = 0, r = 0;
+        if (val === 1) { if (greenIsP1) g = 1; else r = 1; }
+        else if (val === 0) { if (greenIsP1) r = 1; else g = 1; }
+        else { g = 0.5; r = 0.5; }
+        events.push({ minute: tee + holeDone * pace, g, r });
+      };
+      addNine(m.front9, 9);
+      addNine(m.back9, 18);
+    });
+    if (!events.length) return null;
+    events.sort((a, b) => a.minute - b.minute);
+
+    // Aggregate events that land on the same minute into a single point.
+    const log = [{ minute: tees[0], g: 0, r: 0 }];
+    let g = 0, r = 0, i = 0;
+    while (i < events.length) {
+      const minute = events[i].minute;
+      while (i < events.length && events[i].minute === minute) { g += events[i].g; r += events[i].r; i++; }
+      log.push({ minute, g, r });
+    }
+    return log;
+  }
+
+  function computeMomentum(t) {
+    const matches = t.matches || [];
+    const out = [];
+    let cum = 0;
+    for (let h = 1; h <= 18; h++) {
+      let played = false;
+      matches.forEach(m => {
+        const v = (m.holes || {})[h];
+        if (v === 1 || v === 0 || v === 0.5) played = true;
+        const greenIsP1 = sideKey(m.side1) === 'green';
+        if (v === 1) cum += greenIsP1 ? 1 : -1;
+        else if (v === 0) cum += greenIsP1 ? -1 : 1;
+      });
+      out.push({ hole: h, diff: cum, played });
+    }
+    return out;
+  }
+
+  function timelineSection(t, ti) {
+    const log = buildScoreLog(t);
+    const momentum = computeMomentum(t);
+    const anyHoles = momentum.some(m => m.played);
+    if ((!log || log.length < 2) && !anyHoles) return '';
+
+    let html = `<div class="section-header"><h2>How It Unfolded</h2></div>`;
+    html += `<p class="tl-caption">Reconstructed from the tee sheet &mdash; groups off at ${esc((t.teeTimes || []).join(', '))}, one hole apart (~9 min a hole). Points land as each group finishes a nine.</p>`;
+    html += `<div class="timeline-grid">`;
+    html += `<div class="tl-card">
+        <div class="tl-title">Team Score Over Time</div>
+        <div class="tl-sub"><b class="g">${esc(ti.green.name)}</b> vs <b class="r">${esc(ti.red.name)}</b> &middot; running points</div>
+        ${log && log.length > 1 ? snapshotChartSVG(log) : '<div class="tl-empty">No timing data.</div>'}
+      </div>`;
+    html += `<div class="tl-card">
+        <div class="tl-title">Hole-by-Hole Momentum</div>
+        <div class="tl-sub"><b class="g">${esc(ti.green.name)}</b> up top, <b class="r">${esc(ti.red.name)}</b> below &middot; holes won</div>
+        ${anyHoles ? momentumChartSVG(momentum, ti) : '<div class="tl-empty">No holes scored.</div>'}
+      </div>`;
+    html += `</div>`;
+    return html;
+  }
+
+  function snapshotChartSVG(log) {
+    const W = 340, H = 150, L = 26, Tp = 12, R = 12, B = 24;
+    const iw = W - L - R, ih = H - Tp - B;
+    const minM = log[0].minute, maxM = Math.max(log[log.length - 1].minute, minM + 1);
+    const maxY = Math.max(1, ...log.map(p => Math.max(p.g, p.r)));
+    const x = min => L + ((min - minM) / (maxM - minM)) * iw;
+    const y = v => Tp + ih - (v / maxY) * ih;
+    const line = key => log.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(p.minute).toFixed(1)},${y(p[key]).toFixed(1)}`).join(' ');
+    const step = Math.ceil(maxY / 3) || 1;
+    let grid = '';
+    for (let v = 0; v <= maxY; v += step) {
+      grid += `<line class="tl-grid-line" x1="${L}" y1="${y(v).toFixed(1)}" x2="${W - R}" y2="${y(v).toFixed(1)}"/>`
+        + `<text class="tl-axis" x="${L - 4}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end">${v}</text>`;
+    }
+    const gc = COLORS.green, rc = COLORS.red;
+    const dot = (p, key, c) => `<circle cx="${x(p.minute).toFixed(1)}" cy="${y(p[key]).toFixed(1)}" r="3.2" fill="${c}"/>`;
+    const lastP = log[log.length - 1];
+    return `<svg class="tl-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Team score over time">
+      ${grid}
+      <path d="${line('g')}" fill="none" stroke="${gc}" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="${line('r')}" fill="none" stroke="${rc}" stroke-width="2.5" stroke-linejoin="round"/>
+      ${dot(lastP, 'g', gc)}${dot(lastP, 'r', rc)}
+      <text class="tl-axis" x="${L}" y="${H - 6}" text-anchor="start">${esc(fmtClock(minM))}</text>
+      <text class="tl-axis" x="${W - R}" y="${H - 6}" text-anchor="end">${esc(fmtClock(maxM))}</text>
+    </svg>`;
+  }
+
+  function momentumChartSVG(momentum, ti) {
+    const W = 340, H = 150, L = 20, Tp = 14, R = 12, B = 20;
+    const iw = W - L - R, ih = H - Tp - B;
+    let last = -1; momentum.forEach((m, i) => { if (m.played) last = i; });
+    const series = [{ x: 0, v: 0 }];
+    for (let i = 0; i <= last; i++) series.push({ x: i + 1, v: momentum[i].diff });
+    const maxAbs = Math.max(1, ...series.map(s => Math.abs(s.v)));
+    const x = h => L + (h / 18) * iw;
+    const zeroY = Tp + ih / 2;
+    const y = v => zeroY - (v / maxAbs) * (ih / 2);
+    const gc = COLORS.green, rc = COLORS.red;
+    const areaPath = sign => {
+      let d = `M${x(series[0].x).toFixed(1)},${zeroY.toFixed(1)}`;
+      series.forEach(s => { const vv = sign > 0 ? Math.max(s.v, 0) : Math.min(s.v, 0); d += ` L${x(s.x).toFixed(1)},${y(vv).toFixed(1)}`; });
+      d += ` L${x(series[series.length - 1].x).toFixed(1)},${zeroY.toFixed(1)} Z`;
+      return d;
+    };
+    const linePath = series.map((s, i) => `${i === 0 ? 'M' : 'L'}${x(s.x).toFixed(1)},${y(s.v).toFixed(1)}`).join(' ');
+    let xl = '';
+    [1, 9, 18].forEach(h => { xl += `<text class="tl-axis" x="${x(h).toFixed(1)}" y="${H - 5}" text-anchor="middle">${h}</text>`; });
+    const finalDiff = series[series.length - 1].v;
+    const leadName = finalDiff > 0 ? ti.green.name : finalDiff < 0 ? ti.red.name : '';
+    const leadTxt = finalDiff === 0 ? 'All square' : `${Math.abs(finalDiff)} up &middot; ${esc(leadName)}`;
+    const endC = finalDiff >= 0 ? gc : rc;
+    return `<svg class="tl-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Hole-by-hole momentum">
+      <path d="${areaPath(1)}" fill="${gc}" fill-opacity="0.15"/>
+      <path d="${areaPath(-1)}" fill="${rc}" fill-opacity="0.15"/>
+      <line class="tl-grid-line" x1="${L}" y1="${zeroY.toFixed(1)}" x2="${W - R}" y2="${zeroY.toFixed(1)}"/>
+      <path d="${linePath}" fill="none" stroke="${endC}" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="${x(series[series.length - 1].x).toFixed(1)}" cy="${y(finalDiff).toFixed(1)}" r="3.4" fill="${endC}"/>
+      ${xl}
+      <text class="tl-axis" x="${W - R}" y="${Tp - 2}" text-anchor="end" style="font-weight:800; fill:${endC};">${leadTxt}</text>
+    </svg>`;
   }
 
   function resultBanner(ti) {
