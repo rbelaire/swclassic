@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Classic — Rules of Play</title>
+  <link rel="stylesheet" href="css/styles.css?v=20270912">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#17306e">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="The Classic">
+  <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
+  <style>
+  .rules-page { max-width: 780px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 24px) 60px; }
+
+  .rules-intro {
+    color: var(--color-muted); line-height: 1.6; font-size: 0.95rem;
+    max-width: 60ch; margin: 4px auto 26px; text-align: center;
+  }
+
+  /* Table of contents */
+  .rules-toc {
+    border: 1px solid var(--color-line); border-radius: var(--radius-lg);
+    padding: 16px 18px; margin-bottom: 34px; background: var(--color-card);
+  }
+  .rules-toc-title {
+    font-size: 0.66rem; font-weight: 800; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--color-muted); margin-bottom: 10px;
+  }
+  .rules-toc ol { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 24px; }
+  .rules-toc li { margin: 5px 0; break-inside: avoid; }
+  .rules-toc a {
+    color: var(--masters-green); text-decoration: none; font-weight: 700; font-size: 0.9rem;
+    display: flex; gap: 10px; align-items: baseline;
+  }
+  .rules-toc a:hover { text-decoration: underline; }
+  .rules-toc .toc-n { color: var(--masters-red); font-weight: 800; min-width: 1.2em; }
+
+  /* Section */
+  .rule-section { margin: 0 0 30px; scroll-margin-top: 16px; }
+  .rule-section-head {
+    display: flex; align-items: baseline; gap: 14px;
+    padding-bottom: 10px; margin-bottom: 4px;
+    border-bottom: 2px solid var(--masters-green);
+  }
+  .rs-num {
+    font-size: clamp(1.6rem, 6vw, 2.1rem); font-weight: 900; line-height: 1;
+    color: var(--masters-red); font-variant-numeric: tabular-nums;
+  }
+  .rs-title {
+    font-size: clamp(1.05rem, 3.4vw, 1.35rem); font-weight: 800; letter-spacing: 0.02em;
+    text-transform: uppercase; color: var(--masters-green); margin: 0;
+  }
+
+  /* Individual rule */
+  .rule {
+    display: grid; grid-template-columns: 3.1em 1fr; gap: 12px;
+    padding: 13px 0; border-top: 1px solid var(--color-line);
+  }
+  .rule:first-of-type { border-top: none; }
+  .r-num {
+    font-weight: 800; color: var(--masters-green); font-variant-numeric: tabular-nums;
+    font-size: 0.98rem; padding-top: 1px;
+  }
+  .r-body { color: var(--masters-black); line-height: 1.55; }
+  .r-lead { font-weight: 800; color: var(--masters-black); }
+  .r-body p { margin: 0; }
+  .r-sub {
+    display: grid; grid-template-columns: 1.7em 1fr; gap: 8px;
+    margin-top: 8px; color: var(--color-muted); font-size: 0.92em; line-height: 1.5;
+  }
+  .r-sub .r-sub-n { font-weight: 800; color: var(--masters-green); }
+  .r-note {
+    margin-top: 8px; font-size: 0.86em; color: var(--color-muted); font-style: italic; line-height: 1.5;
+  }
+  .r-eg {
+    margin-top: 10px; background: var(--green-tint); border-radius: var(--radius-md);
+    padding: 11px 14px; font-size: 0.9em; line-height: 1.5; color: var(--masters-black);
+  }
+  .r-eg b { color: var(--masters-green); }
+
+  .rules-foot {
+    margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--color-line);
+    text-align: center; color: var(--color-muted); font-size: 0.85rem; line-height: 1.6;
+  }
+  </style>
+</head>
+
+<body>
+
+<nav class="navbar">
+  <input type="checkbox" id="nav-toggle" class="nav-toggle">
+  <label for="nav-toggle" class="nav-toggle-label">Menu</label>
+  <div class="nav-container">
+    <a href="index.html" class="nav-link">Tournament Format</a>
+    <a href="rules.html" class="nav-link active">Rules</a>
+    <a href="draft.html" class="nav-link">Draft Board</a>
+    <a href="leaderboard.html" class="nav-link">Live Leaderboard</a>
+    <a href="history.html" class="nav-link">History</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>RULES OF PLAY</h1>
+  <div class="subtitle">The Classic</div>
+</div>
+
+<div class="container">
+  <div class="rules-page">
+
+    <p class="rules-intro">
+      The rules that govern The Classic. Anything not covered here is decided by the
+      standard Rules of Golf, and any question of play is settled by the two captains.
+    </p>
+
+    <nav class="rules-toc" aria-label="Rules contents">
+      <div class="rules-toc-title">Contents</div>
+      <ol>
+        <li><a href="#r1"><span class="toc-n">1</span> The Competition</a></li>
+        <li><a href="#r2"><span class="toc-n">2</span> Points &amp; Winning</a></li>
+        <li><a href="#r3"><span class="toc-n">3</span> Handicaps — Pops</a></li>
+        <li><a href="#r4"><span class="toc-n">4</span> Playing a Hole</a></li>
+        <li><a href="#r5"><span class="toc-n">5</span> The Course</a></li>
+        <li><a href="#r6"><span class="toc-n">6</span> Match Play &amp; Scoring</a></li>
+        <li><a href="#r7"><span class="toc-n">7</span> Mulligans</a></li>
+        <li><a href="#r8"><span class="toc-n">8</span> Pace &amp; Conduct</a></li>
+        <li><a href="#r9"><span class="toc-n">9</span> Rulings &amp; Disputes</a></li>
+      </ol>
+    </nav>
+
+    <!-- 1 -->
+    <section class="rule-section" id="r1">
+      <header class="rule-section-head"><span class="rs-num">1</span><h2 class="rs-title">The Competition</h2></header>
+
+      <div class="rule"><div class="r-num">1.1</div><div class="r-body">
+        <span class="r-lead">Team match play.</span> The Classic is a team competition between
+        <b>Team Red</b> (Captain Gavin) and <b>Team Blue</b> (Captain Bel). Every player is drafted to
+        one team and plays head-to-head (1&nbsp;v&nbsp;1) matches against the other team.
+      </div></div>
+
+      <div class="rule"><div class="r-num">1.2</div><div class="r-body">
+        <span class="r-lead">Captains.</span> Each team has a captain who sets the lineup, enters or
+        oversees scoring, and rules on any question of play (Rule&nbsp;9). Captains also play their own match.
+      </div></div>
+
+      <div class="rule"><div class="r-num">1.3</div><div class="r-body">
+        <span class="r-lead">The draft.</span> Players are seeded and drafted in snake order
+        (Red, Blue, Blue, Red, …). Captains are not draft picks. A player competes only for the team that drafted them.
+      </div></div>
+
+      <div class="rule"><div class="r-num">1.4</div><div class="r-body">
+        <span class="r-lead">Groups.</span> Matches are played in groups that tee off together. Each group
+        contains two matches and shares a scorer.
+      </div></div>
+
+      <div class="rule"><div class="r-num">1.5</div><div class="r-body">
+        <span class="r-lead">A substitute</span> may be used only with both captains' agreement. A substitute
+        inherits the original player's pops for that match.
+      </div></div>
+    </section>
+
+    <!-- 2 -->
+    <section class="rule-section" id="r2">
+      <header class="rule-section-head"><span class="rs-num">2</span><h2 class="rs-title">Points &amp; Winning</h2></header>
+
+      <div class="rule"><div class="r-num">2.1</div><div class="r-body">
+        <span class="r-lead">Two points per match.</span> Each match is worth 2 points — one for the
+        <b>front nine</b> and one for the <b>back nine</b>. The two nines are scored as separate contests.
+      </div></div>
+
+      <div class="rule"><div class="r-num">2.2</div><div class="r-body">
+        <span class="r-lead">Winning a nine.</span> The player who wins more holes over a nine wins that nine and its point.
+      </div></div>
+
+      <div class="rule"><div class="r-num">2.3</div><div class="r-body">
+        <span class="r-lead">A halved nine.</span> If the holes are split evenly, the nine is halved and each player earns ½&nbsp;point.
+      </div></div>
+
+      <div class="rule"><div class="r-num">2.4</div><div class="r-body">
+        <span class="r-lead">Team total.</span> A team's score is the sum of every point its players earn across all matches.
+      </div></div>
+
+      <div class="rule"><div class="r-num">2.5</div><div class="r-body">
+        <span class="r-lead">Winning The Classic.</span> The team with the most total points wins.
+        <div class="r-note">If the team totals are level, the Classic is shared — unless the captains agree to a playoff (e.g. captain vs captain, or a nominated group replaying a hole).</div>
+      </div></div>
+
+      <div class="rule"><div class="r-num">2.6</div><div class="r-body">
+        <span class="r-lead">Live scoring.</span> Points are shown on the live leaderboard as each nine is decided. A match need not reach the 18th hole (Rule&nbsp;6.4).
+      </div></div>
+    </section>
+
+    <!-- 3 -->
+    <section class="rule-section" id="r3">
+      <header class="rule-section-head"><span class="rs-num">3</span><h2 class="rs-title">Handicaps — The Pops System</h2></header>
+
+      <div class="rule"><div class="r-num">3.1</div><div class="r-body">
+        <span class="r-lead">Purpose.</span> Pops even the matches by giving strokes to the higher-handicap player.
+      </div></div>
+
+      <div class="rule"><div class="r-num">3.2</div><div class="r-body">
+        <span class="r-lead">Your pop number</span> is your seed for the year, set before the draft. It does not change during play.
+      </div></div>
+
+      <div class="rule"><div class="r-num">3.3</div><div class="r-body">
+        <span class="r-lead">Strokes given.</span> In a match, subtract the lower pop number from the higher. The difference is the number of strokes the higher-handicap player receives.
+      </div></div>
+
+      <div class="rule"><div class="r-num">3.4</div><div class="r-body">
+        <span class="r-lead">Where strokes fall.</span> Strokes are applied on the hardest holes first, using the course's stroke index — one stroke per hole.
+      </div></div>
+
+      <div class="rule"><div class="r-num">3.5</div><div class="r-body">
+        <span class="r-lead">Par 3s are excluded.</span> No strokes are ever given on a par 3.
+      </div></div>
+
+      <div class="rule"><div class="r-num">3.6</div><div class="r-body">
+        <span class="r-lead">One stroke per hole, 14 maximum.</span> A player gets at most one stroke on a hole. With 14 non-par-3 holes, the most anyone can receive is 14; a larger difference still gives one stroke on each non-par-3 hole.
+      </div></div>
+
+      <div class="rule"><div class="r-num">3.7</div><div class="r-body">
+        <span class="r-lead">Net score.</span> On a hole where a player receives a stroke, subtract one from their gross score before comparing to decide who won the hole.
+        <div class="r-eg"><b>Example.</b> Austin (4 pops) vs Colby (16 pops) → 16 − 4 = <b>12</b>. Colby gets one stroke on each of the 12 hardest non-par-3 holes.</div>
+      </div></div>
+    </section>
+
+    <!-- 4 -->
+    <section class="rule-section" id="r4">
+      <header class="rule-section-head"><span class="rs-num">4</span><h2 class="rs-title">Playing a Hole</h2></header>
+
+      <div class="rule"><div class="r-num">4.1</div><div class="r-body">
+        <span class="r-lead">Tee shots — best drive.</span> On every hole except par 3s, teammates in the same
+        group may take the best of their tee shots. Each player then plays their <b>own ball</b> from that spot for the rest of the hole.
+      </div></div>
+
+      <div class="rule"><div class="r-num">4.2</div><div class="r-body">
+        <span class="r-lead">Par 3s.</span> Every player plays their own tee shot. There is no shared tee shot on a par 3.
+      </div></div>
+
+      <div class="rule"><div class="r-num">4.3</div><div class="r-body">
+        <span class="r-lead">No help after the tee.</span> From the chosen spot onward each player plays their own ball and holes out on their own. No advice beyond your own group, and no assisted shots.
+      </div></div>
+
+      <div class="rule"><div class="r-num">4.4</div><div class="r-body">
+        <span class="r-lead">Wrong ball.</span> Play your own ball. If you play the wrong ball you lose the hole; put it right and continue.
+      </div></div>
+
+      <div class="rule"><div class="r-num">4.5</div><div class="r-body">
+        <span class="r-lead">Equipment.</span> Distance devices (rangefinders, GPS, watches) are allowed.
+      </div></div>
+    </section>
+
+    <!-- 5 -->
+    <section class="rule-section" id="r5">
+      <header class="rule-section-head"><span class="rs-num">5</span><h2 class="rs-title">The Course</h2></header>
+
+      <div class="rule"><div class="r-num">5.1</div><div class="r-body">
+        <span class="r-lead">Tees.</span> Play the <b>Silver</b> tee boxes.
+      </div></div>
+
+      <div class="rule"><div class="r-num">5.2</div><div class="r-body">
+        <span class="r-lead">Preferred lies (lift, clean &amp; place).</span> Through the green you may lift, clean and
+        place your ball within <b>one club-length</b>, no nearer the hole.
+        <div class="r-sub"><span class="r-sub-n">a</span><span>You may not improve your lie from rough to fairway, out of a bunker, or from fringe to green.</span></div>
+        <div class="r-sub"><span class="r-sub-n">b</span><span>The captains may extend or suspend preferred lies for the day before play begins (for example, allowing placing in bunkers if it has rained).</span></div>
+      </div></div>
+
+      <div class="rule"><div class="r-num">5.3</div><div class="r-body">
+        <span class="r-lead">Out of bounds &amp; lost ball.</span> For pace, drop within two club-lengths of where the
+        ball crossed out of bounds or was likely lost — in the nearest fairway or rough, no nearer the hole — for a <b>one-stroke</b> penalty, and play on. (Stroke-and-distance is not required.)
+      </div></div>
+
+      <div class="rule"><div class="r-num">5.4</div><div class="r-body">
+        <span class="r-lead">Penalty areas (water).</span> One-stroke penalty. Drop within two club-lengths of where the
+        ball last crossed the margin, no nearer the hole, or replay from the previous spot.
+      </div></div>
+
+      <div class="rule"><div class="r-num">5.5</div><div class="r-body">
+        <span class="r-lead">Bunkers.</span> Play the ball as it lies unless preferred lies in bunkers were called that day (Rule&nbsp;5.2b). Rake when finished.
+      </div></div>
+
+      <div class="rule"><div class="r-num">5.6</div><div class="r-body">
+        <span class="r-lead">Unplayable lie.</span> One-stroke penalty; drop within two club-lengths, no nearer the hole.
+      </div></div>
+
+      <div class="rule"><div class="r-num">5.7</div><div class="r-body">
+        <span class="r-lead">Cart path &amp; casual relief.</span> Free relief from cart paths, sprinkler heads, casual water and ground under repair — one club-length, no nearer the hole.
+      </div></div>
+    </section>
+
+    <!-- 6 -->
+    <section class="rule-section" id="r6">
+      <header class="rule-section-head"><span class="rs-num">6</span><h2 class="rs-title">Match Play &amp; Scoring</h2></header>
+
+      <div class="rule"><div class="r-num">6.1</div><div class="r-body">
+        <span class="r-lead">Winning a hole.</span> The lower <b>net</b> score wins the hole. Equal net scores halve the hole.
+      </div></div>
+
+      <div class="rule"><div class="r-num">6.2</div><div class="r-body">
+        <span class="r-lead">Concessions &amp; gimmes.</span> You may concede a hole, or your opponent's next stroke (a "gimme"), at any time. A conceded putt counts as holed. A concession cannot be withdrawn.
+      </div></div>
+
+      <div class="rule"><div class="r-num">6.3</div><div class="r-body">
+        <span class="r-lead">Pick up when you're out of it.</span> Once you can no longer win or halve a hole, pick up — the hole is lost. This keeps pace and matches the way the leaderboard scores holes.
+      </div></div>
+
+      <div class="rule"><div class="r-num">6.4</div><div class="r-body">
+        <span class="r-lead">Closing out a nine.</span> A nine is decided once a player leads by more holes than remain in that nine. The remaining holes of a decided nine need not be played, and the scorer may close it out. A match is final when both nines are decided.
+      </div></div>
+
+      <div class="rule"><div class="r-num">6.5</div><div class="r-body">
+        <span class="r-lead">Reporting scores.</span> Report each hole to your group's scorer as you go. The live leaderboard updates as scores are entered.
+      </div></div>
+
+      <div class="rule"><div class="r-num">6.6</div><div class="r-body">
+        <span class="r-lead">A hole in doubt.</span> If a hole's result is disputed and can't be settled on the spot, play it as a half, note it, and let the captains resolve it (Rule&nbsp;9).
+      </div></div>
+    </section>
+
+    <!-- 7 -->
+    <section class="rule-section" id="r7">
+      <header class="rule-section-head"><span class="rs-num">7</span><h2 class="rs-title">Mulligans</h2></header>
+
+      <div class="rule"><div class="r-num">7.1</div><div class="r-body">
+        <span class="r-lead">One per nine.</span> Each player gets one mulligan on the front nine and one on the back nine.
+      </div></div>
+
+      <div class="rule"><div class="r-num">7.2</div><div class="r-body">
+        <span class="r-lead">How it works.</span> A mulligan is a re-hit of the previous stroke with no penalty. The re-hit ball must be played — you cannot keep the better of the two.
+      </div></div>
+
+      <div class="rule"><div class="r-num">7.3</div><div class="r-body">
+        <span class="r-lead">Where.</span> A mulligan may be used on any full stroke — a tee shot or a stroke through the green — but not on a putt.
+      </div></div>
+
+      <div class="rule"><div class="r-num">7.4</div><div class="r-body">
+        <span class="r-lead">No carry-over.</span> An unused mulligan does not carry to the other nine or bank for later.
+      </div></div>
+    </section>
+
+    <!-- 8 -->
+    <section class="rule-section" id="r8">
+      <header class="rule-section-head"><span class="rs-num">8</span><h2 class="rs-title">Pace &amp; Conduct</h2></header>
+
+      <div class="rule"><div class="r-num">8.1</div><div class="r-body">
+        <span class="r-lead">Keep up.</span> Stay within reach of the group ahead. Play ready golf and be prepared to hit when it's your turn.
+      </div></div>
+
+      <div class="rule"><div class="r-num">8.2</div><div class="r-body">
+        <span class="r-lead">Search time.</span> Give a lost ball no more than three minutes before taking relief under Rule&nbsp;5.3.
+      </div></div>
+
+      <div class="rule"><div class="r-num">8.3</div><div class="r-body">
+        <span class="r-lead">Respect the course &amp; each other.</span> Repair pitch marks, replace divots, rake bunkers, and keep it friendly — it's still a competition.
+      </div></div>
+    </section>
+
+    <!-- 9 -->
+    <section class="rule-section" id="r9">
+      <header class="rule-section-head"><span class="rs-num">9</span><h2 class="rs-title">Rulings &amp; Disputes</h2></header>
+
+      <div class="rule"><div class="r-num">9.1</div><div class="r-body">
+        <span class="r-lead">Captains decide.</span> Any question of play is settled by the two captains together. If they can't agree, the standard Rules of Golf apply.
+      </div></div>
+
+      <div class="rule"><div class="r-num">9.2</div><div class="r-body">
+        <span class="r-lead">When in doubt, play on.</span> If a ruling can't be made on the spot, note the situation, finish the hole, and resolve it afterward rather than holding up play.
+      </div></div>
+
+      <div class="rule"><div class="r-num">9.3</div><div class="r-body">
+        <span class="r-lead">Spirit of the game.</span> These rules exist to keep matches fair and fast. Where a rule is silent, do the fair, obvious thing.
+      </div></div>
+    </section>
+
+    <div class="rules-foot">
+      The Classic — Rules of Play. Subject to revision by the captains before the event.
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
