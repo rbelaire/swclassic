@@ -225,15 +225,8 @@ function matchPlayStatus(match) {
   return { p1, p2, played, diff: p1 - p2, remaining: 18 - played };
 }
 
-// Small round headshot (image only; name is shown separately in the row).
-function rowAvatar(name) {
-  const slug = String(name || "").toLowerCase().replace(/[^a-z]/g, "");
-  if (!slug || slug === "tbd") return `<span class="lb-avatar lb-avatar--tbd">–</span>`;
-  return `<img class="lb-avatar" src="images/players/${slug}.jpg" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`;
-}
-
-// One nine's point, shown as a small pip in the winner's team color inside the
-// dark center block: 1 = left team, 0 = right team, 0.5 = halved, null = to play.
+// One nine's point, shown as a small pip in the winner's team color:
+// 1 = left team, 0 = right team, 0.5 = halved, null = to play.
 function ninePip(val, cL, cR) {
   if (val === null || val === undefined) return `<span class="mp-pip mp-pip--none">–</span>`;
   if (val === 0.5) return `<span class="mp-pip mp-pip--tie">½</span>`;
@@ -241,6 +234,9 @@ function ninePip(val, cL, cR) {
   return `<span class="mp-pip" style="background:${c}">1</span>`;
 }
 
+// Ryder Cup app-style row: winning side flies a solid team chevron with the name
+// reversed out in white; the centre carries the result (margin / TIED / AS) with
+// "Final" or "THRU x" beneath, and the two front-9 / back-9 point pips.
 function buildMatch(match, data) {
   const div = document.createElement("article");
   div.className = "matchup";
@@ -271,32 +267,46 @@ function buildMatch(match, data) {
   const isFinal = !!match.closed || (nineSettled(1, 9) && nineSettled(10, 18));
 
   const leadLeft = st.diff > 0, leadRight = st.diff < 0;
-  const marginTxt = Math.abs(st.diff) + " UP";
-  // Center block: big status word + a "THRU x" line (broadcast bug style).
-  //   not started → "–" · all square → "AS" · final → "F" · leading → margin
-  //   is in the coloured edge box, so the center just carries "THRU x".
-  const bigState = st.played === 0 ? "–"
-    : (isFinal ? "F" : (st.diff === 0 ? "AS" : ""));
-  const thruTxt = (st.played > 0 && !isFinal)
-    ? (st.played >= 18 ? "THRU 18" : "THRU " + st.played)
-    : "";
+  const started = st.played > 0;
+
+  // Row state class: colour the leader's chevron; grey both when tied at the end.
+  if (started && leadLeft) div.classList.add("win-left");
+  else if (started && leadRight) div.classList.add("win-right");
+  else if (isFinal && st.diff === 0) div.classList.add("tied");
+  else div.classList.add("pending");
+
+  // Centre result.
+  let center;
+  if (!started) {
+    center = `<div class="mp-word">–</div>`;
+  } else if (st.diff === 0) {
+    center = `<div class="mp-word">${isFinal ? "TIED" : "AS"}</div>`;
+  } else {
+    center = `<div class="mp-result"><span class="mp-num">${Math.abs(st.diff)}</span><span class="mp-suffix">UP</span></div>`;
+  }
+  const sub = !started ? ""
+    : (isFinal ? "Final" : "Thru " + (st.played >= 18 ? 18 : st.played));
+
+  // Team dots: hollow ring = that player is winning / has won.
+  const leftDot = `<span class="mp-dot mp-dot--left ${leadLeft ? "mp-dot--hollow" : ""}"></span>`;
+  const rightDot = `<span class="mp-dot mp-dot--right ${leadRight ? "mp-dot--hollow" : ""}"></span>`;
 
   div.innerHTML = `
-    <div class="mp-result mp-result--left ${leadLeft ? "on" : ""}">${leadLeft ? marginTxt : ""}</div>
+    <div class="mp-bg mp-bg--left"></div>
+    <div class="mp-bg mp-bg--right"></div>
     <div class="mp-side mp-side--left">
+      ${leftDot}
       <span class="mp-name">${escapeHTML(p1name)}</span>
-      ${rowAvatar(p1name)}
     </div>
     <div class="mp-center">
-      ${bigState ? `<div class="mp-state">${bigState}</div>` : ""}
-      ${thruTxt ? `<div class="mp-thru">${thruTxt}</div>` : ""}
+      ${center}
+      ${sub ? `<div class="mp-sub">${sub}</div>` : ""}
       <div class="mp-pips">${ninePip(match.points.front9, cL, cR)}${ninePip(match.points.back9, cL, cR)}</div>
     </div>
     <div class="mp-side mp-side--right">
-      ${rowAvatar(p2name)}
       <span class="mp-name">${escapeHTML(p2name)}</span>
+      ${rightDot}
     </div>
-    <div class="mp-result mp-result--right ${leadRight ? "on" : ""}">${leadRight ? marginTxt : ""}</div>
   `;
   return div;
 }
