@@ -90,98 +90,65 @@ body {
 /* =====================================================
    NAVIGATION - MASTERS STYLE
    ===================================================== */
+/* One clean strip of five equal navy buttons (LIVE is red). */
 .navbar {
   background: var(--color-card);
-  padding: 20px var(--pad-page);
+  padding: 8px clamp(8px, 2vw, 14px);
   position: sticky;
   top: 0;
   z-index: 1000;
-  border-bottom: 3px solid var(--masters-green);
-  box-shadow: 0 2px 10px rgba(0, 103, 71, 0.1);
+  border-bottom: 2px solid var(--masters-green);
+  box-shadow: 0 2px 8px rgba(13, 21, 18, 0.08);
 }
 
-.nav-toggle {
-  display: none;
-}
-
-.nav-toggle-label {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: 999px;
-  border: 2px solid var(--masters-green);
-  background: var(--masters-green);
-  color: var(--color-bg);
-  font-size: 0.85em;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  margin: 0 auto;
-  max-width: 200px;
-}
-
-.nav-toggle-label:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(0, 103, 71, 0.3);
-  background: var(--masters-dark-green);
-}
+/* No hamburger — the strip is always shown. */
+.nav-toggle,
+.nav-toggle-label { display: none !important; }
 
 .nav-container {
-  max-width: var(--max-width);
+  max-width: 760px;
   margin: 0 auto;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: clamp(15px, 3vw, 30px);
-  flex-wrap: wrap;
+  gap: 6px;
+  align-items: stretch;
+  flex-wrap: nowrap;
 }
 
 .nav-link {
-  color: var(--masters-green);
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   text-decoration: none;
-  font-size: clamp(0.8em, 2vw, 0.95em);
-  font-weight: 600;
-  padding: 10px clamp(15px, 3vw, 25px);
-  border-radius: 5px;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-  letter-spacing: 2px;
+  white-space: nowrap;
+  background: var(--masters-green);
+  color: #fff;
+  font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: clamp(0.6rem, 2.4vw, 0.82rem);
+  padding: 11px 4px;
+  border-radius: 8px;
+  border: none;
+  transition: transform 0.12s ease, background 0.12s ease;
 }
 
 .nav-link:hover {
-  background: var(--color-bg);
-  border-color: var(--masters-green);
-  transform: translateY(-2px);
+  background: var(--masters-dark-green);
+  transform: translateY(-1px);
 }
 
 .nav-link.active {
-  background: var(--masters-green);
-  color: var(--color-bg);
-  border-color: var(--masters-green);
+  background: var(--masters-dark-green);
+  box-shadow: inset 0 -3px 0 rgba(255, 255, 255, 0.55);
 }
 
-/* Admin Link - Red Accent */
-.nav-link.admin-link {
-  background: var(--team-red);
-  color: #fff;
-  border-color: var(--team-red);
-  font-size: 0.85em;
-  padding: 8px 20px;
-  animation: subtlePulse 3s ease-in-out infinite;
-}
-
-.nav-link.admin-link:hover {
-  background: #fff;
-  color: var(--team-red);
-  border-color: var(--team-red);
-  transform: translateY(-2px);
-  animation: none;
-}
+/* LIVE — red button */
+.nav-link.nav-live { background: var(--masters-red); }
+.nav-link.nav-live:hover { background: #a81824; }
+.nav-link.nav-live.active { background: #a81824; box-shadow: inset 0 -3px 0 rgba(255, 255, 255, 0.6); }
 
 @keyframes subtlePulse {
   0%, 100% {
@@ -2631,33 +2598,13 @@ select:focus {
    ===================================================== */
 
 @media (max-width: 768px) {
-  .nav-toggle-label {
-    display: none;
-  }
-
-  .navbar {
-    padding: 10px 8px;
-  }
-
-  .nav-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
-    padding-top: 0;
-  }
-
+  /* Keep the equal-button strip on phones — no wrapping. */
+  .navbar { padding: 8px 8px; }
+  .nav-container { gap: 5px; flex-wrap: nowrap; }
   .nav-link {
-    font-size: 0.68em;
-    padding: 6px 10px;
-    border-radius: 6px;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-  }
-
-  .nav-link.admin-link {
-    font-size: 0.62em;
-    padding: 5px 10px;
+    padding: 10px 3px;
+    border-radius: 8px;
+    letter-spacing: 0.02em;
   }
 
   .container {
@@ -4477,56 +4424,20 @@ RESULT:
 
 @media (min-width: 769px) {
 
-  /* ---- NAVBAR: Wider, more spaced, Masters-style ---- */
+  /* ---- NAVBAR: same equal-button strip, a touch larger on desktop ---- */
   .navbar {
-    padding: 0 var(--pad-page);
+    padding: 10px var(--pad-page);
   }
 
   .nav-container {
-    height: 64px;
-    gap: 0;
-    justify-content: center;
+    max-width: 760px;
+    gap: 8px;
   }
 
   .nav-link {
-    font-size: 0.8em;
-    letter-spacing: 3px;
-    padding: 0 28px;
-    height: 64px;
-    display: flex;
-    align-items: center;
-    border-radius: 0;
-    border: none;
-    border-bottom: 3px solid transparent;
-    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
-  }
-
-  .nav-link:hover {
-    background: rgba(0, 103, 71, 0.06);
-    border-bottom-color: var(--masters-green);
-    border-radius: 0;
-    transform: none;
-  }
-
-  .nav-link.active {
-    background: transparent;
-    color: var(--masters-green);
-    border-bottom: 3px solid var(--masters-green);
-    border-radius: 0;
-  }
-
-  .nav-link.admin-link {
-    font-size: 0.75em;
-    padding: 0 20px;
-    height: 40px;
-    border-radius: var(--radius-md);
-    border: 2px solid var(--masters-gold);
-    margin: 0 0 0 20px;
-    align-self: center;
-  }
-
-  .nav-link.admin-link:hover {
-    border-bottom: 2px solid var(--masters-green);
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    padding: 13px 8px;
   }
 
   /* ---- HERO: Slimmer on desktop — content is the star ---- */
