@@ -4333,13 +4333,42 @@ RESULT:
   }
 
   /* Admin tabs stack on small screens */
-  .admin-tabs {
-    flex-direction: column;
-    border-bottom: none;
-    gap: 4px;
+  /* Tighten the admin header — reclaim the wasted vertical space on phones. */
+  .admin-header { margin-bottom: 12px; gap: 10px; }
+  .admin-eyebrow { font-size: 0.68em; margin-bottom: 2px; letter-spacing: 1.5px; }
+  .admin-header h1 { font-size: 1.5em; margin-bottom: 3px; }
+  .admin-subtitle { font-size: 0.85em; }
+
+  /* Action buttons flow in wrapping rows instead of one tall right-aligned column. */
+  .admin-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+  }
+  .admin-actions > button {
+    flex: 1 1 auto;
+    padding: 10px 14px;
+    font-size: 0.78em;
+    letter-spacing: 0.5px;
+  }
+  .admin-actions .save-reminder {
+    flex-basis: 100%;
+    text-align: center;
+    margin: 0;
   }
 
+  /* Tabs sit in one compact row rather than three stacked full-width blocks. */
+  .admin-tabs {
+    flex-direction: row;
+    gap: 6px;
+    margin-bottom: 14px;
+    border-bottom: none;
+  }
   .admin-tab {
+    padding: 10px 6px;
+    letter-spacing: 0.5px;
     border-radius: var(--radius-md);
     border: 2px solid var(--masters-green);
   }
