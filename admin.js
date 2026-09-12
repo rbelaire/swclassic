@@ -1414,9 +1414,23 @@ function clearAll() {
   markUnsaved();
   render._initialized = false;
   switchTab("draft");
-  // Persist the reset immediately so the live site (draft board, leaderboard)
-  // reflects it — otherwise the cleared state lives only on this device.
-  saveData();
+  // Persist the reset immediately, forcing past the optimistic lock — Clear All
+  // is meant to wipe whatever is on the server, so a conflict shouldn't block it.
+  saveData(true);
+}
+
+// Throw away this device's unsaved edits and reload the latest from the server.
+// Used to recover from a save conflict without leaving the admin stuck behind a
+// stale cached copy (loadData skips the network while classicUnsaved is set).
+function discardAndReload() {
+  hasUnsavedChanges = false;
+  try { localStorage.removeItem("classicUnsaved"); } catch (e) {}
+  try { localStorage.removeItem(DATA_CACHE_KEY); } catch (e) {}
+  loadedLastUpdated = null;
+  data = null;
+  render._initialized = false;
+  showToast("Loading the latest…");
+  loadData();
 }
 
 function clearMatch(matchIndex) {
@@ -1531,7 +1545,7 @@ window.addEventListener('keydown', (e) => {
 /*************************
  * SAVE DATA
  *************************/
-function saveData() {
+function saveData(force) {
   const foursomeMode = isFoursomeUser();
   const saveBtn = document.getElementById(foursomeMode ? 'foursome-save-btn' : 'save-btn');
   const originalText = saveBtn ? saveBtn.textContent : "Save";
@@ -1550,7 +1564,9 @@ function saveData() {
         password: ADMIN_PASSWORD_HASH,
         adminPassword: localStorage.getItem("adminPass") || "",
         foursomeToken: localStorage.getItem("foursomeToken") || "",
-        expectedLastUpdated: loadedLastUpdated,
+        // A forced save (e.g. Clear All) intentionally overwrites whatever is on
+        // the server, so it skips the optimistic lock.
+        expectedLastUpdated: force ? null : loadedLastUpdated,
         foursome: foursomeMode ? userFoursome : null,
         data: data
       })
@@ -1596,13 +1612,28 @@ function saveData() {
     return;
   }
 
+  // A forced save (Clear All) skips the client-side conflict pre-check too.
+  if (force) {
+    postSave().catch(err => {
+      console.error(err);
+      showToast(err.message || "Save failed — check your connection.", "error");
+      if (saveBtn) { saveBtn.textContent = originalText; saveBtn.disabled = false; }
+    });
+    return;
+  }
+
   fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" })
     .then(res => res.json())
     .then(serverData => {
       const serverTimestamp = serverData.meta?.lastUpdated;
       if (loadedLastUpdated && serverTimestamp && serverTimestamp !== loadedLastUpdated) {
         if (saveBtn) { saveBtn.textContent = originalText; saveBtn.disabled = false; }
-        showToast("Conflict: someone else saved first. Reload to get latest changes.", "error");
+        // Offer a one-tap recovery instead of a dead-end: pull the latest from
+        // the server (discarding this screen's unsaved edits) so the admin isn't
+        // stuck when the data changed underneath them (e.g. after a reset).
+        if (confirm("The live data changed since this page loaded (someone saved, or it was reset).\n\nLoad the latest now? Unsaved changes on this screen will be discarded.")) {
+          discardAndReload();
+        }
         return;
       }
       return postSave();
