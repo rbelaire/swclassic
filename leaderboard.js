@@ -272,9 +272,14 @@ function buildMatch(match, data) {
 
   const leadLeft = st.diff > 0, leadRight = st.diff < 0;
   const marginTxt = Math.abs(st.diff) + " UP";
-  // Center state block: "F" final · thru-hole count · "AS" all square · "–".
-  const state = st.played === 0 ? "–"
-    : (st.diff === 0 ? "AS" : (isFinal ? "F" : String(st.played)));
+  // Center block: big status word + a "THRU x" line (broadcast bug style).
+  //   not started → "–" · all square → "AS" · final → "F" · leading → margin
+  //   is in the coloured edge box, so the center just carries "THRU x".
+  const bigState = st.played === 0 ? "–"
+    : (isFinal ? "F" : (st.diff === 0 ? "AS" : ""));
+  const thruTxt = (st.played > 0 && !isFinal)
+    ? (st.played >= 18 ? "THRU 18" : "THRU " + st.played)
+    : "";
 
   div.innerHTML = `
     <div class="mp-result mp-result--left ${leadLeft ? "on" : ""}">${leadLeft ? marginTxt : ""}</div>
@@ -283,7 +288,8 @@ function buildMatch(match, data) {
       ${rowAvatar(p1name)}
     </div>
     <div class="mp-center">
-      <div class="mp-state">${state}</div>
+      ${bigState ? `<div class="mp-state">${bigState}</div>` : ""}
+      ${thruTxt ? `<div class="mp-thru">${thruTxt}</div>` : ""}
       <div class="mp-pips">${ninePip(match.points.front9, cL, cR)}${ninePip(match.points.back9, cL, cR)}</div>
     </div>
     <div class="mp-side mp-side--right">

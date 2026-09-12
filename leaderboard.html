@@ -81,6 +81,11 @@
     gap: 4px; background: var(--masters-black); color: #fff; padding: 6px 12px; min-width: 3em;
   }
   .mp-state { font-weight: 900; font-size: clamp(1rem, 3vw, 1.3rem); line-height: 1; }
+  .mp-thru {
+    font-weight: 800; font-size: 0.6rem; letter-spacing: 0.08em;
+    text-transform: uppercase; line-height: 1; color: rgba(255, 255, 255, 0.72);
+    white-space: nowrap;
+  }
   .mp-pips { display: flex; gap: 3px; }
   .mp-pip {
     display: inline-flex; align-items: center; justify-content: center;
@@ -91,9 +96,12 @@
 
   @media (max-width: 480px) {
     .matchup { grid-template-columns: 3em minmax(0, 1fr) auto minmax(0, 1fr) 3em; }
-    .lb-avatar { width: 34px; height: 34px; }
-    .mp-side { gap: 6px; padding: 8px 7px; }
+    /* Drop the headshots on phones so the names get the full row width. */
+    .lb-avatar { display: none; }
+    .mp-side { gap: 0; padding: 9px 6px; }
+    .mp-name { font-size: 0.95rem; }
     .mp-result { font-size: 0.82rem; }
+    .mp-center { padding: 6px 8px; min-width: 2.6em; }
   }
 
   /* ===== Score timeline ===== */
