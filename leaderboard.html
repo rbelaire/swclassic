@@ -27,78 +27,73 @@
     .modal-close { width: 44px; height: 44px; font-size: 1em; top: 6px; right: 6px; }
   }
 
-  /* Player headshots on matchup cards: avatar stacked above the name so the
-     name keeps the full column width and never collides with the scores.
-     Name properties are set explicitly here to override the global
-     .player-name rule used by the ranking cards. */
-  .matchup-player {
-    display: flex; flex-direction: column; align-items: center;
-    gap: 6px; min-width: 0;
+  /* Tighten the page — less air, denser rows (Sky/FOX broadcast bug). */
+  .hero { padding-top: 34px; padding-bottom: 28px; }
+  .scorebug { margin-bottom: 22px; }
+  .section-header { margin: 22px 0 12px; }
+  .timeline-wrap { margin-bottom: 26px; }
+  /* Single full-width column of matches (like the broadcast bug). */
+  .matches-grid { grid-template-columns: 1fr; gap: 16px; max-width: 720px; margin: 0 auto; }
+  .foursome { padding: 12px 12px 14px; border-radius: 12px; }
+  .foursome-header { margin-bottom: 10px; padding-bottom: 8px; }
+
+  /* Compact match row: [margin] name | F | name [margin], edge-to-edge. */
+  .matchup {
+    display: grid;
+    grid-template-columns: 3.6em minmax(0, 1fr) auto minmax(0, 1fr) 3.6em;
+    align-items: stretch;
+    background: #fff;
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    margin-top: 6px;
+    overflow: hidden;
+    cursor: pointer;
   }
-  /* Fallback name shown only if a headshot fails to load. */
-  .matchup-player .player-name {
-    min-width: 0; max-width: 100%;
-    margin: 0; padding: 0;
-    text-align: center;
-    font-size: clamp(0.8em, 1.7vw, 0.95em);
-    font-weight: 800;
-    letter-spacing: 0;
-    text-transform: uppercase;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  .matchup:hover { box-shadow: 0 2px 8px rgba(13, 21, 18, 0.10); }
+
+  .mp-result {
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: clamp(0.85rem, 2.8vw, 1.1rem);
+    letter-spacing: 0.3px; color: #fff; line-height: 1; text-align: center; padding: 0 2px;
+  }
+  .mp-result:not(.on) { background: transparent; color: transparent; }
+  .mp-result--left.on { background: var(--cL); }
+  .mp-result--right.on { background: var(--cR); }
+
+  .mp-side { display: flex; align-items: center; gap: 9px; padding: 9px 12px; min-width: 0; }
+  .mp-side--left { justify-content: flex-end; }
+  .mp-side--right { justify-content: flex-start; }
+  .mp-name {
+    font-weight: 800; font-size: clamp(1rem, 3vw, 1.3rem);
+    text-transform: uppercase; letter-spacing: 0.3px; line-height: 1.1;
+    min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .lb-avatar {
-    width: 58px; height: 58px; border-radius: 50%; object-fit: cover;
-    border: 3px solid var(--team-green); background: var(--color-surface); flex-shrink: 0;
+    width: 42px; height: 42px; border-radius: 50%; object-fit: cover;
+    background: var(--color-surface); flex-shrink: 0;
   }
-  .matchup-player--left .lb-avatar { border-color: var(--team-green); }
-  .matchup-player--right .lb-avatar { border-color: var(--team-red); }
-  @media (max-width: 480px) {
-    .lb-avatar { width: 48px; height: 48px; }
-  }
+  .mp-side--left .lb-avatar { border: 2px solid var(--cL); }
+  .mp-side--right .lb-avatar { border: 2px solid var(--cR); }
+  .lb-avatar--tbd { display: inline-flex; align-items: center; justify-content: center; color: var(--color-muted); font-weight: 800; }
 
-  /* Team color runs across the row: RED in from the left (Team Red),
-     BLUE in from the right (Team Blue) — instant team identification. */
-  .foursome .matchup {
-    background: linear-gradient(90deg,
-      var(--team-green-tint) 0%, #ffffff 30%, #ffffff 70%, var(--team-red-tint) 100%);
+  .mp-center {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; background: var(--masters-black); color: #fff; padding: 6px 12px; min-width: 3em;
   }
-
-  /* Broadcast readability: bigger status, scores and avatars. */
-  .mp-status { font-size: clamp(1.35rem, 4.6vw, 2rem); letter-spacing: 0.5px; }
-  .matchup-center .nine-result { font-size: clamp(1.1rem, 3vw, 1.4rem); font-weight: 800; }
-  .matchup-center .nine-label { font-size: 0.6rem; }
-  .matchup-center .nine-score { padding: 4px 11px; }
-  .lb-avatar { width: 66px; height: 66px; border-width: 4px; }
-  @media (max-width: 480px) { .lb-avatar { width: 54px; height: 54px; } .mp-status { font-size: clamp(1.25rem, 6vw, 1.7rem); } }
-  .matchup { padding: 16px 18px; }
-
-  /* Center column: match-play status (hero) + point pills + holes played */
-  .matchup-center {
-    display: flex; flex-direction: column; align-items: center;
-    gap: 5px; min-width: 0;
+  .mp-state { font-weight: 900; font-size: clamp(1rem, 3vw, 1.3rem); line-height: 1; }
+  .mp-pips { display: flex; gap: 3px; }
+  .mp-pip {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 17px; height: 17px; border-radius: 3px; font-size: 0.62rem; font-weight: 800; color: #fff;
   }
-  .mp-status {
-    font-weight: 800;
-    font-size: clamp(1.05rem, 3.6vw, 1.4rem);
-    letter-spacing: 0.5px;
-    line-height: 1;
-    white-space: nowrap;
-    color: var(--masters-green);
-  }
-  .mp-status--as { color: #6b7280; letter-spacing: 1px; }
-  .mp-status--none { color: #b8b8b8; }
-  .mp-thru {
-    font-size: clamp(0.6rem, 2vw, 0.72rem);
-    color: #6b7280; letter-spacing: 0.5px; text-transform: uppercase;
-  }
-  /* Slightly smaller point pills so the status reads as primary */
-  .matchup-center .matchup-scores { gap: 6px; }
-  .matchup-center .nine-score { padding: 3px 9px; }
+  .mp-pip--none { background: transparent; color: rgba(255, 255, 255, 0.35); border: 1px solid rgba(255, 255, 255, 0.25); }
+  .mp-pip--tie { background: rgba(255, 255, 255, 0.28); }
 
   @media (max-width: 480px) {
-    .matchup-row { gap: 6px; }
-    .matchup-center { gap: 4px; }
-    .matchup-center .nine-score { padding: 2px 7px; }
+    .matchup { grid-template-columns: 3em minmax(0, 1fr) auto minmax(0, 1fr) 3em; }
+    .lb-avatar { width: 34px; height: 34px; }
+    .mp-side { gap: 6px; padding: 8px 7px; }
+    .mp-result { font-size: 0.82rem; }
   }
 
   /* ===== Score timeline ===== */

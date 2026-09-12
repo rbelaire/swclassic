@@ -225,10 +225,25 @@ function matchPlayStatus(match) {
   return { p1, p2, played, diff: p1 - p2, remaining: 18 - played };
 }
 
+// Small round headshot (image only; name is shown separately in the row).
+function rowAvatar(name) {
+  const slug = String(name || "").toLowerCase().replace(/[^a-z]/g, "");
+  if (!slug || slug === "tbd") return `<span class="lb-avatar lb-avatar--tbd">–</span>`;
+  return `<img class="lb-avatar" src="images/players/${slug}.jpg" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`;
+}
+
+// One nine's point, shown as a small pip in the winner's team color inside the
+// dark center block: 1 = left team, 0 = right team, 0.5 = halved, null = to play.
+function ninePip(val, cL, cR) {
+  if (val === null || val === undefined) return `<span class="mp-pip mp-pip--none">–</span>`;
+  if (val === 0.5) return `<span class="mp-pip mp-pip--tie">½</span>`;
+  const c = val === 1 ? cL : cR;
+  return `<span class="mp-pip" style="background:${c}">1</span>`;
+}
+
 function buildMatch(match, data) {
   const div = document.createElement("article");
   div.className = "matchup";
-  div.style.cursor = "pointer";
   div.onclick = () => showMatchupModal(match, data);
 
   const T = ClassicTeams(data);
@@ -237,32 +252,12 @@ function buildMatch(match, data) {
   const p2team = p2 ? T.sideOf(data.players[p2]) : null;
   const p1name = p1 ? data.players[p1].name : "TBD";
   const p2name = p2 ? data.players[p2].name : "TBD";
-  const teamColor = (team) => T.color(team);
+  const cL = T.color(p1team || "green");   // left = Team Red
+  const cR = T.color(p2team || "red");     // right = Team Blue
+  div.style.setProperty("--cL", cL);
+  div.style.setProperty("--cR", cR);
 
-  // Match-play status shown in the center, leader indicated by an arrow + color.
   const st = matchPlayStatus(match);
-  let statusText, statusStyle, statusClass = "mp-status";
-  if (st.played === 0) {
-    statusText = "—";
-    statusClass += " mp-status--none";
-    statusStyle = "";
-  } else if (st.diff === 0) {
-    statusText = "AS";
-    statusClass += " mp-status--as";
-    statusStyle = "";
-  } else {
-    const margin = Math.abs(st.diff);
-    const leaderIsP1 = st.diff > 0;
-    const color = leaderIsP1 ? teamColor(p1team) : teamColor(p2team);
-    statusStyle = `color:${color};`;
-    const closed = margin > st.remaining && st.remaining >= 0 && st.played > 0;
-    const label = (st.remaining === 0 || closed) && margin > 0
-      ? `${margin} UP`   // final margin
-      : `${margin} UP`;
-    statusText = leaderIsP1 ? `◂ ${label}` : `${label} ▸`;
-  }
-  // A nine is settled once its lead exceeds the holes left in it (clinched)
-  // or all 9 are played; a match is Final when closed out or both nines settle.
   const holesObj = (match.points && match.points.holes) || {};
   const nineSettled = (a, b) => {
     let w1 = 0, w2 = 0, pl = 0;
@@ -274,46 +269,30 @@ function buildMatch(match, data) {
     return pl > 0 && (Math.abs(w1 - w2) > rem || pl === (b - a + 1));
   };
   const isFinal = !!match.closed || (nineSettled(1, 9) && nineSettled(10, 18));
-  const thru = st.played === 0 ? "Not started"
-    : isFinal ? "Final"
-    : `${st.played}/18`;
+
+  const leadLeft = st.diff > 0, leadRight = st.diff < 0;
+  const marginTxt = Math.abs(st.diff) + " UP";
+  // Center state block: "F" final · thru-hole count · "AS" all square · "–".
+  const state = st.played === 0 ? "–"
+    : (st.diff === 0 ? "AS" : (isFinal ? "F" : String(st.played)));
 
   div.innerHTML = `
-    <div class="matchup-row">
-      <div class="matchup-player matchup-player--left">
-        ${playerAvatar(p1name)}
-      </div>
-      <div class="matchup-center">
-        <div class="${statusClass}" style="${statusStyle}">${statusText}</div>
-        <div class="matchup-scores">
-          ${buildNineInline("F9", match.points.front9, teamColor(p1team), teamColor(p2team))}
-          ${buildNineInline("B9", match.points.back9, teamColor(p1team), teamColor(p2team))}
-        </div>
-        <div class="mp-thru">${thru}</div>
-      </div>
-      <div class="matchup-player matchup-player--right">
-        ${playerAvatar(p2name)}
-      </div>
+    <div class="mp-result mp-result--left ${leadLeft ? "on" : ""}">${leadLeft ? marginTxt : ""}</div>
+    <div class="mp-side mp-side--left">
+      <span class="mp-name">${escapeHTML(p1name)}</span>
+      ${rowAvatar(p1name)}
     </div>
+    <div class="mp-center">
+      <div class="mp-state">${state}</div>
+      <div class="mp-pips">${ninePip(match.points.front9, cL, cR)}${ninePip(match.points.back9, cL, cR)}</div>
+    </div>
+    <div class="mp-side mp-side--right">
+      ${rowAvatar(p2name)}
+      <span class="mp-name">${escapeHTML(p2name)}</span>
+    </div>
+    <div class="mp-result mp-result--right ${leadRight ? "on" : ""}">${leadRight ? marginTxt : ""}</div>
   `;
-  if (p1team) div.style.borderLeft = `4px solid ${teamColor(p1team)}`;
-  if (p2team) div.style.borderRight = `4px solid ${teamColor(p2team)}`;
   return div;
-}
-
-// Shows the point earned on a nine from the WINNER's side: a decided nine is
-// worth 1 point, shown as "1" in the winning team's color (gold/green) whether
-// the left or right player won — so the box always reflects the point, matching
-// the team total. A tie is a half point; an undecided nine shows "-".
-function buildNineInline(label, val, c1, c2) {
-  if (val === null || val === undefined) {
-    return `<div class="nine-score"><div class="nine-label">${label}</div><div class="nine-result">-</div></div>`;
-  }
-  if (val === 0.5) {
-    return `<div class="nine-score tied"><div class="nine-label">${label}</div><div class="nine-result">½</div></div>`;
-  }
-  const color = val === 1 ? c1 : c2; // 1 = left player won, 0 = right player won
-  return `<div class="nine-score" style="border-color:${color}; background:${color}1f;"><div class="nine-label">${label}</div><div class="nine-result" style="color:${color}">1</div></div>`;
 }
 
 /* ======================
