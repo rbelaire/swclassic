@@ -183,14 +183,10 @@ function renderMatches(data) {
     header.className = "foursome-header";
     const title = document.createElement("h3");
     title.className = "foursome-title";
-    title.textContent = `Foursome ${index + 1}`;
+    const NUMS = ["One", "Two", "Three", "Four", "Five", "Six"];
+    title.textContent = `Foursome ${NUMS[index] || (index + 1)}`;
 
-    const status = document.createElement("span");
-    const statusData = getFoursomeStatus(group);
-    status.className = `foursome-status ${statusData.className}`;
-    status.textContent = statusData.label;
-
-    header.append(title, status);
+    header.append(title);
 
     wrapper.appendChild(header);
 
