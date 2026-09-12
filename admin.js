@@ -124,12 +124,16 @@ function showAdmin() {
     if (eyebrow) eyebrow.textContent = `Foursome ${userFoursome + 1} Scorer`;
     if (title) title.textContent = `Foursome ${userFoursome + 1}`;
     if (subtitle) subtitle.textContent = "Enter hole-by-hole scores for your matches.";
+    // Foursome scorers use the one-hole stepper: its own Next-Hole button saves,
+    // so the sticky save bar and the page header/stat panels are hidden (CSS via
+    // body.foursome-mode) to keep everything on one no-scroll screen.
+    document.body.classList.add("foursome-mode");
     const saveBar = document.getElementById("foursome-save-bar");
-    if (saveBar) { saveBar.style.display = "flex"; initBarPinning(); }
-    // Hide the header save button — the sticky bar handles it
+    if (saveBar) saveBar.style.display = "none";
     const saveBtn = document.getElementById("save-btn");
     if (saveBtn) saveBtn.style.display = "none";
   } else {
+    document.body.classList.remove("foursome-mode");
     if (tabBar) tabBar.style.display = "";
     if (clearBtn) clearBtn.style.display = "";
     if (archiveBtn) archiveBtn.style.display = "";
@@ -369,9 +373,7 @@ function render() {
       const scoresTab = document.getElementById("tab-scores");
       if (scoresTab) scoresTab.classList.add("active");
 
-      renderStats();
-      renderTotals();
-      renderFoursomes();
+      renderFoursomeStepper();
       return;
     }
 
@@ -765,6 +767,142 @@ function renderFoursomes() {
     container.appendChild(foursomeDiv);
   });
 }
+
+/*************************
+ * FOURSOME ONE-HOLE STEPPER
+ * A phone-first scorer: one hole on screen at a time, both of the foursome's
+ * matches with big tap buttons, a strip to jump back and edit any hole, and a
+ * Next-Hole button that saves as it advances. No scrolling required.
+ *************************/
+let foursomeHole = null; // 1..18, the hole currently on screen
+
+function fsMatchesForUser() {
+  const out = [];
+  [userFoursome * 2, userFoursome * 2 + 1].forEach(i => {
+    if (data.matches[i]) out.push({ i, match: data.matches[i] });
+  });
+  return out;
+}
+
+function fsHoleValue(match, h) {
+  const v = match.points.holes ? match.points.holes[h] : null;
+  return (v === null || v === undefined) ? null : v;
+}
+
+// First hole the foursome hasn't fully entered yet, so the scorer opens where
+// play actually is rather than back at hole 1.
+function fsFirstOpenHole() {
+  const ms = fsMatchesForUser();
+  const live = ms.filter(({ match }) => isValidMatchup(match));
+  if (!live.length) return 1;
+  for (let h = 1; h <= 18; h++) {
+    if (live.some(({ match }) => fsHoleValue(match, h) === null)) return h;
+  }
+  return 18;
+}
+
+function renderFoursomeStepper() {
+  const container = document.getElementById("foursomes");
+  if (!container) return;
+  if (foursomeHole === null) foursomeHole = fsFirstOpenHole();
+  const h = foursomeHole;
+  const par = COURSE_PARS[h];
+  const nineName = h <= 9 ? "Front 9" : "Back 9";
+  const ms = fsMatchesForUser();
+
+  // Jump strip: tap any hole to edit it. Colour marks how far along it is.
+  let strip = '<div class="fs-strip" id="fs-strip">';
+  for (let n = 1; n <= 18; n++) {
+    const vals = ms.map(({ match }) => fsHoleValue(match, n));
+    const done = vals.length && vals.every(v => v !== null);
+    const some = vals.some(v => v !== null);
+    const cls = "fs-pill"
+      + (n === h ? " fs-pill--current" : "")
+      + (done ? " fs-pill--done" : some ? " fs-pill--partial" : "");
+    strip += `<button class="${cls}" onclick="fsGoHole(${n})">${n}</button>`;
+  }
+  strip += "</div>";
+
+  const head = `<div class="fs-holehead">
+      <div class="fs-holenum">HOLE ${h}</div>
+      <div class="fs-holemeta">${nineName} &middot; Par ${par}</div>
+    </div>`;
+
+  let cards = "";
+  ms.forEach(({ i, match }) => {
+    if (!isValidMatchup(match)) {
+      cards += `<div class="fs-card fs-card--invalid">Match ${match.id}: players not set — ask the admin.</div>`;
+      return;
+    }
+    const T = ClassicTeams(data);
+    const [p1, p2] = match.playerIds;
+    const cL = T.color(T.sideOf(data.players[p1]) || "green");
+    const cR = T.color(T.sideOf(data.players[p2]) || "red");
+    const p1Name = escapeHTML(data.players[p1].name);
+    const p2Name = escapeHTML(data.players[p2].name);
+    const v = fsHoleValue(match, h);
+
+    const sh = strokeHolesForMatch(match);
+    let pop = "";
+    if (sh.diff > 0 && sh.holes.has(h)) {
+      const uId = match.playerIds[sh.underdog - 1];
+      const uName = uId && data.players[uId] ? escapeHTML(data.players[uId].name) : "Underdog";
+      pop = `<span class="fs-pop">● ${uName} gets a pop</span>`;
+    }
+
+    cards += `
+      <div class="fs-card" style="--cL:${cL};--cR:${cR}">
+        <div class="fs-cardtop"><span class="fs-mtitle">Match ${match.id}</span>${pop}</div>
+        <div class="fs-btns">
+          <button class="fs-btn fs-btn--l ${v === 1 ? "active" : ""}" onclick="fsSetResult(${i}, ${h}, 1)">${p1Name}</button>
+          <button class="fs-btn fs-btn--tie ${v === 0.5 ? "active" : ""}" onclick="fsSetResult(${i}, ${h}, 0.5)">Tie</button>
+          <button class="fs-btn fs-btn--r ${v === 0 ? "active" : ""}" onclick="fsSetResult(${i}, ${h}, 0)">${p2Name}</button>
+        </div>
+      </div>`;
+  });
+
+  const nextLabel = h < 18 ? "Next Hole &rarr;" : "Finish &amp; Save &check;";
+  const nav = `<div class="fs-nav">
+      <button class="fs-navbtn fs-navbtn--prev" ${h <= 1 ? "disabled" : ""} onclick="fsPrev()">&larr; Prev</button>
+      <div class="fs-navstatus" id="fs-savestatus">${hasUnsavedChanges ? "Unsaved" : "Saved &check;"}</div>
+      <button class="fs-navbtn fs-navbtn--next" onclick="fsNext()">${nextLabel}</button>
+    </div>`;
+
+  const top = `<div class="fs-top">
+      <span class="fs-title">Foursome ${userFoursome + 1}</span>
+      <button class="fs-logout" onclick="logout()">Log out</button>
+    </div>`;
+
+  container.innerHTML = `<div class="fs-stepper">${top}${strip}${head}${cards}${nav}</div>`;
+
+  const cur = container.querySelector(".fs-pill--current");
+  if (cur && cur.scrollIntoView) cur.scrollIntoView({ inline: "center", block: "nearest" });
+}
+
+// Set a hole result for one match and refresh the stepper in place.
+function fsSetResult(matchIndex, holeNum, value) {
+  const match = data.matches[matchIndex];
+  if (!match.points.holes) {
+    match.points.holes = {};
+    for (let i = 1; i <= 18; i++) match.points.holes[i] = null;
+  }
+  match.points.holes[holeNum] = (match.points.holes[holeNum] === value) ? null : value;
+  match.points.front9 = calculateNineFromHoles(match.points.holes, 1, 9);
+  match.points.back9 = calculateNineFromHoles(match.points.holes, 10, 18);
+  const f = match.points.front9, b = match.points.back9;
+  match.status = (f !== null && b !== null) ? "complete" : (f !== null || b !== null) ? "in_progress" : "not_started";
+  markUnsaved();
+  renderFoursomeStepper();
+}
+
+// Navigation saves any pending changes on the way (Next Hole doubles as Save).
+function fsGoHole(n) {
+  if (hasUnsavedChanges) saveData();
+  foursomeHole = Math.max(1, Math.min(18, n));
+  renderFoursomeStepper();
+}
+function fsNext() { fsGoHole(foursomeHole + 1); }
+function fsPrev() { fsGoHole(foursomeHole - 1); }
 
 function buildMatch(match, matchIndex) {
   const div = document.createElement("div");
@@ -1330,6 +1468,8 @@ function markUnsaved() {
   }
   const status = document.getElementById("foursome-save-status");
   if (status) status.textContent = "Unsaved changes";
+  const fss = document.getElementById("fs-savestatus");
+  if (fss) fss.textContent = "Unsaved";
 }
 
 function markSaved() {
@@ -1344,6 +1484,8 @@ function markSaved() {
   }
   const status = document.getElementById("foursome-save-status");
   if (status) status.textContent = "Saved ✓";
+  const fss = document.getElementById("fs-savestatus");
+  if (fss) fss.textContent = "Saved ✓";
 }
 
 function showToast(message, type = "success") {
