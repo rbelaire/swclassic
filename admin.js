@@ -209,8 +209,8 @@ async function tryTokenLogin() {
  * LOAD DATA
  *************************/
 let data;
-const DATA_CACHE_KEY = "classicAdminData_v3";
-const LEADERBOARD_CACHE_KEY = "classicLeaderboardData_v3";
+const DATA_CACHE_KEY = "classicAdminData_v4";
+const LEADERBOARD_CACHE_KEY = "classicLeaderboardData_v4";
 
 function getCachedData() {
   try {

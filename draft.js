@@ -32,7 +32,7 @@ const TEAM_PICK_SLOTS = {
  * LOAD DATA
  *************************/
 let data;
-const DATA_CACHE_KEY = "classicDraftData_v3";
+const DATA_CACHE_KEY = "classicDraftData_v4";
 
 function getCachedData() {
   try {

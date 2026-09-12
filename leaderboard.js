@@ -13,7 +13,7 @@ let refreshTimer = null;
  * LOAD DATA
  *************************/
 let data;
-const DATA_CACHE_KEY = "classicLeaderboardData";
+const DATA_CACHE_KEY = "classicLeaderboardData_v4";
 
 function getCachedData() {
   try {
@@ -225,18 +225,40 @@ function matchPlayStatus(match) {
   return { p1, p2, played, diff: p1 - p2, remaining: 18 - played };
 }
 
-// One nine's point, shown as a small pip in the winner's team color:
-// 1 = left team, 0 = right team, 0.5 = halved, null = to play.
-function ninePip(val, cL, cR) {
-  if (val === null || val === undefined) return `<span class="mp-pip mp-pip--none">–</span>`;
-  if (val === 0.5) return `<span class="mp-pip mp-pip--tie">½</span>`;
-  const c = val === 1 ? cL : cR;
-  return `<span class="mp-pip" style="background:${c}">1</span>`;
+// Tally one nine (holes a..b) from the per-hole winners.
+//   diff = p1 wins − p2 wins · pl = holes played · done = nine is decided.
+function nineStat(holesObj, a, b) {
+  let w1 = 0, w2 = 0, pl = 0;
+  for (let h = a; h <= b; h++) {
+    const v = holesObj[h];
+    if (v === 1) { w1++; pl++; } else if (v === 0) { w2++; pl++; } else if (v === 0.5) { pl++; }
+  }
+  const total = b - a + 1, rem = total - pl, diff = w1 - w2;
+  return { w1, w2, pl, rem, diff, total, done: pl > 0 && (Math.abs(diff) > rem || pl === total) };
 }
 
-// Ryder Cup app-style row: winning side flies a solid team chevron with the name
-// reversed out in white; the centre carries the result (margin / TIED / AS) with
-// "Final" or "THRU x" beneath, and the two front-9 / back-9 point pips.
+// Small "F" / "B" chip showing a nine's state, coloured by the leader. The nine
+// currently being played gets a white ring so you can see which nine is live;
+// a decided nine keeps its result on screen (e.g. the front while on the back).
+function nineChip(label, s, isActive, cL, cR) {
+  let bg = "transparent", fg = "var(--color-muted)", border = "1px solid var(--color-line)", val = "–";
+  if (s.pl > 0) {
+    if (s.diff > 0) { bg = cL; fg = "#fff"; border = "none"; val = (s.done ? "" : "") + (s.w1 - s.w2) + "↑"; }
+    else if (s.diff < 0) { bg = cR; fg = "#fff"; border = "none"; val = (s.w2 - s.w1) + "↑"; }
+    else { bg = "var(--color-muted)"; fg = "#fff"; border = "none"; val = "AS"; }
+  }
+  const ringC = s.diff > 0 ? cL : s.diff < 0 ? cR : "var(--masters-black)";
+  const ring = isActive ? `box-shadow:0 0 0 2px #fff,0 0 0 4px ${ringC};` : "";
+  return `<span class="mp-nine" style="background:${bg};color:${fg};border:${border};${ring}"><i>${label}</i><b>${val}</b></span>`;
+}
+
+function fmtPts(x) { return x % 1 ? (Math.floor(x) || "") + "½" : "" + x; }  // 0.5→½, 1.5→1½
+
+// Ryder Cup app-style row. Because our match is really two nine-hole matches,
+// the centre headlines the CURRENT nine's live battle, the sub-label names the
+// nine ("Back · Thru 3"), and two chips carry both nines so the front result
+// stays on screen once play moves to the back. At the finish the headline flips
+// to the pairing's points score (e.g. 2–0).
 function buildMatch(match, data) {
   const div = document.createElement("article");
   div.className = "matchup";
@@ -253,39 +275,47 @@ function buildMatch(match, data) {
   div.style.setProperty("--cL", cL);
   div.style.setProperty("--cR", cR);
 
-  const st = matchPlayStatus(match);
   const holesObj = (match.points && match.points.holes) || {};
-  const nineSettled = (a, b) => {
-    let w1 = 0, w2 = 0, pl = 0;
-    for (let h = a; h <= b; h++) {
-      const v = holesObj[h];
-      if (v === 1) { w1++; pl++; } else if (v === 0) { w2++; pl++; } else if (v === 0.5) { pl++; }
-    }
-    const rem = (b - a + 1) - pl;
-    return pl > 0 && (Math.abs(w1 - w2) > rem || pl === (b - a + 1));
-  };
-  const isFinal = !!match.closed || (nineSettled(1, 9) && nineSettled(10, 18));
+  const front = nineStat(holesObj, 1, 9);
+  const back = nineStat(holesObj, 10, 18);
+  const started = front.pl > 0 || back.pl > 0;
+  const isFinal = !!match.closed || (front.done && back.done);
 
-  const leadLeft = st.diff > 0, leadRight = st.diff < 0;
-  const started = st.played > 0;
+  // Which nine is live: the back once it has a hole (or the front has finished),
+  // otherwise the front.
+  let active = "none";
+  if (!isFinal && started) active = (back.pl > 0 || front.done) ? "b" : "f";
+  const activeStat = active === "b" ? back : front;
 
-  // Row state class: colour the leader's chevron; grey both when tied at the end.
-  if (started && leadLeft) div.classList.add("win-left");
-  else if (started && leadRight) div.classList.add("win-right");
-  else if (isFinal && st.diff === 0) div.classList.add("tied");
-  else div.classList.add("pending");
-
-  // Centre result.
-  let center;
+  // Headline + chevron.
+  let center, chevron, leadLeft = false, leadRight = false;
   if (!started) {
     center = `<div class="mp-word">–</div>`;
-  } else if (st.diff === 0) {
-    center = `<div class="mp-word">${isFinal ? "TIED" : "AS"}</div>`;
+    chevron = "pending";
+  } else if (isFinal) {
+    const p1pts = (front.diff > 0 ? 1 : front.diff < 0 ? 0 : 0.5) + (back.diff > 0 ? 1 : back.diff < 0 ? 0 : 0.5);
+    const p2pts = 2 - p1pts;
+    if (p1pts > p2pts) {
+      leadLeft = true; chevron = "win-left";
+      center = `<div class="mp-result"><span class="mp-num">${fmtPts(p1pts)}</span><span class="mp-suffix">–${fmtPts(p2pts)}</span></div>`;
+    } else if (p2pts > p1pts) {
+      leadRight = true; chevron = "win-right";
+      center = `<div class="mp-result"><span class="mp-num">${fmtPts(p2pts)}</span><span class="mp-suffix">–${fmtPts(p1pts)}</span></div>`;
+    } else {
+      chevron = "tied";
+      center = `<div class="mp-word">TIED</div>`;
+    }
   } else {
-    center = `<div class="mp-result"><span class="mp-num">${Math.abs(st.diff)}</span><span class="mp-suffix">UP</span></div>`;
+    const cd = activeStat.diff;
+    if (cd > 0) { leadLeft = true; chevron = "win-left"; center = `<div class="mp-result"><span class="mp-num">${cd}</span><span class="mp-suffix">UP</span></div>`; }
+    else if (cd < 0) { leadRight = true; chevron = "win-right"; center = `<div class="mp-result"><span class="mp-num">${-cd}</span><span class="mp-suffix">UP</span></div>`; }
+    else { chevron = "pending"; center = `<div class="mp-word">AS</div>`; }
   }
+  div.classList.add(chevron);
+
   const sub = !started ? ""
-    : (isFinal ? "Final" : "Thru " + (st.played >= 18 ? 18 : st.played));
+    : (isFinal ? "Final"
+      : (active === "b" ? "Back" : "Front") + " · Thru " + activeStat.pl);
 
   // Team dots: hollow ring = that player is winning / has won.
   const leftDot = `<span class="mp-dot mp-dot--left ${leadLeft ? "mp-dot--hollow" : ""}"></span>`;
@@ -301,7 +331,7 @@ function buildMatch(match, data) {
     <div class="mp-center">
       ${center}
       ${sub ? `<div class="mp-sub">${sub}</div>` : ""}
-      <div class="mp-pips">${ninePip(match.points.front9, cL, cR)}${ninePip(match.points.back9, cL, cR)}</div>
+      <div class="mp-nines">${nineChip("F", front, active === "f", cL, cR)}${nineChip("B", back, active === "b", cL, cR)}</div>
     </div>
     <div class="mp-side mp-side--right">
       <span class="mp-name">${escapeHTML(p2name)}</span>

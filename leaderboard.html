@@ -112,14 +112,16 @@
     font-weight: 700; font-size: 0.62rem; letter-spacing: 0.1em;
     text-transform: uppercase; color: var(--color-muted); line-height: 1;
   }
-  /* Front-9 · back-9 point markers (our format) — tiny, under the result. */
-  .mp-pips { display: flex; gap: 4px; margin-top: 3px; }
-  .mp-pip {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 15px; height: 15px; border-radius: 3px; font-size: 0.55rem; font-weight: 800; color: #fff;
+  /* Front / back nine chips (our format is two nine-hole matches). Each chip is
+     coloured by that nine's leader; the live nine gets a white ring. The front
+     chip keeps the settled front result on screen once play reaches the back. */
+  .mp-nines { display: flex; gap: 6px; margin-top: 5px; }
+  .mp-nine {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 2px 6px; border-radius: 6px; line-height: 1;
   }
-  .mp-pip--none { background: transparent; color: var(--color-muted); border: 1px solid var(--color-line); }
-  .mp-pip--tie { background: var(--color-muted); }
+  .mp-nine i { font-style: normal; font-size: 0.5rem; font-weight: 800; letter-spacing: 0.04em; opacity: 0.85; }
+  .mp-nine b { font-size: 0.68rem; font-weight: 900; }
 
   @media (max-width: 480px) {
     .matchup { min-height: 72px; }
