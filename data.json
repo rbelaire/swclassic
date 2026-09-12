@@ -29,7 +29,7 @@
     "brock": {
       "name": "Brock",
       "rank": 5,
-      "pops": 9,
+      "pops": 7,
       "team": null
     },
     "jared": {
@@ -314,7 +314,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-09-12T13:51:31.286Z",
+    "lastUpdated": "2026-09-12T13:53:42.369Z",
     "eventName": "The 2027 Classic",
     "tournamentDate": "2027-09-04",
     "teeTime": "08:00",
