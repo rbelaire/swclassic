@@ -118,7 +118,8 @@
           "18": null
         }
       },
-      "status": "not_started"
+      "status": "not_started",
+      "closed": false
     },
     {
       "id": 2,
@@ -314,7 +315,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-09-12T20:05:46.266Z",
+    "lastUpdated": "2026-09-12T20:12:55.331Z",
     "eventName": "The 2027 Classic",
     "tournamentDate": "2027-09-04",
     "teeTime": "08:00",
@@ -327,7 +328,13 @@
       "nAwBufe3QfU5": 3,
       "Zt7Kq2Lm9xP4": 4
     },
-    "scoreLog": []
+    "scoreLog": [
+      {
+        "t": "2026-09-12T20:12:55.331Z",
+        "g": 0,
+        "r": 0
+      }
+    ]
   },
   "course": {
     "front9": {
