@@ -196,6 +196,56 @@
     return { a, b, kA, kB, winnerSide, winnerName, loserName, margin: Math.abs(a - b), perfect: Math.max(a, b) === 2 && Math.min(a, b) === 0 };
   }
 
+  function fmtPts(n) { return n % 1 === 0 ? String(n) : (Math.floor(n) ? Math.floor(n) + '½' : '½'); }
+
+  // Per-nine margin from the hole winners (1 = player1, 0 = player2, 0.5 tie).
+  function nineMargin(m, a, b) {
+    let w1 = 0, w2 = 0, pl = 0;
+    for (let h = a; h <= b; h++) {
+      const v = m.holes ? m.holes[h] : null;
+      if (v === 1) { w1++; pl++; } else if (v === 0) { w2++; pl++; } else if (v === 0.5) pl++;
+    }
+    return { w1, w2, pl, diff: w1 - w2 };
+  }
+
+  // Small F/B chip coloured by that nine's winner (margin if holes are known,
+  // else just the winner). cL = player1's team colour, cR = player2's.
+  function nineChip(label, m, a, b, nineVal, cL, cR) {
+    let bg = 'transparent', fg = 'var(--color-muted)', border = '1px solid var(--color-line)', val = '–';
+    const s = nineMargin(m, a, b);
+    if (s.pl > 0) {
+      if (s.diff > 0) { bg = cL; fg = '#fff'; border = 'none'; val = (s.w1 - s.w2) + '↑'; }
+      else if (s.diff < 0) { bg = cR; fg = '#fff'; border = 'none'; val = (s.w2 - s.w1) + '↑'; }
+      else { bg = 'var(--color-muted)'; fg = '#fff'; border = 'none'; val = 'AS'; }
+    } else if (nineVal === 1) { bg = cL; fg = '#fff'; border = 'none'; val = 'W'; }
+    else if (nineVal === 0) { bg = cR; fg = '#fff'; border = 'none'; val = 'W'; }
+    else if (nineVal === 0.5) { bg = 'var(--color-muted)'; fg = '#fff'; border = 'none'; val = 'AS'; }
+    return `<span class="cv-chip" style="background:${bg};color:${fg};border:${border}"><i>${label}</i><b>${val}</b></span>`;
+  }
+
+  // One match as a Ryder Cup-style chevron row: winner's name reversed out in
+  // their team colour, points score in the centre, F/B nine chips beneath.
+  function cvRow(m) {
+    const o = outcome(m);
+    const cL = COLORS[o.kA] || COLORS.green;
+    const cR = COLORS[o.kB] || COLORS.red;
+    let state, center;
+    if (o.winnerSide === 'tie' || o.a === o.b) {
+      state = 'tied'; center = `<div class="cv-word">TIED</div>`;
+    } else if (o.a > o.b) {
+      state = 'win-left'; center = `<div class="cv-score">${fmtPts(o.a)}<span class="cv-dash">–</span>${fmtPts(o.b)}</div>`;
+    } else {
+      state = 'win-right'; center = `<div class="cv-score">${fmtPts(o.b)}<span class="cv-dash">–</span>${fmtPts(o.a)}</div>`;
+    }
+    return `<div class="cvrow ${state}" style="--cL:${cL};--cR:${cR}">
+      <div class="cv-bg cv-bg--left"></div>
+      <div class="cv-bg cv-bg--right"></div>
+      <div class="cv-side cv-side--left"><span class="cv-name">${esc(m.player1)}</span></div>
+      <div class="cv-center">${center}<div class="cv-chips">${nineChip('F', m, 1, 9, m.front9, cL, cR)}${nineChip('B', m, 10, 18, m.back9, cL, cR)}</div></div>
+      <div class="cv-side cv-side--right"><span class="cv-name">${esc(m.player2)}</span></div>
+    </div>`;
+  }
+
   function summary(t, ti) {
     const matches = t.matches || [];
     let greenMatch = 0, redMatch = 0, halvedMatch = 0;
@@ -255,19 +305,9 @@
       html += `<ul class="recap-highlights">` + bullets.map(b => `<li>${b}</li>`).join('') + `</ul>`;
     }
 
-    // Compact results table
+    // Chevron match rows (same broadcast look as the live leaderboard).
     html += `<div class="recap-results">`;
-    matches.forEach(m => {
-      const o = outcome(m);
-      const p1cls = o.winnerSide === o.kA && o.winnerSide !== 'tie' ? 'rr-win' : '';
-      const p2cls = o.winnerSide === o.kB && o.winnerSide !== 'tie' ? 'rr-win' : '';
-      const fmt = n => (n % 1 === 0 ? String(n) : (Math.floor(n) ? Math.floor(n) + '½' : '½'));
-      html += `<div class="recap-row">
-        <span class="rr-p rr-left rr-${o.kA} ${p1cls}">${esc(m.player1)}</span>
-        <span class="rr-score">${fmt(o.a)} <span class="rr-dash">–</span> ${fmt(o.b)}</span>
-        <span class="rr-p rr-right rr-${o.kB} ${p2cls}">${esc(m.player2)}</span>
-      </div>`;
-    });
+    matches.forEach(m => { html += cvRow(m); });
     html += `</div>`;
 
     if (t.notes) html += `<p class="recap-note">${esc(t.notes)}</p>`;

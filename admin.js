@@ -1414,6 +1414,9 @@ function clearAll() {
   markUnsaved();
   render._initialized = false;
   switchTab("draft");
+  // Persist the reset immediately so the live site (draft board, leaderboard)
+  // reflects it — otherwise the cleared state lives only on this device.
+  saveData();
 }
 
 function clearMatch(matchIndex) {
