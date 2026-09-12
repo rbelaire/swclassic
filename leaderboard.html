@@ -62,7 +62,7 @@
   .matchup:hover { background: #fbfcfe; }
 
   /* Angled colour bands (chevrons). Hidden until a side is marked. */
-  .mp-bg { position: absolute; top: 0; bottom: 0; width: calc(50% - 54px); z-index: 0; display: none; }
+  .mp-bg { position: absolute; top: 0; bottom: 0; width: calc(50% - 66px); z-index: 0; display: none; }
   .mp-bg--left  { left: 0;  clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 50%, calc(100% - 24px) 100%, 0 100%); }
   .mp-bg--right { right: 0; clip-path: polygon(24px 0, 100% 0, 100% 100%, 24px 100%, 0 50%); }
   .matchup.win-left  .mp-bg--left,
@@ -98,9 +98,9 @@
   .matchup.win-right .mp-side--right .mp-dot--hollow { color: #fff; }
 
   .mp-center {
-    position: relative; z-index: 1;
+    position: relative; z-index: 2;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 2px; padding: 4px 6px; min-width: 96px; text-align: center;
+    gap: 2px; padding: 4px 6px; min-width: 108px; max-width: 128px; text-align: center;
   }
   .mp-result { display: flex; align-items: baseline; justify-content: center; gap: 3px; line-height: 1; }
   .mp-num { font-weight: 900; font-size: clamp(1.7rem, 6vw, 2.5rem); color: var(--masters-black); }
@@ -109,8 +109,9 @@
   .matchup.win-left  .mp-num, .matchup.win-left  .mp-suffix { color: var(--cL); }
   .matchup.win-right .mp-num, .matchup.win-right .mp-suffix { color: var(--cR); }
   .mp-sub {
-    font-weight: 700; font-size: 0.62rem; letter-spacing: 0.1em;
+    font-weight: 700; font-size: 0.6rem; letter-spacing: 0.06em;
     text-transform: uppercase; color: var(--color-muted); line-height: 1;
+    white-space: nowrap;
   }
   /* Front / back nine chips (our format is two nine-hole matches). Each chip is
      coloured by that nine's leader; the live nine gets a white ring. The front
@@ -124,11 +125,19 @@
   .mp-nine b { font-size: 0.68rem; font-weight: 900; }
 
   @media (max-width: 480px) {
-    .matchup { min-height: 72px; }
-    .mp-bg { width: calc(50% - 44px); }
-    .mp-side { gap: 7px; padding: 8px 11px; }
+    .matchup { min-height: 76px; }
+    /* Pull the chevron tips back so the centre keeps a clear white gap. */
+    .mp-bg { width: calc(50% - 64px); }
+    .mp-bg--left  { clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%); }
+    .mp-bg--right { clip-path: polygon(18px 0, 100% 0, 100% 100%, 18px 100%, 0 50%); }
+    .mp-side { gap: 7px; padding: 8px 9px; }
     .mp-name { font-size: 1rem; }
-    .mp-center { min-width: 78px; padding: 4px 2px; }
+    .mp-center { min-width: 90px; max-width: 120px; padding: 4px 2px; }
+    .mp-num { font-size: 1.7rem; }
+    .mp-sub { font-size: 0.54rem; letter-spacing: 0.03em; }
+    .mp-nines { gap: 5px; margin-top: 4px; }
+    .mp-nine { padding: 2px 5px; }
+    .mp-nine b { font-size: 0.62rem; }
     .mp-dot { width: 12px; height: 12px; }
   }
 
