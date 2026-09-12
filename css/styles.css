@@ -4996,3 +4996,52 @@ body.foursome-mode #tab-scores { margin: 0; }
   .fs-btn { min-height: 64px; font-size: 1rem; }
   .fs-navbtn { min-height: 54px; font-size: 1rem; padding: 0 14px; }
 }
+
+/* =====================================================================
+   HOMEPAGE RULES — clean PGA / Ryder Cup-style spec sheet (no emojis)
+   ===================================================================== */
+.rules .card { padding: 0; }
+.rules .card h2 {
+  font-size: clamp(0.95em, 2.6vw, 1.1em);
+  letter-spacing: 0.16em;
+  margin: 0;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--color-line);
+}
+.rules .card-content { padding: 2px 22px 18px; line-height: 1.5; }
+
+.rule-item {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  gap: 16px;
+  align-items: baseline;
+  padding: 15px 0;
+  border-top: 1px solid var(--color-line);
+}
+.rule-item:first-child { border-top: none; }
+.rule-fig {
+  font-weight: 800; font-size: 1.7rem; line-height: 1;
+  color: var(--masters-green); text-align: center; font-variant-numeric: tabular-nums;
+}
+.rule-kicker {
+  font-weight: 800; font-size: 0.6rem; letter-spacing: 0.1em; line-height: 1.2;
+  text-transform: uppercase; color: var(--masters-red); text-align: center; align-self: center;
+}
+.rule-title { font-weight: 700; color: var(--masters-black); line-height: 1.4; }
+.rule-sub { font-size: 0.85em; color: var(--color-muted); margin-top: 4px; line-height: 1.45; }
+
+.rule-example-btn {
+  width: 100%; margin-top: 6px; background: transparent; color: var(--masters-green);
+  border: 1px solid var(--masters-green); border-radius: var(--radius-md);
+  padding: 11px 16px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  font-size: 0.72rem; cursor: pointer; transition: background 0.15s ease, color 0.15s ease;
+}
+.rule-example-btn:hover { background: var(--masters-green); color: #fff; }
+.rule-example { margin-top: 14px; border: 1px solid var(--color-line); border-radius: var(--radius-md); overflow: hidden; }
+.rule-example-head { display: flex; align-items: center; justify-content: center; gap: 20px; padding: 16px; background: var(--green-tint); }
+.rule-ex-player { text-align: center; }
+.rule-ex-name { font-weight: 800; color: var(--masters-green); font-size: 1.05em; }
+.rule-ex-pops { font-size: 0.72em; color: var(--color-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 3px; }
+.rule-ex-vs { font-weight: 800; color: var(--color-muted); font-size: 0.8em; letter-spacing: 0.12em; }
+.rule-ex-calc { padding: 14px 16px; text-align: center; line-height: 1.55; color: var(--masters-black); font-size: 0.9em; }
+.rule-ex-calc b { color: var(--masters-green); font-size: 1.05em; display: block; margin-bottom: 4px; }
