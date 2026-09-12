@@ -120,11 +120,18 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ error: "Current data.json is not valid JSON" });
     }
 
-    // Authorize a foursome write: its token must match this foursome in the
-    // live data (tokens rotate each season).
+    // Authorize a foursome write in one of two ways:
+    //   1. a QR scan token that maps to this foursome in the live data, or
+    //   2. valid admin credentials — a captain scoring from the username +
+    //      password login instead of a scan link has no token.
     if (isFoursome) {
       const tokMap = (currentData.meta && currentData.meta.foursomeTokens) || {};
-      if (!foursomeToken || tokMap[foursomeToken] !== foursome + 1) {
+      const tokenOk = !!foursomeToken && tokMap[foursomeToken] === foursome + 1;
+      const envHash = process.env.ADMIN_PASSWORD_HASH;
+      const adminOk = envHash
+        ? (!!adminPassword && sha256hex(adminPassword) === envHash)
+        : (password === ADMIN_PASSWORD_HASH);
+      if (!tokenOk && !adminOk) {
         return res.status(401).json({ error: "Invalid or expired foursome token" });
       }
     }
