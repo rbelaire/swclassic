@@ -4954,6 +4954,9 @@ body.foursome-mode #tab-scores { margin: 0; }
   flex: 0 0 auto; width: 36px; height: 36px; border-radius: 9px;
   border: 2px solid var(--color-line); background: #fff;
   font-weight: 800; font-size: 0.9rem; color: var(--masters-black); cursor: pointer;
+  /* Flex-centre the digit so it isn't nudged high by default button metrics. */
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0; line-height: 1; font-variant-numeric: tabular-nums;
 }
 .fs-pill--partial { border-color: var(--masters-green); color: var(--masters-green); }
 .fs-pill--done { background: var(--masters-green); border-color: var(--masters-green); color: #fff; }
