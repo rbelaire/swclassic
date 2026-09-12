@@ -4350,9 +4350,26 @@ RESULT:
     gap: 10px;
   }
 
+  /* The generic .player-card mobile rule turns cards into a cramped flex row,
+     which overflows the two team buttons. Force the draft pool back to a clean
+     vertical stack: rank on top, name, pops, then full-width team buttons. */
   .draft-pool-card {
-    padding: 12px;
+    display: block;
+    text-align: center;
+    padding: 12px 10px;
+    overflow: visible;
   }
+
+  .draft-pool-card .rank-badge {
+    position: static;
+    margin: 0 auto 6px;
+    width: 38px; height: 38px; min-width: 38px;
+    font-size: 0.95em;
+    box-shadow: none;
+  }
+
+  .draft-pool-card .pool-player-name { margin: 2px 0 0; font-size: 1em; }
+  .draft-pool-card .pool-player-info { margin: 0 0 10px; }
 
   .draft-pool-card .pool-actions {
     flex-direction: column;
@@ -4361,7 +4378,8 @@ RESULT:
 
   .draft-pool-card .pool-actions button {
     width: 100%;
-    padding: 8px 12px;
+    padding: 10px 8px;
+    white-space: nowrap;
   }
 
   /* Matchup builder stacks on mobile */
