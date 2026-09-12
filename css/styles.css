@@ -12,37 +12,40 @@
 :root {
   --color-bg: #ffffff;
   --color-card: #ffffff;
-  --color-surface: #f4f7f5;   /* subtle green-tinted panel */
-  --color-line: #e2e8e4;      /* hairline */
+  --color-surface: #f5f7fb;   /* subtle cool panel */
+  --color-line: #e3e7ef;      /* hairline */
 
-  /* Green (Primary / brand / Team one) */
-  --color-primary: #0b6b3a;
-  --masters-green: #0b6b3a;
-  --masters-dark-green: #075130;
-  --masters-light-green: #0e8043;
-  --green-tint: #eaf4ee;
+  /* Brand = NAVY (Ryder Cup red/white/blue). These vars keep their old
+     "green" names for compatibility, but now hold navy. */
+  --color-primary: #17306e;
+  --masters-green: #17306e;
+  --masters-dark-green: #0f1f4d;
+  --masters-light-green: #274a9e;
+  --green-tint: #eaeff9;       /* light navy tint (brand) */
 
-  /* Team colors */
-  --team-green: #0b6b3a;
-  --team-red: #c22e2e;
-  --red-tint: #fbebea;
+  /* TEAM COLORS — Ryder Cup. NOTE the names are legacy: the "green"
+     slot flies RED (Team Red · Gavin); the "red" slot flies BLUE
+     (Team Blue · Bel). The site data keys stay green/red; only the
+     paint changed. */
+  --team-green: #cc1f2d;       /* Team Red  (slot "green", Gavin) */
+  --team-red: #2a5fce;         /* Team Blue (slot "red",  Bel)   */
+  --team-green-tint: #fbe9ea;  /* red tint  */
+  --team-red-tint: #e9f0fc;    /* blue tint */
+  --red-tint: #e9f0fc;         /* legacy alias -> team-two (blue) tint */
 
-  /* Accents — gold retired; accent is now green.
-     --masters-gold kept as a legacy alias so any stray
-     reference stays on-brand (green) instead of breaking. */
-  --color-accent: #0b6b3a;
-  --masters-gold: #0b6b3a;
-  --masters-red: #c22e2e;
-  --masters-black: #0d1512;
+  --color-accent: #17306e;
+  --masters-gold: #17306e;     /* legacy alias -> navy */
+  --masters-red: #cc1f2d;      /* danger / alerts */
+  --masters-black: #0d1220;
 
   /* Text Colors */
-  --color-text: #0d1512;
-  --color-muted: #5c6a63;
+  --color-text: #0d1220;
+  --color-muted: #5b6377;
 
   /* Utility Colors */
-  --color-warning: #c22e2e;
-  --color-success: #0b6b3a;
-  --color-highlight: #eef4f0;
+  --color-warning: #cc1f2d;
+  --color-success: #17306e;
+  --color-highlight: #eef2fb;
 
   /* Spacing */
   --max-width: 1400px;
@@ -763,41 +766,52 @@ body {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 16px 20px;
+  padding: 14px clamp(16px, 3vw, 26px);
   color: #fff;
 }
 
+/* Slot "green" flies RED; slot "red" flies BLUE (Ryder Cup). */
 .scorebug-team--green {
   justify-content: space-between;
-  background: linear-gradient(135deg, var(--team-green), var(--masters-dark-green));
+  background: linear-gradient(135deg, #e23140, var(--team-green) 55%, #a3161f);
 }
 
 .scorebug-team--red {
   justify-content: space-between;
   flex-direction: row-reverse;
-  background: linear-gradient(225deg, var(--team-red), #9c2020);
+  background: linear-gradient(225deg, #3f77e6, var(--team-red) 55%, #1c46a0);
 }
 
-.scorebug-team.winning {
-  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.35);
-}
+.scorebug-team.winning { box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.5); }
+.scorebug-teamblock { display: flex; flex-direction: column; line-height: 1; }
+.scorebug-team--red .scorebug-teamblock { align-items: flex-end; }
 
 .scorebug-name {
-  font-size: clamp(0.9em, 3.5vw, 1.2em);
-  font-weight: 800;
-  letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.95);
+  font-size: clamp(1.1em, 4.5vw, 1.7em);
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #fff;
   text-transform: uppercase;
 }
 
+.scorebug-capt {
+  font-size: clamp(0.6em, 2vw, 0.78em);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 4px;
+}
+
 .scorebug-score {
-  font-size: clamp(1.8em, 7vw, 2.6em);
+  font-size: clamp(2.6em, 11vw, 4em);
   font-weight: 900;
   color: #fff;
-  line-height: 1;
-  min-width: 2.2ch;
+  line-height: 0.9;
+  min-width: 2ch;
   text-align: center;
   font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
 .scorebug-divider {
@@ -975,7 +989,7 @@ body {
 }
 
 .nine-score.won .nine-result {
-  color: #006747;
+  color: var(--team-green);
   font-weight: 800;
 }
 
@@ -1976,8 +1990,8 @@ button:active {
 .total-card.green { border-top-color: var(--team-green); }
 .total-card.red { border-top-color: var(--team-red); }
 
-.total-card.green.winning { background: var(--green-tint); border-color: var(--team-green); }
-.total-card.red.winning { background: var(--red-tint); border-color: var(--team-red); }
+.total-card.green.winning { background: var(--team-green-tint); border-color: var(--team-green); }
+.total-card.red.winning { background: var(--team-red-tint); border-color: var(--team-red); }
 
 .total-team {
   display: block;
@@ -3541,9 +3555,9 @@ RESULT:
   border: 2px solid #9e9e9e;
 }
 .draft-status--live {
-  background: rgba(76, 175, 80, 0.15);
-  color: #4caf50;
-  border: 2px solid #4caf50;
+  background: rgba(23, 48, 110, 0.10);
+  color: var(--masters-green);
+  border: 2px solid var(--masters-green);
   animation: pulse-border 2s ease-in-out infinite;
 }
 .draft-status--complete {
@@ -3553,8 +3567,8 @@ RESULT:
 }
 
 @keyframes pulse-border {
-  0%, 100% { border-color: #4caf50; }
-  50% { border-color: rgba(76, 175, 80, 0.4); }
+  0%, 100% { border-color: var(--masters-green); }
+  50% { border-color: rgba(23, 48, 110, 0.4); }
 }
 
 /* Team column header */
@@ -3646,7 +3660,7 @@ RESULT:
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: linear-gradient(160deg, #004d35 0%, #006747 40%, #00854d 100%);
+  background: linear-gradient(160deg, var(--masters-dark-green) 0%, var(--masters-green) 55%, var(--masters-light-green) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4076,16 +4090,17 @@ RESULT:
 
 .hole-btn {
   flex: 1;
-  padding: 6px 4px;
-  border: 2px solid rgba(0, 103, 71, 0.2);
+  padding: 10px 6px;
+  border: 2px solid var(--color-line);
   border-radius: var(--radius-md);
   background: var(--color-card);
   cursor: pointer;
-  font-size: 0.75em;
+  font-size: 0.95em;
+  font-weight: 700;
   font-family: inherit;
   transition: all 0.15s ease;
   text-align: center;
-  min-height: 36px;
+  min-height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4093,7 +4108,7 @@ RESULT:
 
 .hole-btn:hover {
   border-color: var(--masters-green);
-  background: rgba(0, 103, 71, 0.05);
+  background: rgba(23, 48, 110, 0.05);
 }
 
 .hole-btn-p1.active {
@@ -4835,7 +4850,7 @@ RESULT:
     border: 1.5px solid;
     white-space: nowrap;
 }
-.weather-strip-condition.ideal { background: rgba(76,175,80,0.2); border-color: #4caf50; color: #4caf50; }
+.weather-strip-condition.ideal { background: rgba(23,48,110,0.16); border-color: var(--masters-green); color: #fff; }
 .weather-strip-condition.good  { background: rgba(255,193,7,0.2);  border-color: #ffc107; color: #ffc107; }
 .weather-strip-condition.fair  { background: rgba(255,152,0,0.2);  border-color: #ff9800; color: #ff9800; }
 .weather-strip-condition.poor  { background: rgba(244,67,54,0.2);  border-color: #f44336; color: #f44336; }

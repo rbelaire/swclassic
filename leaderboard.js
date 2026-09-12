@@ -119,8 +119,12 @@ function renderTotals(data) {
 
   const gName = document.getElementById("team-green-name");
   const rName = document.getElementById("team-red-name");
-  if (gName) gName.textContent = T.green.name.toUpperCase();
-  if (rName) rName.textContent = T.red.name.toUpperCase();
+  if (gName) gName.textContent = T.green.short;            // RED
+  if (rName) rName.textContent = T.red.short;              // BLUE
+  const gCapt = document.getElementById("team-green-capt");
+  const rCapt = document.getElementById("team-red-capt");
+  if (gCapt) gCapt.textContent = T.green.captain || "";    // Gavin
+  if (rCapt) rCapt.textContent = T.red.captain || "";      // Bel
 
   document.getElementById("team-green-score").textContent =
     (totals.green || 0).toFixed(1);

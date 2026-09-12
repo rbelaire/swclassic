@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Admin - The Classic</title>
-  <link rel="stylesheet" href="css/styles.css?v=20270907">
+  <link rel="stylesheet" href="css/styles.css?v=20270912">
   <link rel="icon" href="/favicon.ico">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0b6b3a">
+  <meta name="theme-color" content="#17306e">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="The Classic">
@@ -76,20 +76,20 @@
     <div class="tab-content active" id="tab-draft">
 
       <!-- Event Setup (admin) -->
-      <div id="event-setup" style="background:#fff; border:2px solid #006747; border-radius:10px; padding:16px 18px; margin-bottom:20px;">
-        <div style="font-weight:800; color:#006747; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Event Setup</div>
+      <div id="event-setup" style="background:#fff; border:2px solid #17306e; border-radius:10px; padding:16px 18px; margin-bottom:20px;">
+        <div style="font-weight:800; color:#17306e; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Event Setup</div>
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:12px;">
-          <label style="font-size:0.8em; color:#0d3d1f; font-weight:700;">Event name<br><input id="es-name" type="text" placeholder="The Classic 2027" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
-          <label style="font-size:0.8em; color:#0d3d1f; font-weight:700;">Date<br><input id="es-date" type="date" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
-          <label style="font-size:0.8em; color:#0d3d1f; font-weight:700;">Venue<br><input id="es-venue" type="text" placeholder="Course" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
-          <label style="font-size:0.8em; color:#0d3d1f; font-weight:700;">First tee<br><input id="es-teetime" type="time" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
-          <label style="font-size:0.8em; color:#0d3d1f; font-weight:700;">TZ offset<br><input id="es-tz" type="text" placeholder="-05:00" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
-          <label style="font-size:0.8em; color:#0d3d1f; font-weight:700;">Tee times (comma sep)<br><input id="es-tees" type="text" placeholder="9:15, 9:24, 9:33" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
+          <label style="font-size:0.8em; color:#14264f; font-weight:700;">Event name<br><input id="es-name" type="text" placeholder="The Classic 2027" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
+          <label style="font-size:0.8em; color:#14264f; font-weight:700;">Date<br><input id="es-date" type="date" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
+          <label style="font-size:0.8em; color:#14264f; font-weight:700;">Venue<br><input id="es-venue" type="text" placeholder="Course" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
+          <label style="font-size:0.8em; color:#14264f; font-weight:700;">First tee<br><input id="es-teetime" type="time" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
+          <label style="font-size:0.8em; color:#14264f; font-weight:700;">TZ offset<br><input id="es-tz" type="text" placeholder="-05:00" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
+          <label style="font-size:0.8em; color:#14264f; font-weight:700;">Tee times (comma sep)<br><input id="es-tees" type="text" placeholder="9:15, 9:24, 9:33" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-size:1em;"></label>
         </div>
         <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; align-items:center;">
           <button class="btn-primary" type="button" onclick="saveEventInfo()">Save Event Info</button>
           <button class="btn-danger" type="button" onclick="startNewSeason()">Start New Season</button>
-          <span id="es-status" style="font-size:0.85em; color:#006747; font-weight:600;"></span>
+          <span id="es-status" style="font-size:0.85em; color:#17306e; font-weight:600;"></span>
         </div>
       </div>
 
@@ -99,12 +99,12 @@
 
       <div class="captains-grid">
         <div>
-          <div class="team-column-header team-column-header--green" id="admin-team-green-header">Team Green</div>
+          <div class="team-column-header team-column-header--green" id="admin-team-green-header">Team Red</div>
           <div class="draft-slots draft-slots--green" id="admin-team-green-slots"></div>
         </div>
         <div class="captains-vs">VS</div>
         <div>
-          <div class="team-column-header team-column-header--red" id="admin-team-red-header">Team Red</div>
+          <div class="team-column-header team-column-header--red" id="admin-team-red-header">Team Blue</div>
           <div class="draft-slots draft-slots--red" id="admin-team-red-slots"></div>
         </div>
       </div>
@@ -151,11 +151,11 @@
         </div>
         <div class="totals-grid">
           <div class="total-card green">
-            <span class="total-team" id="total-green-name">Team Green</span>
+            <span class="total-team" id="total-green-name">Team Red</span>
             <span class="total-score" id="total-green">0.0</span>
           </div>
           <div class="total-card red">
-            <span class="total-team" id="total-red-name">Team Red</span>
+            <span class="total-team" id="total-red-name">Team Blue</span>
             <span class="total-score" id="total-red">0.0</span>
           </div>
         </div>
@@ -167,9 +167,9 @@
   </div><!-- end #admin-app -->
 
   <!-- Sticky save bar for foursome users -->
-  <div id="foursome-save-bar" style="display:none; position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:3px solid #0b6b3a; padding:12px 20px; padding-bottom:calc(12px + env(safe-area-inset-bottom)); align-items:center; justify-content:space-between; z-index:1000; box-shadow:0 -2px 12px rgba(13,21,18,0.1); will-change:bottom;">
-    <span id="foursome-save-status" style="font-size:0.85em; font-weight:600; color:#0b6b3a;"></span>
-    <button id="foursome-save-btn" class="btn-primary" type="button" onclick="saveData()" style="background:#0b6b3a; color:#fff; border:none; padding:10px 28px; border-radius:6px; font-size:1em; font-weight:700; cursor:pointer; min-width:150px;">Save Scores</button>
+  <div id="foursome-save-bar" style="display:none; position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:3px solid #17306e; padding:12px 20px; padding-bottom:calc(12px + env(safe-area-inset-bottom)); align-items:center; justify-content:space-between; z-index:1000; box-shadow:0 -2px 12px rgba(13,21,18,0.1); will-change:bottom;">
+    <span id="foursome-save-status" style="font-size:0.85em; font-weight:600; color:#17306e;"></span>
+    <button id="foursome-save-btn" class="btn-primary" type="button" onclick="saveData()" style="background:#17306e; color:#fff; border:none; padding:10px 28px; border-radius:6px; font-size:1em; font-weight:700; cursor:pointer; min-width:150px;">Save Scores</button>
   </div>
 
   <script src="teams.js"></script>

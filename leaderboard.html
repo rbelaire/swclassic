@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Classic 2026 - Live Leaderboard</title>
-  <link rel="stylesheet" href="css/styles.css?v=20270907">
+  <link rel="stylesheet" href="css/styles.css?v=20270912">
   <link rel="icon" href="/favicon.ico">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0b6b3a">
+  <meta name="theme-color" content="#17306e">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="The Classic">
@@ -16,7 +16,7 @@
   @media (max-width: 768px) {
     .hero { margin-bottom: 0; padding-top: 28px; padding-bottom: 24px; }
     .section-header { margin: 24px 0 16px; }
-    .section-header h2 { font-size: 1em; letter-spacing: 3px; padding: 8px 0; background: none; border: none; border-radius: 0; border-bottom: 2px solid #006747; display: block; width: 100%; animation: none; }
+    .section-header h2 { font-size: 1em; letter-spacing: 3px; padding: 8px 0; background: none; border: none; border-radius: 0; border-bottom: 2px solid #17306e; display: block; width: 100%; animation: none; }
     .scorebug { top: 0; border-radius: 0; margin-bottom: 0; }
     .scorebug-team { padding: 10px 14px; gap: 8px; }
     .refresh-controls { display: none; }
@@ -56,12 +56,21 @@
     .lb-avatar { width: 48px; height: 48px; }
   }
 
-  /* Team color runs across the row: green in from the left (Team one),
-     red in from the right (Team two) — instant team identification. */
+  /* Team color runs across the row: RED in from the left (Team Red),
+     BLUE in from the right (Team Blue) — instant team identification. */
   .foursome .matchup {
     background: linear-gradient(90deg,
-      var(--green-tint) 0%, #ffffff 30%, #ffffff 70%, var(--red-tint) 100%);
+      var(--team-green-tint) 0%, #ffffff 30%, #ffffff 70%, var(--team-red-tint) 100%);
   }
+
+  /* Broadcast readability: bigger status, scores and avatars. */
+  .mp-status { font-size: clamp(1.35rem, 4.6vw, 2rem); letter-spacing: 0.5px; }
+  .matchup-center .nine-result { font-size: clamp(1.1rem, 3vw, 1.4rem); font-weight: 800; }
+  .matchup-center .nine-label { font-size: 0.6rem; }
+  .matchup-center .nine-score { padding: 4px 11px; }
+  .lb-avatar { width: 66px; height: 66px; border-width: 4px; }
+  @media (max-width: 480px) { .lb-avatar { width: 54px; height: 54px; } .mp-status { font-size: clamp(1.25rem, 6vw, 1.7rem); } }
+  .matchup { padding: 16px 18px; }
 
   /* Center column: match-play status (hero) + point pills + holes played */
   .matchup-center {
@@ -149,12 +158,18 @@
   <!-- TEAM TOTALS SCOREBUG -->
   <div class="scorebug" id="scorebug">
     <div class="scorebug-team scorebug-team--green" id="team-green">
-      <span class="scorebug-name" id="team-green-name">GREEN</span>
+      <div class="scorebug-teamblock">
+        <span class="scorebug-name" id="team-green-name">RED</span>
+        <span class="scorebug-capt" id="team-green-capt"></span>
+      </div>
       <span class="scorebug-score" id="team-green-score">0.0</span>
     </div>
     <div class="scorebug-divider">VS</div>
     <div class="scorebug-team scorebug-team--red" id="team-red">
-      <span class="scorebug-name" id="team-red-name">RED</span>
+      <div class="scorebug-teamblock">
+        <span class="scorebug-name" id="team-red-name">BLUE</span>
+        <span class="scorebug-capt" id="team-red-capt"></span>
+      </div>
       <span class="scorebug-score" id="team-red-score">0.0</span>
     </div>
   </div>

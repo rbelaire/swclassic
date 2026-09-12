@@ -136,8 +136,8 @@ function render() {
   const T = ClassicTeams(data);
   const gh = document.getElementById("team-green-header");
   const rh = document.getElementById("team-red-header");
-  if (gh) gh.textContent = "Team " + T.green.name;
-  if (rh) rh.textContent = "Team " + T.red.name;
+  if (gh) gh.textContent = T.green.label;
+  if (rh) rh.textContent = T.red.label;
 
   const players = Object.values(data.players);
 
@@ -176,7 +176,7 @@ function renderTeam(team, players, slots) {
   if (!el) return;
 
   const T = ClassicTeams(data);
-  const ownerName = team === "red" ? T.red.name : T.green.name;
+  const ownerName = team === "red" ? T.red.short : T.green.short;
 
   let html = "";
   for (let i = 0; i < slots.length; i++) {

@@ -73,7 +73,7 @@
   }
 
   /* ---------- Simulated timeline (from tee times) ---------- */
-  var COLORS = { green: '#0b6b3a', red: '#c22e2e' };
+  var COLORS = { green: '#cc1f2d', red: '#2a5fce' };
 
   function parseClock(s) {
     const m = String(s || '').match(/(\d{1,2}):(\d{2})/);

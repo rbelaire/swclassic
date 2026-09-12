@@ -408,8 +408,8 @@ function renderDraft() {
   const T = ClassicTeams(data);
   const gh = document.getElementById("admin-team-green-header");
   const rh = document.getElementById("admin-team-red-header");
-  if (gh) gh.textContent = "Team " + T.green.name;
-  if (rh) rh.textContent = "Team " + T.red.name;
+  if (gh) gh.textContent = T.green.label;
+  if (rh) rh.textContent = T.red.label;
 
   const players = Object.entries(data.players);
   const teamGreen = players.filter(([, p]) => p.team === "green" && !p.captain).sort((a, b) => a[1].rank - b[1].rank);
@@ -485,8 +485,8 @@ function renderDraftPool(pool) {
 
   const T = ClassicTeams(data);
   grid.innerHTML = pool.map(([id, p]) => {
-    const greenBtn = `<button class="btn-green" onclick="draftPlayer('${id}', 'green')">Team ${escapeHTML(T.green.name)}</button>`;
-    const redBtn = `<button class="btn-red" onclick="draftPlayer('${id}', 'red')">Team ${escapeHTML(T.red.name)}</button>`;
+    const greenBtn = `<button class="btn-green" onclick="draftPlayer('${id}', 'green')">${escapeHTML(T.green.label)}</button>`;
+    const redBtn = `<button class="btn-red" onclick="draftPlayer('${id}', 'red')">${escapeHTML(T.red.label)}</button>`;
 
     return `
       <div class="draft-pool-card player-card">
@@ -509,7 +509,7 @@ function draftPlayer(id, team) {
   const teamCount = Object.values(data.players).filter(p => p.team === team && !p.captain).length;
   if (teamCount >= TEAM_PICK_LIMIT) {
     const T = ClassicTeams(data);
-    alert(`Team ${T.name(team)} is full (${TEAM_PICK_LIMIT} players).`);
+    alert(`${T.label(team)} is full (${TEAM_PICK_LIMIT} players).`);
     return;
   }
 
@@ -600,7 +600,7 @@ function renderMatchupBuilder() {
 
       // Team Green dropdown
       html += `<div>
-        <label>Team ${escapeHTML(T.green.name)}</label>
+        <label>${escapeHTML(T.green.label)}</label>
         ${buildMatchupSelect(match, 0, matchIndex, "green", greenPlayers, assignedGreen)}
       </div>`;
 
@@ -608,7 +608,7 @@ function renderMatchupBuilder() {
 
       // Team Red dropdown
       html += `<div>
-        <label>Team ${escapeHTML(T.red.name)}</label>
+        <label>${escapeHTML(T.red.label)}</label>
         ${buildMatchupSelect(match, 1, matchIndex, "red", redPlayers, assignedRed)}
       </div>`;
 
@@ -692,8 +692,8 @@ function renderTotals() {
 
   const gName = document.getElementById("total-green-name");
   const rName = document.getElementById("total-red-name");
-  if (gName) gName.textContent = "Team " + T.green.name;
-  if (rName) rName.textContent = "Team " + T.red.name;
+  if (gName) gName.textContent = T.green.label;
+  if (rName) rName.textContent = T.red.label;
 
   document.getElementById("total-green").textContent = totals.green.toFixed(1);
   document.getElementById("total-red").textContent = totals.red.toFixed(1);
@@ -820,12 +820,12 @@ function buildMatch(match, matchIndex) {
   const playerSelects = isFoursomeUser() ? '' : `
       <div class="teams-row">
         <div class="team-select-box team-green">
-          <label>Team ${escapeHTML(ClassicTeams(data).green.name)} Player</label>
+          <label>${escapeHTML(ClassicTeams(data).green.label)} Player</label>
           ${buildTeamSelect(match, 0, matchIndex, 'green')}
         </div>
         <div class="vs-text">VS</div>
         <div class="team-select-box team-red">
-          <label>Team ${escapeHTML(ClassicTeams(data).red.name)} Player</label>
+          <label>${escapeHTML(ClassicTeams(data).red.label)} Player</label>
           ${buildTeamSelect(match, 1, matchIndex, 'red')}
         </div>
       </div>`;
@@ -876,8 +876,8 @@ function buildScoreSelect(match, key, matchIndex, valid) {
 
   const T = ClassicTeams(data);
   const [p1Id, p2Id] = match.playerIds;
-  const p1Name = p1Id ? escapeHTML(data.players[p1Id].name) : `Team ${T.green.name} Player`;
-  const p2Name = p2Id ? escapeHTML(data.players[p2Id].name) : `Team ${T.red.name} Player`;
+  const p1Name = p1Id ? escapeHTML(data.players[p1Id].name) : `${T.green.label} Player`;
+  const p2Name = p2Id ? escapeHTML(data.players[p2Id].name) : `${T.red.label} Player`;
 
   let html = `<select id="${selectId}" onchange="updateScore(${matchIndex}, '${key}', this.value)" ${disabled}>`;
   html += '<option value="">-- Select Winner --</option>';
