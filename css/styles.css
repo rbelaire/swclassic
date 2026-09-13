@@ -5029,3 +5029,4 @@ body.foursome-mode #tab-scores { margin: 0; }
 .cc-fig { font-family: 'Archivo', system-ui, sans-serif; font-size: clamp(1.3rem, 5vw, 1.8rem); font-weight: 900; color: var(--masters-green); line-height: 1; }
 .cc-lab { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--color-muted); }
 .course-holes { font-size: 0.85rem; color: var(--color-muted); font-weight: 600; }
+.course-tbd { color: var(--color-muted); font-style: italic; font-size: 0.9rem; margin-top: 10px; }

@@ -169,14 +169,15 @@
     <div class="section-header">
         <h2>The Course</h2>
     </div>
-    <div class="course-card" id="course-card" style="display:none;">
+    <div class="course-card" id="course-card">
         <div class="course-name" id="cc-name">To Be Announced</div>
-        <div class="course-stats">
+        <div class="course-stats" id="cc-stats" style="display:none;">
             <div class="cc-stat"><span class="cc-fig" id="cc-par">&mdash;</span><span class="cc-lab">Par</span></div>
             <div class="cc-stat"><span class="cc-fig" id="cc-yds">&mdash;</span><span class="cc-lab">Yds &middot; Silver</span></div>
             <div class="cc-stat"><span class="cc-fig">Silver</span><span class="cc-lab">Tees</span></div>
         </div>
-        <div class="course-holes" id="cc-holes"></div>
+        <div class="course-holes" id="cc-holes" style="display:none;"></div>
+        <div class="course-tbd" id="cc-tbd">Course &amp; details to be announced.</div>
     </div>
 </div>
 
@@ -318,14 +319,21 @@
                     holes++;
                 });
             });
-            if (!holes) return;
             const venue = (d.meta && d.meta.venue) || "";
             const known = venue && !/^(tbd|pending|course pending)$/i.test(venue.trim());
             const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            const show = (id, on) => { const el = document.getElementById(id); if (el) el.style.display = on ? "" : "none"; };
             set("cc-name", known ? venue : "To Be Announced");
-            set("cc-par", par || "—");
-            set("cc-yds", yds ? yds.toLocaleString() : "—");
-            set("cc-holes", `${holes} holes · ${p3} par 3s · ${p5} par 5s`);
+            // Until the venue is set, don't show course stats — they'd belong to a
+            // course we haven't picked. Show a plain placeholder instead.
+            if (known && holes) {
+                set("cc-par", par || "—");
+                set("cc-yds", yds ? yds.toLocaleString() : "—");
+                set("cc-holes", `${holes} holes · ${p3} par 3s · ${p5} par 5s`);
+                show("cc-stats", true); show("cc-holes", true); show("cc-tbd", false);
+            } else {
+                show("cc-stats", false); show("cc-holes", false); show("cc-tbd", true);
+            }
             card.style.display = "";
         };
         fetch(`/api/data?t=${Date.now()}`, { cache: "no-store" })
