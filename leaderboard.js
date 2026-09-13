@@ -233,33 +233,45 @@ function nineStat(holesObj, a, b) {
   return { w1, w2, pl, rem, diff, total, done: pl > 0 && (Math.abs(diff) > rem || pl === total) };
 }
 
-// Small "F" / "B" chip showing a nine's state, coloured by the leader. The nine
-// currently being played gets a white ring so you can see which nine is live;
-// a decided nine keeps its result on screen (e.g. the front while on the back).
-function nineChip(label, s, isActive, cL, cR) {
-  let bg = "transparent", fg = "var(--color-muted)", border = "1px solid var(--color-line)", val = "–";
-  if (s.pl > 0) {
-    if (s.diff > 0) { bg = cL; fg = "#fff"; border = "none"; val = (s.done ? "" : "") + (s.w1 - s.w2) + "↑"; }
-    else if (s.diff < 0) { bg = cR; fg = "#fff"; border = "none"; val = (s.w2 - s.w1) + "↑"; }
-    else { bg = "var(--color-muted)"; fg = "#fff"; border = "none"; val = "AS"; }
+// One nine as a compact chevron line for the live board, with a black F9/B9 tab
+// on the left. While the nine is in progress it shows the live margin and a
+// "Thru n" count; once decided it shows the closeout ("4&3") or "N UP"; an even
+// nine reads "AS", and an untouched nine "–".
+function nineLine(label, holesObj, start, end, p1name, p2name) {
+  const st = nineStat(holesObj, start, end);
+  let state = "pending", centerHTML = `<div class="np-word">–</div>`;
+  if (st.pl > 0) {
+    const clinchedEarly = Math.abs(st.diff) > st.rem && st.pl < st.total;
+    if (st.done && st.diff === 0) {
+      state = "tied"; centerHTML = `<div class="np-word">AS</div>`;
+    } else if (st.diff === 0) {
+      state = "pending";
+      centerHTML = `<div class="np-result"><span class="np-word">AS</span></div><div class="np-thru">Thru ${st.pl}</div>`;
+    } else {
+      state = st.diff > 0 ? "win-left" : "win-right";
+      const big = Math.abs(st.diff);
+      const suffix = (st.done && clinchedEarly) ? "&" + st.rem : "UP";
+      const thru = st.done ? "" : `<div class="np-thru">Thru ${st.pl}</div>`;
+      centerHTML = `<div class="np-result"><span class="np-num">${big}</span><span class="np-suffix">${suffix}</span></div>${thru}`;
+    }
   }
-  const ringC = s.diff > 0 ? cL : s.diff < 0 ? cR : "var(--masters-black)";
-  const ring = isActive ? `box-shadow:0 0 0 2px #fff,0 0 0 4px ${ringC};` : "";
-  return `<span class="mp-nine" style="background:${bg};color:${fg};border:${border};${ring}"><i>${label}</i><b>${val}</b></span>`;
+  return `
+    <div class="np-line ${state}">
+      <div class="np-tab">${label}</div>
+      <div class="np-row">
+        <div class="np-bg np-bg--left"></div>
+        <div class="np-bg np-bg--right"></div>
+        <div class="np-side np-side--left"><span class="np-name">${escapeHTML(p1name)}</span></div>
+        <div class="np-center">${centerHTML}</div>
+        <div class="np-side np-side--right"><span class="np-name">${escapeHTML(p2name)}</span></div>
+      </div>
+    </div>`;
 }
 
-function fmtPts(x) { return x % 1 ? (Math.floor(x) || "") + "½" : "" + x; }  // 0.5→½, 1.5→1½
-
-// Ryder Cup app-style row. Because our match is really two nine-hole matches,
-// the centre headlines the CURRENT nine's live battle, the sub-label names the
-// nine ("Back · Thru 3"), and two chips carry both nines so the front result
-// stays on screen once play moves to the back. At the finish the headline flips
-// to the pairing's points score (e.g. 2–0).
+// A match is two stacked nine-lines (front, then back). The back nine stays
+// hidden until the front nine is complete; both lines are kept together under
+// their foursome.
 function buildMatch(match, data) {
-  const div = document.createElement("article");
-  div.className = "matchup";
-  div.onclick = () => showMatchupModal(match, data);
-
   const T = ClassicTeams(data);
   const [p1, p2] = match.playerIds;
   const p1team = p1 ? T.sideOf(data.players[p1]) : null;
@@ -268,73 +280,20 @@ function buildMatch(match, data) {
   const p2name = p2 ? data.players[p2].name : "TBD";
   const cL = T.color(p1team || "green");   // left = Team Red
   const cR = T.color(p2team || "red");     // right = Team Blue
-  div.style.setProperty("--cL", cL);
-  div.style.setProperty("--cR", cR);
-
   const holesObj = (match.points && match.points.holes) || {};
   const front = nineStat(holesObj, 1, 9);
   const back = nineStat(holesObj, 10, 18);
-  const started = front.pl > 0 || back.pl > 0;
-  const isFinal = !!match.closed || (front.done && back.done);
 
-  // Which nine is live: the back once it has a hole (or the front has finished),
-  // otherwise the front.
-  let active = "none";
-  if (!isFinal && started) active = (back.pl > 0 || front.done) ? "b" : "f";
-  const activeStat = active === "b" ? back : front;
+  const pair = document.createElement("article");
+  pair.className = "match-pair";
+  pair.style.setProperty("--cL", cL);
+  pair.style.setProperty("--cR", cR);
+  pair.onclick = () => showMatchupModal(match, data);
 
-  // Headline + chevron.
-  let center, chevron, leadLeft = false, leadRight = false;
-  if (!started) {
-    center = `<div class="mp-word">–</div>`;
-    chevron = "pending";
-  } else if (isFinal) {
-    const p1pts = (front.diff > 0 ? 1 : front.diff < 0 ? 0 : 0.5) + (back.diff > 0 ? 1 : back.diff < 0 ? 0 : 0.5);
-    const p2pts = 2 - p1pts;
-    if (p1pts > p2pts) {
-      leadLeft = true; chevron = "win-left";
-      center = `<div class="mp-result"><span class="mp-num">${fmtPts(p1pts)}</span><span class="mp-suffix">–${fmtPts(p2pts)}</span></div>`;
-    } else if (p2pts > p1pts) {
-      leadRight = true; chevron = "win-right";
-      center = `<div class="mp-result"><span class="mp-num">${fmtPts(p2pts)}</span><span class="mp-suffix">–${fmtPts(p1pts)}</span></div>`;
-    } else {
-      chevron = "tied";
-      center = `<div class="mp-word">TIED</div>`;
-    }
-  } else {
-    const cd = activeStat.diff;
-    if (cd > 0) { leadLeft = true; chevron = "win-left"; center = `<div class="mp-result"><span class="mp-num">${cd}</span><span class="mp-suffix">UP</span></div>`; }
-    else if (cd < 0) { leadRight = true; chevron = "win-right"; center = `<div class="mp-result"><span class="mp-num">${-cd}</span><span class="mp-suffix">UP</span></div>`; }
-    else { chevron = "pending"; center = `<div class="mp-word">AS</div>`; }
-  }
-  div.classList.add(chevron);
-
-  const sub = !started ? ""
-    : (isFinal ? "Final"
-      : (active === "b" ? "Back" : "Front") + " · Thru " + activeStat.pl);
-
-  // Team dots: hollow ring = that player is winning / has won.
-  const leftDot = `<span class="mp-dot mp-dot--left ${leadLeft ? "mp-dot--hollow" : ""}"></span>`;
-  const rightDot = `<span class="mp-dot mp-dot--right ${leadRight ? "mp-dot--hollow" : ""}"></span>`;
-
-  div.innerHTML = `
-    <div class="mp-bg mp-bg--left"></div>
-    <div class="mp-bg mp-bg--right"></div>
-    <div class="mp-side mp-side--left">
-      ${leftDot}
-      <span class="mp-name">${escapeHTML(p1name)}</span>
-    </div>
-    <div class="mp-center">
-      ${center}
-      ${sub ? `<div class="mp-sub">${sub}</div>` : ""}
-      <div class="mp-nines">${nineChip("F", front, active === "f", cL, cR)}${nineChip("B", back, active === "b", cL, cR)}</div>
-    </div>
-    <div class="mp-side mp-side--right">
-      <span class="mp-name">${escapeHTML(p2name)}</span>
-      ${rightDot}
-    </div>
-  `;
-  return div;
+  let html = nineLine("F9", holesObj, 1, 9, p1name, p2name);
+  if (front.done || back.pl > 0) html += nineLine("B9", holesObj, 10, 18, p1name, p2name);
+  pair.innerHTML = html;
+  return pair;
 }
 
 /* ======================

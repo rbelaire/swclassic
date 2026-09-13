@@ -45,8 +45,8 @@
      chevron pointing at the centre with the name reversed out in white; the
      other side stays white with dark type. A tied match greys both chevrons.
      Backgrounds are absolutely-positioned clip-path layers behind the text. */
-  .matches-grid { gap: 0; }
-  .foursome { padding: 0; border: 1px solid var(--color-line); overflow: hidden; }
+  .matches-grid { gap: 14px; }
+  .foursome { padding: 0; border: 1px solid var(--color-line); border-radius: 10px; overflow: hidden; }
   /* Thin black bar with small white lettering — a divider, not a heading. */
   .foursome-header {
     margin: 0; padding: 2px 12px;
@@ -60,100 +60,79 @@
     text-transform: uppercase; line-height: 1.2;
   }
 
-  .matchup {
+  /* A match = two stacked nine-lines (front, then back), each a chevron with a
+     black F9/B9 tab on the left. Two ~46px lines fill the height one big row
+     used to. The back line is only emitted once the front nine is complete. */
+  .match-pair { background: #fff; border-bottom: 3px solid var(--color-line); cursor: pointer; }
+  .match-pair:last-child { border-bottom: 0; }
+  .match-pair:hover { background: #fbfcfe; }
+
+  .np-line {
     position: relative;
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    min-height: 92px;
-    background: #fff;
-    border-bottom: 1px solid var(--color-line);
-    margin: 0;
-    overflow: hidden;
-    cursor: pointer;
+    grid-template-columns: 2.6em 1fr;
+    align-items: stretch;
+    min-height: 46px;
   }
-  .matchup:last-child { border-bottom: 0; }
-  .matchup:hover { background: #fbfcfe; }
+  .np-line + .np-line { border-top: 1px solid var(--color-line); }
 
-  /* Angled colour bands (chevrons). Hidden until a side is marked. */
-  .mp-bg { position: absolute; top: 0; bottom: 0; width: calc(50% - 66px); z-index: 0; display: none; }
-  .mp-bg--left  { left: 0;  clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 50%, calc(100% - 24px) 100%, 0 100%); }
-  .mp-bg--right { right: 0; clip-path: polygon(24px 0, 100% 0, 100% 100%, 24px 100%, 0 50%); }
-  .matchup.win-left  .mp-bg--left,
-  .matchup.win-right .mp-bg--right,
-  .matchup.tied .mp-bg { display: block; }
-  .matchup.win-left  .mp-bg--left  { background: var(--cL); }
-  .matchup.win-right .mp-bg--right { background: var(--cR); }
-  .matchup.tied .mp-bg { background: #e6e8ee; }
-
-  .mp-side {
-    position: relative; z-index: 1;
-    display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 16px;
-  }
-  .mp-side--left { justify-content: flex-start; }
-  .mp-side--right { justify-content: flex-end; }
-  .mp-name {
+  .np-tab {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--masters-black); color: #fff;
     font-family: 'Archivo', system-ui, sans-serif;
-    font-weight: 700; font-size: clamp(1.05rem, 3.6vw, 1.4rem);
-    letter-spacing: -0.01em; line-height: 1.1; color: var(--masters-black);
+    font-weight: 900; font-size: 0.7rem; letter-spacing: 0.04em;
+  }
+
+  .np-row { position: relative; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; overflow: hidden; }
+
+  /* Angled colour bands (chevrons), computed within the row (right of the tab). */
+  .np-bg { position: absolute; top: 0; bottom: 0; width: calc(50% - 54px); z-index: 0; display: none; }
+  .np-bg--left  { left: 0;  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%); }
+  .np-bg--right { right: 0; clip-path: polygon(18px 0, 100% 0, 100% 100%, 18px 100%, 0 50%); }
+  .np-line.win-left  .np-bg--left,
+  .np-line.win-right .np-bg--right,
+  .np-line.tied .np-bg { display: block; }
+  .np-line.win-left  .np-bg--left  { background: var(--cL); }
+  .np-line.win-right .np-bg--right { background: var(--cR); }
+  .np-line.tied .np-bg { background: #e6e8ee; }
+
+  .np-side {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; min-width: 0; padding: 6px 12px;
+    font-family: 'Archivo', system-ui, sans-serif;
+  }
+  .np-side--left { justify-content: flex-start; }
+  .np-side--right { justify-content: flex-end; }
+  .np-name {
+    font-weight: 700; font-size: clamp(0.95rem, 3.2vw, 1.2rem); letter-spacing: -0.01em;
+    line-height: 1.05; color: var(--masters-black);
     min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .matchup.win-left  .mp-side--left  .mp-name,
-  .matchup.win-right .mp-side--right .mp-name { color: #fff; }
+  .np-line.win-left  .np-side--left  .np-name,
+  .np-line.win-right .np-side--right .np-name { color: #fff; }
 
-  /* Team dot before/after the name; hollow ring = winning/leading. */
-  .mp-dot { flex-shrink: 0; width: 14px; height: 14px; border-radius: 50%; }
-  .mp-dot--left  { background: var(--cL); }
-  .mp-dot--right { background: var(--cR); }
-  .mp-dot--hollow { background: transparent; border: 3px solid currentColor; }
-  .mp-side--left .mp-dot--hollow  { color: var(--cL); }
-  .mp-side--right .mp-dot--hollow { color: var(--cR); }
-  /* On a filled colour band the winner's hollow ring reads in white. */
-  .matchup.win-left  .mp-side--left  .mp-dot--hollow,
-  .matchup.win-right .mp-side--right .mp-dot--hollow { color: #fff; }
-
-  .mp-center {
+  .np-center {
     position: relative; z-index: 2;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 2px; padding: 4px 6px; min-width: 108px; max-width: 128px; text-align: center;
+    gap: 0; padding: 2px 6px; min-width: 80px; max-width: 104px; text-align: center;
+    font-family: 'Archivo', system-ui, sans-serif;
   }
-  .mp-result { font-family: 'Archivo', system-ui, sans-serif; display: flex; align-items: baseline; justify-content: center; gap: 1px; line-height: 0.9; }
-  .mp-num { font-weight: 900; font-size: clamp(2.1rem, 8vw, 3rem); letter-spacing: -0.02em; color: var(--masters-black); }
-  .mp-suffix { font-weight: 800; font-size: clamp(0.72rem, 2.4vw, 0.95rem); letter-spacing: 0.3px; color: var(--masters-black); }
-  .mp-word { font-family: 'Archivo', system-ui, sans-serif; font-weight: 900; font-size: clamp(1.5rem, 5.2vw, 2rem); letter-spacing: 0.02em; color: var(--color-muted); }
-  .matchup.win-left  .mp-num, .matchup.win-left  .mp-suffix { color: var(--cL); }
-  .matchup.win-right .mp-num, .matchup.win-right .mp-suffix { color: var(--cR); }
-  .mp-sub {
-    font-weight: 700; font-size: 0.6rem; letter-spacing: 0.06em;
-    text-transform: uppercase; color: var(--color-muted); line-height: 1;
-    white-space: nowrap;
-  }
-  /* Front / back nine chips (our format is two nine-hole matches). Each chip is
-     coloured by that nine's leader; the live nine gets a white ring. The front
-     chip keeps the settled front result on screen once play reaches the back. */
-  .mp-nines { display: flex; gap: 6px; margin-top: 5px; }
-  .mp-nine {
-    display: inline-flex; align-items: center; gap: 3px;
-    padding: 2px 6px; border-radius: 6px; line-height: 1;
-  }
-  .mp-nine i { font-style: normal; font-size: 0.5rem; font-weight: 800; letter-spacing: 0.04em; opacity: 0.85; }
-  .mp-nine b { font-size: 0.68rem; font-weight: 900; }
+  .np-result { display: flex; align-items: baseline; justify-content: center; gap: 1px; line-height: 0.95; }
+  .np-num { font-weight: 900; font-size: clamp(1.35rem, 5vw, 1.85rem); letter-spacing: -0.02em; color: var(--masters-black); }
+  .np-suffix { font-weight: 800; font-size: 0.46em; letter-spacing: 0.2px; color: var(--masters-black); }
+  .np-word { font-weight: 900; font-size: clamp(1.1rem, 4vw, 1.5rem); letter-spacing: 0.02em; color: var(--color-muted); line-height: 1; }
+  .np-thru { font-size: 0.5rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-muted); line-height: 1; margin-top: 1px; }
+  .np-line.win-left  .np-num, .np-line.win-left  .np-suffix { color: var(--cL); }
+  .np-line.win-right .np-num, .np-line.win-right .np-suffix { color: var(--cR); }
 
   @media (max-width: 480px) {
-    .matchup { min-height: 84px; }
-    /* Pull the chevron tips back so the centre keeps a clear white gap. */
-    .mp-bg { width: calc(50% - 64px); }
-    .mp-bg--left  { clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%); }
-    .mp-bg--right { clip-path: polygon(18px 0, 100% 0, 100% 100%, 18px 100%, 0 50%); }
-    .mp-side { gap: 7px; padding: 8px 9px; }
-    .mp-name { font-size: 1rem; }
-    .mp-center { min-width: 90px; max-width: 120px; padding: 4px 2px; }
-    .mp-num { font-size: 1.7rem; }
-    .mp-sub { font-size: 0.54rem; letter-spacing: 0.03em; }
-    .mp-nines { gap: 5px; margin-top: 4px; }
-    .mp-nine { padding: 2px 5px; }
-    .mp-nine b { font-size: 0.62rem; }
-    .mp-dot { width: 12px; height: 12px; }
+    .np-line { min-height: 44px; }
+    .np-bg { width: calc(50% - 50px); }
+    .np-side { padding: 6px 9px; }
+    .np-name { font-size: 0.98rem; }
+    .np-center { min-width: 74px; max-width: 98px; }
+    .np-num { font-size: 1.5rem; }
+    .np-tab { font-size: 0.64rem; }
   }
 
   /* ===== Score timeline ===== */
