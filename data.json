@@ -18,146 +18,146 @@
       "name": "Austin",
       "rank": 3,
       "pops": 5,
-      "team": "green"
+      "team": null
     },
     "bruce": {
       "name": "Bruce",
       "rank": 4,
       "pops": 7,
-      "team": "red"
+      "team": null
     },
     "brock": {
       "name": "Brock",
       "rank": 5,
       "pops": 7,
-      "team": "red"
+      "team": null
     },
     "jared": {
       "name": "Jared",
       "rank": 6,
       "pops": 7,
-      "team": "green"
+      "team": null
     },
     "hunter": {
       "name": "Hunter",
       "rank": 7,
       "pops": 11,
-      "team": "green"
+      "team": null
     },
     "colby": {
       "name": "Colby",
       "rank": 8,
       "pops": 12,
-      "team": "red"
+      "team": null
     },
     "lane": {
       "name": "Lane",
       "rank": 9,
       "pops": 12,
-      "team": "red"
+      "team": null
     },
     "alex": {
       "name": "Alex",
       "rank": 10,
       "pops": 13,
-      "team": "green"
+      "team": null
     },
     "dex": {
       "name": "Dexter",
       "rank": 11,
       "pops": 14,
-      "team": "green"
+      "team": null
     },
     "jv": {
       "name": "Jordan",
       "rank": 12,
       "pops": 14,
-      "team": "red"
+      "team": null
     },
     "nick": {
       "name": "Nick",
       "rank": 13,
       "pops": 12,
-      "team": "red"
+      "team": null
     },
     "steve": {
       "name": "Steve",
       "rank": 14,
       "pops": 13,
-      "team": "green"
+      "team": null
     }
   },
   "matches": [
     {
       "id": 1,
       "playerIds": [
-        "gavin",
-        "nick"
+        null,
+        null
       ],
       "points": {
-        "front9": 1,
-        "back9": 1,
+        "front9": null,
+        "back9": null,
         "holes": {
-          "1": 1,
-          "2": 1,
-          "3": 1,
-          "4": 1,
-          "5": 1,
+          "1": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
           "6": null,
           "7": null,
           "8": null,
           "9": null,
-          "10": 1,
-          "11": 1,
-          "12": 1,
-          "13": 0.5,
-          "14": 0.5,
-          "15": 1,
+          "10": null,
+          "11": null,
+          "12": null,
+          "13": null,
+          "14": null,
+          "15": null,
           "16": null,
           "17": null,
           "18": null
         }
       },
-      "status": "complete",
+      "status": "not_started",
       "closed": false
     },
     {
       "id": 2,
       "playerIds": [
-        "ak",
-        "jv"
+        null,
+        null
       ],
       "points": {
-        "front9": 0,
-        "back9": 0,
+        "front9": null,
+        "back9": null,
         "holes": {
-          "1": 0,
-          "2": 0,
-          "3": 0,
-          "4": 0,
-          "5": 0,
+          "1": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
           "6": null,
           "7": null,
           "8": null,
           "9": null,
-          "10": 0,
-          "11": 0.5,
-          "12": 0.5,
-          "13": 0.5,
-          "14": 0,
-          "15": 0,
-          "16": 0,
+          "10": null,
+          "11": null,
+          "12": null,
+          "13": null,
+          "14": null,
+          "15": null,
+          "16": null,
           "17": null,
           "18": null
         }
       },
-      "status": "complete"
+      "status": "not_started"
     },
     {
       "id": 3,
       "playerIds": [
-        "jared",
-        "lane"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -188,8 +188,8 @@
     {
       "id": 4,
       "playerIds": [
-        "hunter",
-        "colby"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -220,8 +220,8 @@
     {
       "id": 5,
       "playerIds": [
-        "alex",
-        "brock"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -252,8 +252,8 @@
     {
       "id": 6,
       "playerIds": [
-        "dex",
-        "bruce"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -284,8 +284,8 @@
     {
       "id": 7,
       "playerIds": [
-        "steve",
-        "bel"
+        null,
+        null
       ],
       "points": {
         "front9": null,
@@ -315,7 +315,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-09-13T00:59:23.931Z",
+    "lastUpdated": "2026-09-13T01:24:45.952Z",
     "eventName": "The 2027 Classic",
     "tournamentDate": "2027-09-04",
     "teeTime": "08:00",
@@ -330,14 +330,9 @@
     },
     "scoreLog": [
       {
-        "t": "2026-09-12T21:05:00.274Z",
+        "t": "2026-09-13T01:24:45.952Z",
         "g": 0,
         "r": 0
-      },
-      {
-        "t": "2026-09-13T00:59:23.931Z",
-        "g": 2,
-        "r": 2
       }
     ]
   },
