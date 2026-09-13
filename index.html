@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Classic 2027 - Tournament Format</title>
     <link rel="stylesheet" href="css/styles.css?v=20270912">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&display=swap">
     <link rel="icon" href="/favicon.ico">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#17306e">
@@ -184,6 +187,18 @@
     <div class="cap-draftnote" id="cap-draftnote">Draft date to be announced</div>
 </div>
 
+<div class="container">
+    <div class="section-header">
+        <h2>Defending Champions</h2>
+    </div>
+    <div id="champ-banner"></div>
+
+    <div class="section-header" style="margin-top: var(--gap-section);">
+        <h2>All-Time Wins</h2>
+    </div>
+    <div class="alltime" id="alltime"></div>
+</div>
+
 
      <script>
         const countdownElement = document.getElementById('countdown');
@@ -280,6 +295,43 @@
 
         updateCountdown();
         setInterval(updateCountdown, 1000);
+
+        // ---- Champions (most recent first). Past winners are static history. ----
+        const CHAMPIONS = [
+            { year: 2026, team: "Brock", defeated: "Jared", score: "9–3", winners: ["Gavin","Bel","Lane","Alex","Jordan","Brock"] },
+            { year: 2025, winners: ["Gavin","Brock","Jared","Dexter","Lane","Austin","Slowby","Jordan"] },
+            { year: 2024, rainedOut: true, winners: [] },
+            { year: 2023, winners: ["Hunter","Brock","Dexter","Jordan","Austin","Colby","Gavin"] },
+            { year: 2022, winners: ["Bel","Hunter","Austin","Colby","Alex","Bruce","Nick"] },
+            { year: 2021, winners: ["Jordan","Steve","Alex","Jared","Austin","Colby","Gavin"] },
+            { year: 2020, winners: ["Gavin","Colby","Dexter","Brock","Bruce","Jared","Hunter"] },
+            { year: 2019, winners: ["Gavin","Brock","Al","Steve","Slowb"] }
+        ];
+        (function renderChampions() {
+            const esc = (s) => { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; };
+            const champ = CHAMPIONS.find(c => !c.rainedOut && c.winners && c.winners.length);
+            const banner = document.getElementById('champ-banner');
+            if (banner && champ) {
+                banner.className = 'champ-banner';
+                banner.innerHTML =
+                    `<div class="champ-eyebrow">${champ.year} Champions</div>` +
+                    `<div class="champ-team">Team ${esc(champ.team || champ.winners[0])}</div>` +
+                    (champ.defeated ? `<div class="champ-sub">def. <b>Team ${esc(champ.defeated)}</b> &middot; ${esc(champ.score || '')}</div>` : '') +
+                    `<div class="champ-roster">${champ.winners.map(w => `<span class="champ-chip">${esc(w)}</span>`).join('')}</div>`;
+            }
+            const tally = {};
+            CHAMPIONS.forEach(c => (c.winners || []).forEach(n => { tally[n] = (tally[n] || 0) + 1; }));
+            const rows = Object.entries(tally).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+            const max = rows.length ? rows[0][1] : 1;
+            const el = document.getElementById('alltime');
+            if (el) el.innerHTML = rows.map(([name, wins], i) =>
+                `<div class="at-row ${i === 0 ? 'at-row--lead' : ''}">` +
+                `<div class="at-bar" style="width:${Math.round(wins / max * 100)}%"></div>` +
+                `<span class="at-rank">${i + 1}</span>` +
+                `<span class="at-name">${esc(name)}</span>` +
+                `<span class="at-wins">${wins}</span>` +
+                `</div>`).join('');
+        })();
     </script>
 </body>
 </html>
