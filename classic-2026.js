@@ -198,50 +198,58 @@
 
   function fmtPts(n) { return n % 1 === 0 ? String(n) : (Math.floor(n) ? Math.floor(n) + '½' : '½'); }
 
-  // Per-nine margin from the hole winners (1 = player1, 0 = player2, 0.5 tie).
-  function nineMargin(m, a, b) {
-    let w1 = 0, w2 = 0, pl = 0;
-    for (let h = a; h <= b; h++) {
-      const v = m.holes ? m.holes[h] : null;
-      if (v === 1) { w1++; pl++; } else if (v === 0) { w2++; pl++; } else if (v === 0.5) pl++;
+  // One nine's result in proper match-play terms. A nine is closed out the
+  // moment a player leads by more holes than remain in it, so we report the
+  // closeout margin ("4&3") rather than a raw hole differential; a nine played
+  // to the 9th reads "N UP", and an even nine is "AS".
+  function nineOutcome(m, start, end) {
+    const holes = m.holes || {};
+    const s1 = sideKey(m.side1), s2 = sideKey(m.side2);
+    let w1 = 0, w2 = 0, any = false, clinch = null, up = 0, rem = 0;
+    for (let h = start; h <= end; h++) {
+      const v = holes[h];
+      if (v === 1 || v === 0 || v === 0.5) any = true;
+      if (v === 1) w1++; else if (v === 0) w2++;
+      if (clinch === null && (v === 1 || v === 0 || v === 0.5)) {
+        const lead = Math.abs(w1 - w2), left = end - h;
+        if (lead > 0 && lead > left) { clinch = h; up = lead; rem = left; }
+      }
     }
-    return { w1, w2, pl, diff: w1 - w2 };
+    const nineVal = start <= 9 ? m.front9 : m.back9;
+    if (!any) {
+      if (nineVal === 1) return { side: s1, word: 'WON' };
+      if (nineVal === 0) return { side: s2, word: 'WON' };
+      if (nineVal === 0.5) return { side: 'tie', word: 'AS' };
+      return { side: 'none', word: '—' };
+    }
+    const diff = w1 - w2;
+    const winSide = diff > 0 ? s1 : diff < 0 ? s2 : 'tie';
+    if (clinch !== null && rem > 0 && diff !== 0) return { side: winSide, big: String(up), suffix: '&' + rem };
+    if (diff === 0) return { side: 'tie', word: 'AS' };
+    return { side: winSide, big: String(Math.abs(diff)), suffix: 'UP' };
   }
 
-  // Small F/B chip coloured by that nine's winner (margin if holes are known,
-  // else just the winner). cL = player1's team colour, cR = player2's.
-  function nineChip(label, m, a, b, nineVal, cL, cR) {
-    let bg = 'transparent', fg = 'var(--color-muted)', border = '1px solid var(--color-line)', val = '–';
-    const s = nineMargin(m, a, b);
-    if (s.pl > 0) {
-      if (s.diff > 0) { bg = cL; fg = '#fff'; border = 'none'; val = (s.w1 - s.w2) + '↑'; }
-      else if (s.diff < 0) { bg = cR; fg = '#fff'; border = 'none'; val = (s.w2 - s.w1) + '↑'; }
-      else { bg = 'var(--color-muted)'; fg = '#fff'; border = 'none'; val = 'AS'; }
-    } else if (nineVal === 1) { bg = cL; fg = '#fff'; border = 'none'; val = 'W'; }
-    else if (nineVal === 0) { bg = cR; fg = '#fff'; border = 'none'; val = 'W'; }
-    else if (nineVal === 0.5) { bg = 'var(--color-muted)'; fg = '#fff'; border = 'none'; val = 'AS'; }
-    return `<span class="cv-chip" style="background:${bg};color:${fg};border:${border}"><i>${label}</i><b>${val}</b></span>`;
-  }
-
-  // One match as a Ryder Cup-style chevron row: winner's name reversed out in
-  // their team colour, points score in the centre, F/B nine chips beneath.
-  function cvRow(m) {
-    const o = outcome(m);
-    const cL = COLORS[o.kA] || COLORS.green;
-    const cR = COLORS[o.kB] || COLORS.red;
+  // One nine as a Ryder Cup-style chevron row: the winner's name reversed out in
+  // their team colour with that nine's result in the centre.
+  function cvNineRow(m, start, end) {
+    const o = nineOutcome(m, start, end);
+    const s1 = sideKey(m.side1), s2 = sideKey(m.side2);
+    const cL = COLORS[s1] || COLORS.green, cR = COLORS[s2] || COLORS.red;
     let state, center;
-    if (o.winnerSide === 'tie' || o.a === o.b) {
-      state = 'tied'; center = `<div class="cv-word">TIED</div>`;
-    } else if (o.a > o.b) {
-      state = 'win-left'; center = `<div class="cv-score">${fmtPts(o.a)}<span class="cv-dash">–</span>${fmtPts(o.b)}</div>`;
+    if (o.side === 'tie' || o.side === 'none') {
+      state = o.side === 'none' ? 'pending' : 'tied';
+      center = `<div class="cv-word">${o.word || 'AS'}</div>`;
     } else {
-      state = 'win-right'; center = `<div class="cv-score">${fmtPts(o.b)}<span class="cv-dash">–</span>${fmtPts(o.a)}</div>`;
+      state = o.side === s1 ? 'win-left' : 'win-right';
+      center = o.word
+        ? `<div class="cv-word cv-word--win">${o.word}</div>`
+        : `<div class="cv-score"><span class="cv-num">${o.big}</span><span class="cv-suffix">${o.suffix}</span></div>`;
     }
     return `<div class="cvrow ${state}" style="--cL:${cL};--cR:${cR}">
       <div class="cv-bg cv-bg--left"></div>
       <div class="cv-bg cv-bg--right"></div>
       <div class="cv-side cv-side--left"><span class="cv-name">${esc(m.player1)}</span></div>
-      <div class="cv-center">${center}<div class="cv-chips">${nineChip('F', m, 1, 9, m.front9, cL, cR)}${nineChip('B', m, 10, 18, m.back9, cL, cR)}</div></div>
+      <div class="cv-center">${center}</div>
       <div class="cv-side cv-side--right"><span class="cv-name">${esc(m.player2)}</span></div>
     </div>`;
   }
@@ -305,9 +313,14 @@
       html += `<ul class="recap-highlights">` + bullets.map(b => `<li>${b}</li>`).join('') + `</ul>`;
     }
 
-    // Chevron match rows (same broadcast look as the live leaderboard).
+    // Two sessions — front nine and back nine — scored like separate rounds.
+    html += `<div class="recap-nine-head">Front Nine</div>`;
     html += `<div class="recap-results">`;
-    matches.forEach(m => { html += cvRow(m); });
+    matches.forEach(m => { html += cvNineRow(m, 1, 9); });
+    html += `</div>`;
+    html += `<div class="recap-nine-head">Back Nine</div>`;
+    html += `<div class="recap-results">`;
+    matches.forEach(m => { html += cvNineRow(m, 10, 18); });
     html += `</div>`;
 
     if (t.notes) html += `<p class="recap-note">${esc(t.notes)}</p>`;
