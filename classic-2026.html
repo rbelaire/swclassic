@@ -147,9 +147,16 @@
       position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;
       gap: 3px; padding: 4px 6px; min-width: 100px; max-width: 122px; text-align: center;
     }
-    .cv-score { display: flex; align-items: baseline; gap: 3px; font-weight: 900; line-height: 1;
-      font-size: clamp(1.4rem, 5vw, 1.9rem); color: var(--masters-black); }
-    .cv-score .cv-dash { font-size: 0.7em; }
+    .cv-score { display: flex; align-items: baseline; gap: 2px; font-weight: 900; line-height: 1;
+      color: var(--masters-black); }
+    .cv-num { font-size: clamp(1.5rem, 5.5vw, 2rem); font-weight: 900; }
+    .cv-suffix { font-size: 0.56em; font-weight: 800; letter-spacing: 0.02em; }
+    .cv-word--win { color: #fff; }
+    .recap-nine-head {
+      text-align: center; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--masters-green); margin: 24px 0 10px;
+    }
+    .recap-nine-head:first-of-type { margin-top: 6px; }
     .cvrow.win-left .cv-score { color: var(--cL); }
     .cvrow.win-right .cv-score { color: var(--cR); }
     .cv-word { font-weight: 900; font-size: clamp(1.1rem, 4vw, 1.5rem); letter-spacing: 2px; color: var(--color-muted); }
