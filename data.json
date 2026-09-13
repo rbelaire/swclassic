@@ -91,8 +91,8 @@
     {
       "id": 1,
       "playerIds": [
-        null,
-        null
+        "gavin",
+        "nick"
       ],
       "points": {
         "front9": null,
@@ -124,8 +124,8 @@
     {
       "id": 2,
       "playerIds": [
-        null,
-        null
+        "ak",
+        "jv"
       ],
       "points": {
         "front9": null,
@@ -156,8 +156,8 @@
     {
       "id": 3,
       "playerIds": [
-        null,
-        null
+        "jared",
+        "lane"
       ],
       "points": {
         "front9": null,
@@ -188,8 +188,8 @@
     {
       "id": 4,
       "playerIds": [
-        null,
-        null
+        "hunter",
+        "colby"
       ],
       "points": {
         "front9": null,
@@ -220,8 +220,8 @@
     {
       "id": 5,
       "playerIds": [
-        null,
-        null
+        "alex",
+        "brock"
       ],
       "points": {
         "front9": null,
@@ -252,8 +252,8 @@
     {
       "id": 6,
       "playerIds": [
-        null,
-        null
+        "dex",
+        "bruce"
       ],
       "points": {
         "front9": null,
@@ -284,8 +284,8 @@
     {
       "id": 7,
       "playerIds": [
-        null,
-        null
+        "steve",
+        "bel"
       ],
       "points": {
         "front9": null,
@@ -315,7 +315,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-09-13T00:58:07.331Z",
+    "lastUpdated": "2026-09-13T00:58:49.385Z",
     "eventName": "The 2027 Classic",
     "tournamentDate": "2027-09-04",
     "teeTime": "08:00",
