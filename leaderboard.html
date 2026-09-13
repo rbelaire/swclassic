@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Classic 2026 - Live Leaderboard</title>
   <link rel="stylesheet" href="css/styles.css?v=20270912">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&display=swap">
   <link rel="icon" href="/favicon.ico">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#17306e">
@@ -62,7 +65,7 @@
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    min-height: 84px;
+    min-height: 92px;
     background: #fff;
     border-bottom: 1px solid var(--color-line);
     margin: 0;
@@ -90,8 +93,9 @@
   .mp-side--left { justify-content: flex-start; }
   .mp-side--right { justify-content: flex-end; }
   .mp-name {
-    font-weight: 800; font-size: clamp(1rem, 3.4vw, 1.35rem);
-    letter-spacing: 0.2px; line-height: 1.1; color: var(--masters-black);
+    font-family: 'Archivo', system-ui, sans-serif;
+    font-weight: 700; font-size: clamp(1.05rem, 3.6vw, 1.4rem);
+    letter-spacing: -0.01em; line-height: 1.1; color: var(--masters-black);
     min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .matchup.win-left  .mp-side--left  .mp-name,
@@ -113,10 +117,10 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 2px; padding: 4px 6px; min-width: 108px; max-width: 128px; text-align: center;
   }
-  .mp-result { display: flex; align-items: baseline; justify-content: center; gap: 3px; line-height: 1; }
-  .mp-num { font-weight: 900; font-size: clamp(1.7rem, 6vw, 2.5rem); color: var(--masters-black); }
-  .mp-suffix { font-weight: 800; font-size: clamp(0.8rem, 2.6vw, 1.05rem); letter-spacing: 0.5px; color: var(--masters-black); }
-  .mp-word { font-weight: 900; font-size: clamp(1.2rem, 4.4vw, 1.7rem); letter-spacing: 2px; color: var(--color-muted); }
+  .mp-result { font-family: 'Archivo', system-ui, sans-serif; display: flex; align-items: baseline; justify-content: center; gap: 1px; line-height: 0.9; }
+  .mp-num { font-weight: 900; font-size: clamp(2.1rem, 8vw, 3rem); letter-spacing: -0.02em; color: var(--masters-black); }
+  .mp-suffix { font-weight: 800; font-size: clamp(0.72rem, 2.4vw, 0.95rem); letter-spacing: 0.3px; color: var(--masters-black); }
+  .mp-word { font-family: 'Archivo', system-ui, sans-serif; font-weight: 900; font-size: clamp(1.5rem, 5.2vw, 2rem); letter-spacing: 0.02em; color: var(--color-muted); }
   .matchup.win-left  .mp-num, .matchup.win-left  .mp-suffix { color: var(--cL); }
   .matchup.win-right .mp-num, .matchup.win-right .mp-suffix { color: var(--cR); }
   .mp-sub {
@@ -136,7 +140,7 @@
   .mp-nine b { font-size: 0.68rem; font-weight: 900; }
 
   @media (max-width: 480px) {
-    .matchup { min-height: 76px; }
+    .matchup { min-height: 84px; }
     /* Pull the chevron tips back so the centre keeps a clear white gap. */
     .mp-bg { width: calc(50% - 64px); }
     .mp-bg--left  { clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%); }

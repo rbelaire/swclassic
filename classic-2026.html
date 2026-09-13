@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Classic 2026 - Recap</title>
   <link rel="stylesheet" href="css/styles.css?v=20270912">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&display=swap">
   <link rel="icon" href="/favicon.ico">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#17306e">
@@ -119,7 +122,7 @@
     .recap-results { display: grid; gap: 10px; margin: 0 auto 8px; max-width: 560px; }
     .cvrow {
       position: relative; display: grid; grid-template-columns: 1fr auto 1fr;
-      align-items: center; min-height: 66px; overflow: hidden;
+      align-items: center; min-height: 80px; overflow: hidden;
       background: var(--color-card); border: 1px solid var(--color-line);
       border-radius: var(--radius-md);
     }
@@ -137,7 +140,9 @@
     .cv-side--left { justify-content: flex-start; }
     .cv-side--right { justify-content: flex-end; }
     .cv-name {
-      font-weight: 800; font-size: clamp(1rem, 3.2vw, 1.25rem); color: var(--masters-black);
+      font-family: 'Archivo', system-ui, sans-serif;
+      font-weight: 700; font-size: clamp(1.05rem, 3.4vw, 1.3rem); letter-spacing: -0.01em;
+      color: var(--masters-black);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .cvrow.win-left .cv-side--left .cv-name,
@@ -145,12 +150,20 @@
 
     .cv-center {
       position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;
-      gap: 3px; padding: 4px 6px; min-width: 100px; max-width: 122px; text-align: center;
+      gap: 3px; padding: 4px 6px; min-width: 108px; max-width: 132px; text-align: center;
     }
-    .cv-score { display: flex; align-items: baseline; gap: 2px; font-weight: 900; line-height: 1;
-      color: var(--masters-black); }
-    .cv-num { font-size: clamp(1.5rem, 5.5vw, 2rem); font-weight: 900; }
-    .cv-suffix { font-size: 0.56em; font-weight: 800; letter-spacing: 0.02em; }
+    .cv-score {
+      font-family: 'Archivo', system-ui, sans-serif;
+      display: flex; align-items: baseline; justify-content: center; gap: 1px;
+      font-weight: 900; line-height: 0.9; color: var(--masters-black);
+    }
+    .cv-num { font-size: clamp(2.2rem, 9vw, 3.1rem); font-weight: 900; letter-spacing: -0.02em; }
+    .cv-suffix { font-size: 0.42em; font-weight: 800; letter-spacing: 0.03em; }
+    .cv-word {
+      font-family: 'Archivo', system-ui, sans-serif;
+      font-weight: 900; font-size: clamp(1.5rem, 6vw, 2.1rem); letter-spacing: 0.02em;
+      color: var(--color-muted); line-height: 1;
+    }
     .cv-word--win { color: #fff; }
     .recap-nine-head {
       text-align: center; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.16em;
@@ -159,7 +172,6 @@
     .recap-nine-head:first-of-type { margin-top: 6px; }
     .cvrow.win-left .cv-score { color: var(--cL); }
     .cvrow.win-right .cv-score { color: var(--cR); }
-    .cv-word { font-weight: 900; font-size: clamp(1.1rem, 4vw, 1.5rem); letter-spacing: 2px; color: var(--color-muted); }
     .cv-chips { display: flex; gap: 5px; margin-top: 4px; }
     .cv-chip { display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 6px; line-height: 1; }
     .cv-chip i { font-style: normal; font-size: 0.5rem; font-weight: 800; letter-spacing: 0.04em; opacity: 0.85; }
