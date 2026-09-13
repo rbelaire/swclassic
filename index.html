@@ -165,6 +165,21 @@
     </div>
 </section>
 
+<div class="container">
+    <div class="section-header">
+        <h2>The Course</h2>
+    </div>
+    <div class="course-card" id="course-card" style="display:none;">
+        <div class="course-name" id="cc-name">To Be Announced</div>
+        <div class="course-stats">
+            <div class="cc-stat"><span class="cc-fig" id="cc-par">&mdash;</span><span class="cc-lab">Par</span></div>
+            <div class="cc-stat"><span class="cc-fig" id="cc-yds">&mdash;</span><span class="cc-lab">Yds &middot; Silver</span></div>
+            <div class="cc-stat"><span class="cc-fig">Silver</span><span class="cc-lab">Tees</span></div>
+        </div>
+        <div class="course-holes" id="cc-holes"></div>
+    </div>
+</div>
+
 <div class="container" id="captains-container" style="display:none;">
     <div class="section-header">
         <h2>2027 Captains</h2>
@@ -287,10 +302,36 @@
             const wrap = document.getElementById("captains-container");
             if (wrap) wrap.style.display = "";
         };
+        // Course card — par, Silver yardage and hole mix from the stored course.
+        const applyCourse = (d) => {
+            const c = d && d.course;
+            const card = document.getElementById('course-card');
+            if (!c || !card) return;
+            let par = 0, yds = 0, p3 = 0, p5 = 0, holes = 0;
+            ["front9", "back9"].forEach(n => {
+                Object.values(c[n] || {}).forEach(h => {
+                    if (!h) return;
+                    par += (+h.par || 0);
+                    yds += (h.yardage && +h.yardage.silver) || 0;
+                    if (+h.par === 3) p3++;
+                    if (+h.par === 5) p5++;
+                    holes++;
+                });
+            });
+            if (!holes) return;
+            const venue = (d.meta && d.meta.venue) || "";
+            const known = venue && !/^(tbd|pending|course pending)$/i.test(venue.trim());
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            set("cc-name", known ? venue : "To Be Announced");
+            set("cc-par", par || "—");
+            set("cc-yds", yds ? yds.toLocaleString() : "—");
+            set("cc-holes", `${holes} holes · ${p3} par 3s · ${p5} par 5s`);
+            card.style.display = "";
+        };
         fetch(`/api/data?t=${Date.now()}`, { cache: "no-store" })
             .then(r => r.ok ? r.json() : Promise.reject())
             .catch(() => fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" }).then(r => r.json()))
-            .then(d => { applyEventConfig(d && d.meta); applyCaptains(d); })
+            .then(d => { applyEventConfig(d && d.meta); applyCaptains(d); applyCourse(d); })
             .catch(() => {});
 
         updateCountdown();
