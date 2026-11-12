@@ -85,6 +85,18 @@
       "rank": 14,
       "pops": 13,
       "team": null
+    },
+    "tbd1": {
+      "name": "TBD 1",
+      "rank": 15,
+      "pops": 15,
+      "team": null
+    },
+    "tbd2": {
+      "name": "TBD 2",
+      "rank": 16,
+      "pops": 15,
+      "team": null
     }
   },
   "matches": [
@@ -119,7 +131,11 @@
         }
       },
       "status": "not_started",
-      "closed": false
+      "closed": false,
+      "partnerIds": [
+        null,
+        null
+      ]
     },
     {
       "id": 2,
@@ -151,7 +167,11 @@
           "18": null
         }
       },
-      "status": "not_started"
+      "status": "not_started",
+      "partnerIds": [
+        null,
+        null
+      ]
     },
     {
       "id": 3,
@@ -183,7 +203,11 @@
           "18": null
         }
       },
-      "status": "not_started"
+      "status": "not_started",
+      "partnerIds": [
+        null,
+        null
+      ]
     },
     {
       "id": 4,
@@ -215,103 +239,11 @@
           "18": null
         }
       },
-      "status": "not_started"
-    },
-    {
-      "id": 5,
-      "playerIds": [
+      "status": "not_started",
+      "partnerIds": [
         null,
         null
-      ],
-      "points": {
-        "front9": null,
-        "back9": null,
-        "holes": {
-          "1": null,
-          "2": null,
-          "3": null,
-          "4": null,
-          "5": null,
-          "6": null,
-          "7": null,
-          "8": null,
-          "9": null,
-          "10": null,
-          "11": null,
-          "12": null,
-          "13": null,
-          "14": null,
-          "15": null,
-          "16": null,
-          "17": null,
-          "18": null
-        }
-      },
-      "status": "not_started"
-    },
-    {
-      "id": 6,
-      "playerIds": [
-        null,
-        null
-      ],
-      "points": {
-        "front9": null,
-        "back9": null,
-        "holes": {
-          "1": null,
-          "2": null,
-          "3": null,
-          "4": null,
-          "5": null,
-          "6": null,
-          "7": null,
-          "8": null,
-          "9": null,
-          "10": null,
-          "11": null,
-          "12": null,
-          "13": null,
-          "14": null,
-          "15": null,
-          "16": null,
-          "17": null,
-          "18": null
-        }
-      },
-      "status": "not_started"
-    },
-    {
-      "id": 7,
-      "playerIds": [
-        null,
-        null
-      ],
-      "points": {
-        "front9": null,
-        "back9": null,
-        "holes": {
-          "1": null,
-          "2": null,
-          "3": null,
-          "4": null,
-          "5": null,
-          "6": null,
-          "7": null,
-          "8": null,
-          "9": null,
-          "10": null,
-          "11": null,
-          "12": null,
-          "13": null,
-          "14": null,
-          "15": null,
-          "16": null,
-          "17": null,
-          "18": null
-        }
-      },
-      "status": "not_started"
+      ]
     }
   ],
   "meta": {
@@ -334,7 +266,13 @@
         "g": 0,
         "r": 0
       }
-    ]
+    ],
+    "format": {
+      "teamSize": 2,
+      "front9": "scramble",
+      "back9": "altshot",
+      "handicaps": false
+    }
   },
   "course": {
     "front9": {

@@ -153,9 +153,9 @@ function calculateTotals(data) {
     const s2 = T.sideOf(data.players[p2]);
     if (!s1 || !s2) return;
 
-    ["front9", "back9"].forEach(key => {
+    ClassicTeams.POINT_KEYS.forEach(key => {
       const v = match.points[key];
-      if (v === null) return;
+      if (v === null || v === undefined) return;
       totals[s1] += v;
       totals[s2] += 1 - v;
     });
@@ -172,7 +172,8 @@ function renderMatches(data) {
   const grid = document.getElementById("matches-grid");
   grid.innerHTML = "";
 
-  const foursomes = chunk(data.matches, 2);
+  // One 2v2 match per foursome.
+  const foursomes = chunk(data.matches, 1);
 
   foursomes.forEach((group, index) => {
     const wrapper = document.createElement("section");
@@ -276,8 +277,8 @@ function buildMatch(match, data) {
   const [p1, p2] = match.playerIds;
   const p1team = p1 ? T.sideOf(data.players[p1]) : null;
   const p2team = p2 ? T.sideOf(data.players[p2]) : null;
-  const p1name = p1 ? data.players[p1].name : "TBD";
-  const p2name = p2 ? data.players[p2].name : "TBD";
+  const p1name = ClassicTeams.pairName(match, 0, data.players, " / ") || "TBD";
+  const p2name = ClassicTeams.pairName(match, 1, data.players, " / ") || "TBD";
   const cL = T.color(p1team || "green");   // left = Team Red
   const cR = T.color(p2team || "red");     // right = Team Blue
   const holesObj = (match.points && match.points.holes) || {};
@@ -290,8 +291,11 @@ function buildMatch(match, data) {
   pair.style.setProperty("--cR", cR);
   pair.onclick = () => showMatchupModal(match, data);
 
-  let html = nineLine("F9", holesObj, 1, 9, p1name, p2name);
-  if (front.done || back.pl > 0) html += nineLine("B9", holesObj, 10, 18, p1name, p2name);
+  let html = nineLine('F9<span class="np-fmt">SCR</span>', holesObj, 1, 9, p1name, p2name);
+  if (front.done || back.pl > 0) {
+    html += nineLine('B9<span class="np-fmt">ALT</span>', holesObj, 10, 18, p1name, p2name);
+    html += nineLine('TOT<span class="np-fmt">18</span>', holesObj, 1, 18, p1name, p2name);
+  }
   pair.innerHTML = html;
   return pair;
 }
@@ -428,7 +432,7 @@ function renderLastUpdated(data) {
 }
 
 function getFoursomeStatus(group) {
-  const hasPlayers = group.every(match => match.playerIds?.every(Boolean));
+  const hasPlayers = group.every(match => [0, 1].every(side => ClassicTeams.pairIds(match, side).length === 2));
   if (!hasPlayers) {
     return { label: "Not Started", className: "foursome-status--not-started" };
   }

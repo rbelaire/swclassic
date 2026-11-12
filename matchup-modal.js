@@ -38,17 +38,14 @@ function showMatchupModal(match, data) {
   const [p1Id, p2Id] = match.playerIds;
   if (!p1Id || !p2Id) return;
 
-  const p1 = data.players[p1Id];
-  const p2 = data.players[p2Id];
+  const lead1 = data.players[p1Id];
+  const lead2 = data.players[p2Id];
+  if (!lead1 || !lead2) return;
 
-  // Calculate differential
-  const popsDiff = Math.abs(p1.pops - p2.pops);
-  const underdog = p1.pops > p2.pops ? p1 : p2;
-
-  // Get strokes per nine
-  const strokeHoles = getStrokeHoles(popsDiff);
-  const front9Strokes = strokeHoles.filter(h => h.hole <= 9);
-  const back9Strokes = strokeHoles.filter(h => h.hole >= 10);
+  // Each side is a pair: show "A & B" and colour by the pair's team.
+  const p1 = { name: ClassicTeams.pairName(match, 0, data.players) || lead1.name, team: lead1.team };
+  const p2 = { name: ClassicTeams.pairName(match, 1, data.players) || lead2.name, team: lead2.team };
+  const F = ClassicTeams.FORMAT;
 
   // Build modal HTML
   const modalHTML = `
@@ -62,13 +59,11 @@ function showMatchupModal(match, data) {
             <span class="modal-header-vs">vs</span>
             <span class="modal-header-p2">${escapeHTML(p2.name)}</span>
           </div>
-          <div class="modal-header-sub">${p1.pops} pops vs ${p2.pops} pops${popsDiff > 0 ? ` \u2022 ${escapeHTML(underdog.name)} gets ${popsDiff}` : ' \u2022 Even match'}</div>
+          <div class="modal-header-sub">${escapeHTML(F.front9.label)} (Front 9) \u2022 ${escapeHTML(F.back9.label)} (Back 9) \u2022 No handicap strokes</div>
         </div>
 
         <div class="modal-body">
           ${buildCompactScorecard(match, p1, p2)}
-
-          ${popsDiff > 0 ? buildPopsBreakdown(front9Strokes, back9Strokes, underdog) : ''}
         </div>
       </div>
     </div>
@@ -83,16 +78,6 @@ function showMatchupModal(match, data) {
 function closeMatchupModal() {
   const modal = document.getElementById('matchup-modal');
   if (modal) modal.remove();
-}
-
-function getStrokeHoles(numStrokes) {
-  if (numStrokes === 0) return [];
-  const allHoles = [...SCORECARD.front9, ...SCORECARD.back9];
-  // Pops are not applied on par 3s
-  const sortedByDifficulty = allHoles
-    .filter(h => h.par !== 3)
-    .sort((a, b) => a.handicap - b.handicap);
-  return sortedByDifficulty.slice(0, numStrokes);
 }
 
 /*************************
@@ -130,10 +115,25 @@ function buildCompactScorecard(match, p1, p2) {
     </div>`;
 
   // Front 9
-  html += buildCompactNine(holes, 1, 9, p1, p2, f9p1, f9p2, 'Front 9', match.points.front9);
+  html += buildCompactNine(holes, 1, 9, p1, p2, f9p1, f9p2, 'Front 9 \u00b7 Scramble', match.points.front9);
 
   // Back 9
-  html += buildCompactNine(holes, 10, 18, p1, p2, b9p1, b9p2, 'Back 9', match.points.back9);
+  html += buildCompactNine(holes, 10, 18, p1, p2, b9p1, b9p2, 'Back 9 \u00b7 Alt Shot', match.points.back9);
+
+  // Overall 18 (the third point)
+  const t = match.points.total;
+  const tp1 = f9p1 + b9p1, tp2 = f9p2 + b9p2;
+  const tText = t === 1 ? p1.name : t === 0 ? p2.name : t === 0.5 ? 'Halved' : '-';
+  const tClass = t === 1 ? 'result-' + (p1.team === 'red' ? 'red' : 'green')
+    : t === 0 ? 'result-' + (p2.team === 'red' ? 'red' : 'green')
+    : t === 0.5 ? 'result-halved' : 'result-pending';
+  html += `<div class="compact-nine">
+    <div class="compact-nine-header">
+      <span class="compact-nine-label">Overall 18</span>
+      <span class="compact-nine-tally">${tp1} - ${tp2}</span>
+      <span class="compact-nine-result ${tClass}">${escapeHTML(tText)}</span>
+    </div>
+  </div>`;
 
   html += `</div>`;
   return html;
@@ -155,7 +155,7 @@ function buildCompactNine(holes, startHole, endHole, p1, p2, p1Wins, p2Wins, lab
   let html = `<div class="compact-nine">
     <div class="compact-nine-header">
       <span class="compact-nine-label">${label}</span>
-      <span class="compact-nine-tally">${escapeHTML(p1.name.substring(0, 3))} ${p1Wins} - ${p2Wins} ${escapeHTML(p2.name.substring(0, 3))}</span>
+      <span class="compact-nine-tally">${p1Wins} - ${p2Wins}</span>
       <span class="compact-nine-result ${resultClass}">${escapeHTML(resultText)}</span>
     </div>
     <div class="compact-holes-row">`;
@@ -173,43 +173,5 @@ function buildCompactNine(holes, startHole, endHole, p1, p2, p1Wins, p2Wins, lab
   }
 
   html += `</div></div>`;
-  return html;
-}
-
-/*************************
- * POPS BREAKDOWN WITH CIRCLE ICONS
- *************************/
-
-function buildPopsBreakdown(front9Strokes, back9Strokes, underdog) {
-  const front9Set = new Set(front9Strokes.map(h => h.hole));
-  const back9Set = new Set(back9Strokes.map(h => h.hole));
-
-  let html = `<div class="modal-section pops-section">
-    <div class="pops-header">
-      <span class="pops-title">${escapeHTML(underdog.name)}'s Stroke Holes</span>
-      <span class="pops-count">${front9Strokes.length + back9Strokes.length} total</span>
-    </div>`;
-
-  // Front 9 pops
-  html += `<div class="pops-nine">
-    <span class="pops-nine-label">Front</span>
-    <div class="pops-holes-row">`;
-  for (let h = 1; h <= 9; h++) {
-    const isStroke = front9Set.has(h);
-    html += `<div class="pops-hole ${isStroke ? 'pops-stroke' : 'pops-no-stroke'}"><span>${h}</span></div>`;
-  }
-  html += `<span class="pops-nine-count">${front9Strokes.length}</span></div></div>`;
-
-  // Back 9 pops
-  html += `<div class="pops-nine">
-    <span class="pops-nine-label">Back</span>
-    <div class="pops-holes-row">`;
-  for (let h = 10; h <= 18; h++) {
-    const isStroke = back9Set.has(h);
-    html += `<div class="pops-hole ${isStroke ? 'pops-stroke' : 'pops-no-stroke'}"><span>${h}</span></div>`;
-  }
-  html += `<span class="pops-nine-count">${back9Strokes.length}</span></div></div>`;
-
-  html += `</div>`;
   return html;
 }

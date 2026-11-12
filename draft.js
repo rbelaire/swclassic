@@ -7,20 +7,10 @@ const REFRESH_INTERVAL = 10000; // 10 seconds for draft night
 let autoRefreshEnabled = true;
 let lastUpdateTime = Date.now();
 let refreshTimer = null;
-// Snake-style ownership of the 12 draft picks (green = team one, red = team two).
+// Snake-style ownership of the 14 draft picks (7 per team; captains make 8) (green = team one, red = team two).
 const FINAL_DRAFT_ORDER = [
-  "green",
-  "red",
-  "red",
-  "green",
-  "green",
-  "red",
-  "red",
-  "green",
-  "green",
-  "red",
-  "red",
-  "green"
+  "green", "red", "red", "green", "green", "red", "red",
+  "green", "green", "red", "red", "green", "green", "red"
 ];
 
 const TEAM_PICK_SLOTS = {

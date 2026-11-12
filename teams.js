@@ -71,5 +71,36 @@
     };
   }
 
+  // ---- 2v2 match helpers --------------------------------------------
+  // A match is one pair per side. `playerIds[i]` is the lead player for side i
+  // (side 0 = "green" slot / Team Red, side 1 = "red" slot / Team Blue) and
+  // `partnerIds[i]` is that side's partner. Keeping the lead in `playerIds`
+  // means every team/side lookup written for 1v1 still works.
+  // Every match is worth three points: front nine, back nine, and the overall
+  // 18 holes. Older archived matches have no `total`, so readers skip nulls.
+  ClassicTeams.POINT_KEYS = ["front9", "back9", "total"];
+
+  ClassicTeams.FORMAT = {
+    front9: { key: "scramble", label: "Scramble", short: "SCR" },
+    back9: { key: "altshot", label: "Alternate Shot", short: "ALT" }
+  };
+
+  // Ids on one side of a match, lead first. Empty slots are dropped.
+  ClassicTeams.pairIds = function (match, side) {
+    var lead = match && match.playerIds ? match.playerIds[side] : null;
+    var mate = match && match.partnerIds ? match.partnerIds[side] : null;
+    return [lead, mate].filter(Boolean);
+  };
+
+  // Display names for one side, e.g. "Gavin & Austin". Unknown ids are skipped;
+  // returns "" when nobody is set so callers can substitute their own "TBD".
+  ClassicTeams.pairName = function (match, side, players, sep) {
+    players = players || {};
+    return ClassicTeams.pairIds(match, side)
+      .map(function (id) { return players[id] ? players[id].name : ""; })
+      .filter(Boolean)
+      .join(sep || " & ");
+  };
+
   window.ClassicTeams = ClassicTeams;
 })();
