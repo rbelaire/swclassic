@@ -78,25 +78,13 @@
       "name": "Nick",
       "rank": 13,
       "pops": 12,
-      "team": "red"
+      "team": null
     },
     "steve": {
       "name": "Steve",
       "rank": 14,
       "pops": 13,
-      "team": "green"
-    },
-    "tbd1": {
-      "name": "TBD 1",
-      "rank": 15,
-      "pops": 15,
-      "team": "green"
-    },
-    "tbd2": {
-      "name": "TBD 2",
-      "rank": 16,
-      "pops": 15,
-      "team": "red"
+      "team": null
     }
   },
   "matches": [
@@ -208,46 +196,10 @@
         null,
         null
       ]
-    },
-    {
-      "id": 4,
-      "playerIds": [
-        null,
-        null
-      ],
-      "points": {
-        "front9": null,
-        "back9": null,
-        "holes": {
-          "1": null,
-          "2": null,
-          "3": null,
-          "4": null,
-          "5": null,
-          "6": null,
-          "7": null,
-          "8": null,
-          "9": null,
-          "10": null,
-          "11": null,
-          "12": null,
-          "13": null,
-          "14": null,
-          "15": null,
-          "16": null,
-          "17": null,
-          "18": null
-        }
-      },
-      "status": "not_started",
-      "partnerIds": [
-        null,
-        null
-      ]
     }
   ],
   "meta": {
-    "lastUpdated": "2026-11-12T16:58:37.052Z",
+    "lastUpdated": "2026-11-12T17:04:22.000Z",
     "eventName": "The 2027 Classic",
     "tournamentDate": "2027-09-04",
     "teeTime": "08:00",
@@ -268,10 +220,10 @@
       }
     ],
     "format": {
-      "teamSize": 2,
       "front9": "scramble",
       "back9": "altshot",
-      "handicaps": false
+      "handicaps": false,
+      "playersPerTeam": 6
     }
   },
   "course": {
