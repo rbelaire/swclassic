@@ -9,7 +9,7 @@ const VALID_USERS = ["admin", "foursome1", "foursome2", "foursome3", "foursome4"
 // Scan-to-score tokens now live in data.json (meta.foursomeTokens) so they can
 // be rotated each season from the admin console without a code change.
 let hasUnsavedChanges = false;
-const TEAM_PICK_LIMIT = 6;
+const TEAM_PICK_LIMIT = 7; // drafted players per team; the captain makes 8, i.e. four 2v2 pairs
 
 async function hashPassword(password) {
   const encoder = new TextEncoder();
@@ -260,12 +260,15 @@ function validateData(d) {
   if (!Array.isArray(d.matches)) {
     errors.push("Matches array is missing.");
   } else {
-    if (d.matches.length !== 7) {
-      errors.push(`Expected 7 matches, found ${d.matches.length}.`);
+    if (d.matches.length !== 4) {
+      errors.push(`Expected 4 matches, found ${d.matches.length}.`);
     }
     d.matches.forEach((m, i) => {
       if (!Array.isArray(m.playerIds)) {
         errors.push(`Match ${i + 1} is missing playerIds array.`);
+      }
+      if (!Array.isArray(m.partnerIds)) {
+        errors.push(`Match ${i + 1} is missing partnerIds array.`);
       }
       if (!m.points || typeof m.points !== "object") {
         errors.push(`Match ${i + 1} is missing points object.`);
@@ -527,8 +530,10 @@ function undraftPlayer(id) {
 
   // Clear player from any match slots
   data.matches.forEach(match => {
-    if (match.playerIds[0] === id) match.playerIds[0] = null;
-    if (match.playerIds[1] === id) match.playerIds[1] = null;
+    [0, 1].forEach(side => {
+      if (match.playerIds[side] === id) match.playerIds[side] = null;
+      if (match.partnerIds && match.partnerIds[side] === id) match.partnerIds[side] = null;
+    });
   });
 
   markUnsaved();
@@ -551,7 +556,7 @@ function renderMatchupBuilder() {
     .filter(([id, p]) => p.team === "red")
     .sort((a, b) => a[1].rank - b[1].rank);
 
-  // Check draft completeness (each team needs 5 picks + captain = 6)
+  // Check draft completeness (each team needs its picks + captain = 8)
   if (greenPlayers.length <= TEAM_PICK_LIMIT || redPlayers.length <= TEAM_PICK_LIMIT) {
     if (statusEl) {
       statusEl.className = "draft-status draft-status--waiting";
@@ -565,17 +570,17 @@ function renderMatchupBuilder() {
   const assignedGreen = new Set();
   const assignedRed = new Set();
   data.matches.forEach(match => {
-    [0, 1].forEach(i => {
-      const id = match.playerIds[i];
-      if (!id) return;
-      const p = data.players[id];
-      if (!p) return;
-      if (p.team === "green") assignedGreen.add(id);
-      if (p.team === "red") assignedRed.add(id);
+    [0, 1].forEach(side => {
+      ClassicTeams.pairIds(match, side).forEach(id => {
+        const p = data.players[id];
+        if (!p) return;
+        if (p.team === "green") assignedGreen.add(id);
+        if (p.team === "red") assignedRed.add(id);
+      });
     });
   });
 
-  const matchSlots = TEAM_PICK_LIMIT + 1; // drafted players + captain
+  const matchSlots = TEAM_PICK_LIMIT + 1; // drafted players + captain (8 per team)
   const allAssigned = assignedGreen.size === matchSlots && assignedRed.size === matchSlots;
   if (statusEl) {
     if (allAssigned) {
@@ -587,46 +592,52 @@ function renderMatchupBuilder() {
     }
   }
 
-  // Build foursomes (2 matches each; the last group may hold a single match).
+  // One 2v2 match per foursome: two dropdowns per side (lead + partner).
   let html = "";
-  const groupCount = Math.ceil(data.matches.length / 2);
-  for (let f = 0; f < groupCount; f++) {
-    html += `<div class="matchup-builder-foursome"><h3>Foursome ${f + 1}</h3>`;
+  data.matches.forEach((match, matchIndex) => {
+    html += `<div class="matchup-builder-foursome"><h3>Foursome ${matchIndex + 1}</h3>`;
+    html += `<div class="matchup-builder-match">`;
 
-    for (let m = 0; m < 2; m++) {
-      const matchIndex = f * 2 + m;
-      if (matchIndex >= data.matches.length) break;
-      const match = data.matches[matchIndex];
+    html += `<div>
+      <label>${escapeHTML(T.green.label)}</label>
+      ${buildMatchupSelect(match, 0, 0, matchIndex, greenPlayers, assignedGreen)}
+      ${buildMatchupSelect(match, 0, 1, matchIndex, greenPlayers, assignedGreen)}
+    </div>`;
 
-      html += `<div class="matchup-builder-match">`;
+    html += `<div class="matchup-builder-vs">VS</div>`;
 
-      // Team Green dropdown
-      html += `<div>
-        <label>${escapeHTML(T.green.label)}</label>
-        ${buildMatchupSelect(match, 0, matchIndex, "green", greenPlayers, assignedGreen)}
-      </div>`;
+    html += `<div>
+      <label>${escapeHTML(T.red.label)}</label>
+      ${buildMatchupSelect(match, 1, 0, matchIndex, redPlayers, assignedRed)}
+      ${buildMatchupSelect(match, 1, 1, matchIndex, redPlayers, assignedRed)}
+    </div>`;
 
-      html += `<div class="matchup-builder-vs">VS</div>`;
-
-      // Team Red dropdown
-      html += `<div>
-        <label>${escapeHTML(T.red.label)}</label>
-        ${buildMatchupSelect(match, 1, matchIndex, "red", redPlayers, assignedRed)}
-      </div>`;
-
-      html += `</div>`; // end match
-    }
-
-    html += `</div>`; // end foursome
-  }
+    html += `</div></div>`; // end match, end foursome
+  });
 
   container.innerHTML = html;
 }
 
-function buildMatchupSelect(match, playerIndex, matchIndex, team, teamPlayers, assignedSet) {
-  const currentId = match.playerIds[playerIndex];
-  let html = `<select onchange="updateMatchupPlayer(${matchIndex}, ${playerIndex}, this.value)">`;
-  html += `<option value="">-- Select --</option>`;
+// Read/write one slot of a match. Slot 0 is the side's lead (playerIds), slot 1
+// its partner (partnerIds).
+function getMatchSlot(match, side, slot) {
+  const arr = slot === 0 ? match.playerIds : match.partnerIds;
+  return (arr && arr[side]) || null;
+}
+
+function setMatchSlot(match, side, slot, id) {
+  if (slot === 0) {
+    match.playerIds[side] = id || null;
+  } else {
+    if (!Array.isArray(match.partnerIds)) match.partnerIds = [null, null];
+    match.partnerIds[side] = id || null;
+  }
+}
+
+function buildMatchupSelect(match, side, slot, matchIndex, teamPlayers, assignedSet) {
+  const currentId = getMatchSlot(match, side, slot);
+  let html = `<select onchange="updateMatchupPlayer(${matchIndex}, ${side}, ${slot}, this.value)">`;
+  html += `<option value="">-- ${slot === 0 ? "Player 1" : "Player 2"} --</option>`;
 
   teamPlayers.forEach(([id, p]) => {
     // Show if: currently selected for this slot, or not assigned elsewhere
@@ -634,15 +645,15 @@ function buildMatchupSelect(match, playerIndex, matchIndex, team, teamPlayers, a
     const isAvailable = !assignedSet.has(id) || isSelected;
     if (!isAvailable) return;
 
-    html += `<option value="${id}" ${isSelected ? "selected" : ""}>${escapeHTML(p.name)} (${p.pops} pops)</option>`;
+    html += `<option value="${id}" ${isSelected ? "selected" : ""}>${escapeHTML(p.name)}${p.captain ? " (Capt)" : ""}</option>`;
   });
 
   html += `</select>`;
   return html;
 }
 
-function updateMatchupPlayer(matchIndex, playerIndex, playerId) {
-  data.matches[matchIndex].playerIds[playerIndex] = playerId || null;
+function updateMatchupPlayer(matchIndex, side, slot, playerId) {
+  setMatchSlot(data.matches[matchIndex], side, slot, playerId);
   markUnsaved();
   render();
 }
@@ -725,9 +736,9 @@ function calculateTotals() {
     const s2 = T.sideOf(data.players[p2]);
     if (!s1 || !s2) return;
 
-    ["front9", "back9"].forEach(key => {
+    ClassicTeams.POINT_KEYS.forEach(key => {
       const v = match.points[key];
-      if (v === null) return;
+      if (v === null || v === undefined) return;
       totals[s1] += v;
       totals[s2] += 1 - v;
     });
@@ -740,10 +751,8 @@ function renderFoursomes() {
   const container = document.getElementById("foursomes");
   container.innerHTML = "";
 
-  const foursomes = [];
-  for (let i = 0; i < data.matches.length; i += 2) {
-    foursomes.push(data.matches.slice(i, i + 2));
-  }
+  // One 2v2 match per foursome.
+  const foursomes = data.matches.map(m => [m]);
 
   foursomes.forEach((matches, foursomeIndex) => {
     // Foursome users only see their own foursome
@@ -760,7 +769,7 @@ function renderFoursomes() {
     }
 
     matches.forEach((match, localIndex) => {
-      const matchIndex = foursomeIndex * 2 + localIndex;
+      const matchIndex = foursomeIndex + localIndex;
       foursomeDiv.appendChild(buildMatch(match, matchIndex));
     });
 
@@ -778,7 +787,7 @@ let foursomeHole = null; // 1..18, the hole currently on screen
 
 function fsMatchesForUser() {
   const out = [];
-  [userFoursome * 2, userFoursome * 2 + 1].forEach(i => {
+  [userFoursome].forEach(i => {
     if (data.matches[i]) out.push({ i, match: data.matches[i] });
   });
   return out;
@@ -807,7 +816,7 @@ function renderFoursomeStepper() {
   if (foursomeHole === null) foursomeHole = fsFirstOpenHole();
   const h = foursomeHole;
   const par = COURSE_PARS[h];
-  const nineName = h <= 9 ? "Front 9" : "Back 9";
+  const nineName = h <= 9 ? "Front 9 \u00b7 Scramble" : "Back 9 \u00b7 Alternate Shot";
   const ms = fsMatchesForUser();
 
   // Jump strip: tap any hole to edit it. Colour marks how far along it is.
@@ -831,28 +840,20 @@ function renderFoursomeStepper() {
   let cards = "";
   ms.forEach(({ i, match }) => {
     if (!isValidMatchup(match)) {
-      cards += `<div class="fs-card fs-card--invalid">Match ${match.id}: players not set — ask the admin.</div>`;
+      cards += `<div class="fs-card fs-card--invalid">Match ${match.id}: pairs not set — ask the admin.</div>`;
       return;
     }
     const T = ClassicTeams(data);
     const [p1, p2] = match.playerIds;
     const cL = T.color(T.sideOf(data.players[p1]) || "green");
     const cR = T.color(T.sideOf(data.players[p2]) || "red");
-    const p1Name = escapeHTML(data.players[p1].name);
-    const p2Name = escapeHTML(data.players[p2].name);
+    const p1Name = escapeHTML(ClassicTeams.pairName(match, 0, data.players, " & "));
+    const p2Name = escapeHTML(ClassicTeams.pairName(match, 1, data.players, " & "));
     const v = fsHoleValue(match, h);
-
-    const sh = strokeHolesForMatch(match);
-    let pop = "";
-    if (sh.diff > 0 && sh.holes.has(h)) {
-      const uId = match.playerIds[sh.underdog - 1];
-      const uName = uId && data.players[uId] ? escapeHTML(data.players[uId].name) : "Underdog";
-      pop = `<span class="fs-pop">● ${uName} gets a pop</span>`;
-    }
 
     cards += `
       <div class="fs-card" style="--cL:${cL};--cR:${cR}">
-        <div class="fs-cardtop"><span class="fs-mtitle">Match ${match.id}</span>${pop}</div>
+        <div class="fs-cardtop"><span class="fs-mtitle">Match ${match.id}</span></div>
         <div class="fs-btns">
           <button class="fs-btn fs-btn--l ${v === 1 ? "active" : ""}" onclick="fsSetResult(${i}, ${h}, 1)">${p1Name}</button>
           <button class="fs-btn fs-btn--tie ${v === 0.5 ? "active" : ""}" onclick="fsSetResult(${i}, ${h}, 0.5)">Tie</button>
@@ -889,6 +890,7 @@ function fsSetResult(matchIndex, holeNum, value) {
   match.points.holes[holeNum] = (match.points.holes[holeNum] === value) ? null : value;
   match.points.front9 = calculateNineFromHoles(match.points.holes, 1, 9);
   match.points.back9 = calculateNineFromHoles(match.points.holes, 10, 18);
+  match.points.total = calculateNineFromHoles(match.points.holes, 1, 18);
   const f = match.points.front9, b = match.points.back9;
   match.status = (f !== null && b !== null) ? "complete" : (f !== null || b !== null) ? "in_progress" : "not_started";
   markUnsaved();
@@ -916,7 +918,7 @@ function buildMatch(match, matchIndex) {
   const front = match.points.front9;
   const back = match.points.back9;
   const holes = match.points.holes || {};
-  const bothDecided = nineState(holes, 1, 9).decided && nineState(holes, 10, 18).decided;
+  const bothDecided = nineState(holes, 1, 9).decided && nineState(holes, 10, 18).decided && nineState(holes, 1, 18).decided;
   const closed = !!match.closed;
   const anyPlayed = front !== null || back !== null;
 
@@ -933,13 +935,20 @@ function buildMatch(match, matchIndex) {
   if (closed) div.classList.add("closed");
 
   const valid = isValidMatchup(match);
-  if (!valid && (match.playerIds[0] || match.playerIds[1])) {
+  const anySet = [0, 1].some(side => ClassicTeams.pairIds(match, side).length > 0);
+  if (!valid && anySet) {
     div.classList.add("invalid");
   }
 
-  const [p1, p2] = match.playerIds;
-  const p1Name = p1 ? escapeHTML(data.players[p1].name) + (data.players[p1].captain ? ' (Capt)' : '') : "Not Selected";
-  const p2Name = p2 ? escapeHTML(data.players[p2].name) + (data.players[p2].captain ? ' (Capt)' : '') : "Not Selected";
+  const pairLabel = side => {
+    const ids = ClassicTeams.pairIds(match, side);
+    if (!ids.length) return "Not Selected";
+    return ids.map(id => escapeHTML(data.players[id].name) + (data.players[id].captain ? ' (Capt)' : '')).join(" &amp; ");
+  };
+  const p1 = ClassicTeams.pairIds(match, 0).length > 0;
+  const p2 = ClassicTeams.pairIds(match, 1).length > 0;
+  const p1Name = pairLabel(0);
+  const p2Name = pairLabel(1);
 
   const header = `
     <div class="match-header" onclick="toggleMatch(${matchIndex})">
@@ -950,7 +959,8 @@ function buildMatch(match, matchIndex) {
       <div><strong>${p1Name}</strong> vs <strong>${p2Name}</strong></div>
       <div>
         F9: ${front === null ? "-" : front} |
-        B9: ${back === null ? "-" : back}
+        B9: ${back === null ? "-" : back} |
+        Tot: ${match.points.total == null ? "-" : match.points.total}
       </div>
     </div>
   `;
@@ -958,13 +968,15 @@ function buildMatch(match, matchIndex) {
   const playerSelects = isFoursomeUser() ? '' : `
       <div class="teams-row">
         <div class="team-select-box team-green">
-          <label>${escapeHTML(ClassicTeams(data).green.label)} Player</label>
-          ${buildTeamSelect(match, 0, matchIndex, 'green')}
+          <label>${escapeHTML(ClassicTeams(data).green.label)} Pair</label>
+          ${buildTeamSelect(match, 0, 0, matchIndex, 'green')}
+          ${buildTeamSelect(match, 0, 1, matchIndex, 'green')}
         </div>
         <div class="vs-text">VS</div>
         <div class="team-select-box team-red">
-          <label>${escapeHTML(ClassicTeams(data).red.label)} Player</label>
-          ${buildTeamSelect(match, 1, matchIndex, 'red')}
+          <label>${escapeHTML(ClassicTeams(data).red.label)} Pair</label>
+          ${buildTeamSelect(match, 1, 0, matchIndex, 'red')}
+          ${buildTeamSelect(match, 1, 1, matchIndex, 'red')}
         </div>
       </div>`;
 
@@ -973,7 +985,7 @@ function buildMatch(match, matchIndex) {
     : '';
   const details = `
     <div class="match-details">
-      ${!valid && (p1 || p2) ? '<div class="error-message">Invalid matchup: Both players must be from different teams.</div>' : ''}
+      ${!valid && (p1 || p2) ? '<div class="error-message">Invalid matchup: each side needs two different players from the same team, one pair per team.</div>' : ''}
       ${playerSelects}
       ${valid ? buildHoleByHoleGrid(match, matchIndex) : ''}
       <div class="match-actions">
@@ -989,18 +1001,18 @@ function buildMatch(match, matchIndex) {
   return div;
 }
 
-function buildTeamSelect(match, playerIndex, matchIndex, team) {
-  const selectId = `player-${matchIndex}-${playerIndex}`;
-  let html = `<select id="${selectId}" onchange="updatePlayer(${matchIndex}, ${playerIndex}, this.value)">`;
-  html += '<option value="">-- Select Player --</option>';
+function buildTeamSelect(match, side, slot, matchIndex, team) {
+  const selectId = `player-${matchIndex}-${side}-${slot}`;
+  let html = `<select id="${selectId}" onchange="updatePlayer(${matchIndex}, ${side}, ${slot}, this.value)">`;
+  html += `<option value="">-- Select Player ${slot + 1} --</option>`;
 
   const sortedPlayers = Object.entries(data.players)
     .filter(([id, p]) => p.team === team)
     .sort((a, b) => a[1].rank - b[1].rank);
 
   sortedPlayers.forEach(([id, p]) => {
-    const selected = match.playerIds[playerIndex] === id ? 'selected' : '';
-    const label = p.captain ? `${escapeHTML(p.name)} (Capt)` : `${escapeHTML(p.name)} (${p.pops} pops)`;
+    const selected = getMatchSlot(match, side, slot) === id ? 'selected' : '';
+    const label = p.captain ? `${escapeHTML(p.name)} (Capt)` : escapeHTML(p.name);
     html += `<option value="${id}" ${selected}>${label}</option>`;
   });
 
@@ -1013,9 +1025,8 @@ function buildScoreSelect(match, key, matchIndex, valid) {
   const disabled = !valid ? 'disabled' : '';
 
   const T = ClassicTeams(data);
-  const [p1Id, p2Id] = match.playerIds;
-  const p1Name = p1Id ? escapeHTML(data.players[p1Id].name) : `${T.green.label} Player`;
-  const p2Name = p2Id ? escapeHTML(data.players[p2Id].name) : `${T.red.label} Player`;
+  const p1Name = escapeHTML(ClassicTeams.pairName(match, 0, data.players) || `${T.green.label} Pair`);
+  const p2Name = escapeHTML(ClassicTeams.pairName(match, 1, data.players) || `${T.red.label} Pair`);
 
   let html = `<select id="${selectId}" onchange="updateScore(${matchIndex}, '${key}', this.value)" ${disabled}>`;
   html += '<option value="">-- Select Winner --</option>';
@@ -1037,37 +1048,12 @@ const COURSE_PARS = {
   10: 4, 11: 5, 12: 4, 13: 3, 14: 4, 15: 4, 16: 4, 17: 3, 18: 5
 };
 
-// Which holes the underdog receives a pop on (hardest holes, par 3s excluded),
-// and which side (1 = p1, 2 = p2) is the underdog. Uses the course handicaps.
-function strokeHolesForMatch(match) {
-  const [p1, p2] = match.playerIds;
-  if (!p1 || !p2 || !data.players[p1] || !data.players[p2]) {
-    return { holes: new Set(), underdog: 0, diff: 0 };
-  }
-  const pops1 = data.players[p1].pops || 0;
-  const pops2 = data.players[p2].pops || 0;
-  const diff = Math.abs(pops1 - pops2);
-  if (diff === 0) return { holes: new Set(), underdog: 0, diff: 0 };
-  const underdog = pops1 > pops2 ? 1 : 2;
-  const rows = [];
-  const course = (data.course) || {};
-  ["front9", "back9"].forEach(nine => {
-    const c = course[nine] || {};
-    Object.keys(c).forEach(h => rows.push({ hole: +h, par: c[h].par, hcp: c[h].handicap }));
-  });
-  const eligible = rows.filter(r => r.par !== 3).sort((a, b) => a.hcp - b.hcp).slice(0, diff);
-  return { holes: new Set(eligible.map(r => r.hole)), underdog, diff };
-}
-
-// Derive the hole winner from gross strokes + pops: 1 = p1, 0 = p2, 0.5 tie.
+// Derive the hole winner from the two team scores: 1 = p1 (Team Red pair),
+// 0 = p2 (Team Blue pair), 0.5 tie. No handicap strokes in the 2v2 format.
 function winnerFromGross(match, holeNum, g1, g2) {
   if (g1 == null || g2 == null || g1 === "" || g2 === "") return null;
-  const sh = strokeHolesForMatch(match);
-  let net1 = Number(g1), net2 = Number(g2);
-  if (sh.holes.has(holeNum)) {
-    if (sh.underdog === 1) net1 -= 1; else net2 -= 1;
-  }
-  return net1 < net2 ? 1 : net2 < net1 ? 0 : 0.5;
+  const a = Number(g1), b = Number(g2);
+  return a < b ? 1 : b < a ? 0 : 0.5;
 }
 
 function toggleGross(matchIndex) {
@@ -1084,13 +1070,14 @@ function setHoleGross(matchIndex, holeNum, playerIndex, value) {
   pair[playerIndex] = v;
   match.points.gross[holeNum] = pair;
 
-  // If both strokes are in, auto-set the hole winner (net, with pops).
+  // If both team scores are in, auto-set the hole winner.
   const derived = winnerFromGross(match, holeNum, pair[0], pair[1]);
   if (derived !== null) {
     if (!match.points.holes) { match.points.holes = {}; for (let i = 1; i <= 18; i++) match.points.holes[i] = null; }
     match.points.holes[holeNum] = derived;
     match.points.front9 = calculateNineFromHoles(match.points.holes, 1, 9);
     match.points.back9 = calculateNineFromHoles(match.points.holes, 10, 18);
+    match.points.total = calculateNineFromHoles(match.points.holes, 1, 18);
     const f = match.points.front9, b = match.points.back9;
     match.status = (f !== null && b !== null) ? "complete" : (f !== null || b !== null) ? "in_progress" : "not_started";
   }
@@ -1128,41 +1115,39 @@ function nineSummaryText(st, p1Name, p2Name) {
 }
 
 function buildHoleByHoleGrid(match, matchIndex) {
-  const [p1Id, p2Id] = match.playerIds;
-  const p1Name = p1Id ? escapeHTML(data.players[p1Id].name) : "P1";
-  const p2Name = p2Id ? escapeHTML(data.players[p2Id].name) : "P2";
+  const p1Name = escapeHTML(ClassicTeams.pairName(match, 0, data.players) || "Red");
+  const p2Name = escapeHTML(ClassicTeams.pairName(match, 1, data.players) || "Blue");
   const holes = match.points.holes || {};
 
   const f9 = nineState(holes, 1, 9);
   const b9 = nineState(holes, 10, 18);
+  const t18 = nineState(holes, 1, 18);
 
   let html = `<div class="hole-scoring-section">`;
 
   // Nine result summary bar (clinch-aware)
   html += `<div class="nine-results-bar">
     <div class="nine-result-item">
-      <span class="nine-result-label">Front 9</span>
+      <span class="nine-result-label">Front 9 &middot; Scramble</span>
       <span class="nine-result-value ${f9.played === 0 ? 'pending' : ''} ${f9.clinched ? 'clinched' : ''}">${nineSummaryText(f9, p1Name, p2Name)}</span>
     </div>
     <div class="nine-result-item">
-      <span class="nine-result-label">Back 9</span>
+      <span class="nine-result-label">Back 9 &middot; Alt Shot</span>
       <span class="nine-result-value ${b9.played === 0 ? 'pending' : ''} ${b9.clinched ? 'clinched' : ''}">${nineSummaryText(b9, p1Name, p2Name)}</span>
+    </div>
+    <div class="nine-result-item">
+      <span class="nine-result-label">Overall 18</span>
+      <span class="nine-result-value ${t18.played === 0 ? 'pending' : ''} ${t18.clinched ? 'clinched' : ''}">${nineSummaryText(t18, p1Name, p2Name)}</span>
     </div>
   </div>`;
 
   // "Match decided" nudge toward Close Out.
-  const bothDecided = f9.decided && b9.decided;
+  const bothDecided = f9.decided && b9.decided && t18.decided;
   html += `<div class="match-decided-note" id="decided-note-${matchIndex}" ${bothDecided && !match.closed ? '' : 'style="display:none;"'}>Match decided &mdash; tap <b>Close Out &mdash; Final</b> below to lock it. Remaining holes are optional.</div>`;
 
-  // Optional gross-score mode + pops note
+  // Optional gross-score mode (team score per hole; no handicap strokes)
   const grossMode = grossMatches.has(matchIndex);
-  const sh = strokeHolesForMatch(match);
-  let popsNote = "Even — no pops";
-  if (sh.diff > 0) {
-    const uId = match.playerIds[sh.underdog - 1];
-    const uName = uId && data.players[uId] ? escapeHTML(data.players[uId].name) : "Underdog";
-    popsNote = `${uName} gets ${sh.diff} (hardest non-par-3 holes)`;
-  }
+  const popsNote = "No handicap strokes";
   html += `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin:8px 0; flex-wrap:wrap;">
     <label style="font-size:0.85em; color:#0d3d1f; font-weight:600; display:flex; align-items:center; gap:6px; cursor:pointer;">
       <input type="checkbox" onchange="toggleGross(${matchIndex})" ${grossMode ? "checked" : ""}> Gross scoring (auto-scores holes)
@@ -1173,21 +1158,21 @@ function buildHoleByHoleGrid(match, matchIndex) {
 
   // Front 9 grid
   html += `<div class="hole-grid-section">
-    <div class="hole-grid-label">Front 9</div>
+    <div class="hole-grid-label">Front 9 &middot; Scramble</div>
     <div class="hole-grid">`;
   for (let h = 1; h <= 9; h++) {
-    const redundant = f9.clinched && (holes[h] === null || holes[h] === undefined);
-    html += buildHoleRow(h, holes[h], p1Name, p2Name, matchIndex, grossMode, gross, sh, redundant);
+    const redundant = f9.clinched && t18.clinched && (holes[h] === null || holes[h] === undefined);
+    html += buildHoleRow(h, holes[h], p1Name, p2Name, matchIndex, grossMode, gross, redundant);
   }
   html += `</div></div>`;
 
   // Back 9 grid
   html += `<div class="hole-grid-section">
-    <div class="hole-grid-label">Back 9</div>
+    <div class="hole-grid-label">Back 9 &middot; Alternate Shot</div>
     <div class="hole-grid">`;
   for (let h = 10; h <= 18; h++) {
-    const redundant = b9.clinched && (holes[h] === null || holes[h] === undefined);
-    html += buildHoleRow(h, holes[h], p1Name, p2Name, matchIndex, grossMode, gross, sh, redundant);
+    const redundant = b9.clinched && t18.clinched && (holes[h] === null || holes[h] === undefined);
+    html += buildHoleRow(h, holes[h], p1Name, p2Name, matchIndex, grossMode, gross, redundant);
   }
   html += `</div></div>`;
 
@@ -1195,7 +1180,7 @@ function buildHoleByHoleGrid(match, matchIndex) {
   return html;
 }
 
-function buildHoleRow(holeNum, value, p1Name, p2Name, matchIndex, grossMode, gross, sh, redundant) {
+function buildHoleRow(holeNum, value, p1Name, p2Name, matchIndex, grossMode, gross, redundant) {
   const par = COURSE_PARS[holeNum];
   const isP1 = value === 1;
   const isHalved = value === 0.5;
@@ -1204,13 +1189,12 @@ function buildHoleRow(holeNum, value, p1Name, p2Name, matchIndex, grossMode, gro
   let grossRow = "";
   if (grossMode) {
     const g = (gross && gross[holeNum]) || [null, null];
-    const dot = sh && sh.holes && sh.holes.has(holeNum)
-      ? `<span class="g-net" title="Pop hole">● pop</span>` : `<span class="g-net"></span>`;
+    const dot = `<span class="g-net"></span>`;
     grossRow = `
       <div class="hole-gross">
-        <input type="number" inputmode="numeric" min="1" max="20" aria-label="${p1Name} strokes" placeholder="${p1Name.slice(0, 3)}" value="${g[0] == null ? "" : g[0]}" onchange="setHoleGross(${matchIndex}, ${holeNum}, 0, this.value)">
+        <input type="number" inputmode="numeric" min="1" max="20" aria-label="${p1Name} score" placeholder="Red" value="${g[0] == null ? "" : g[0]}" onchange="setHoleGross(${matchIndex}, ${holeNum}, 0, this.value)">
         ${dot}
-        <input type="number" inputmode="numeric" min="1" max="20" aria-label="${p2Name} strokes" placeholder="${p2Name.slice(0, 3)}" value="${g[1] == null ? "" : g[1]}" onchange="setHoleGross(${matchIndex}, ${holeNum}, 1, this.value)">
+        <input type="number" inputmode="numeric" min="1" max="20" aria-label="${p2Name} score" placeholder="Blue" value="${g[1] == null ? "" : g[1]}" onchange="setHoleGross(${matchIndex}, ${holeNum}, 1, this.value)">
       </div>`;
   }
 
@@ -1242,6 +1226,7 @@ function setHoleResult(matchIndex, holeNum, value) {
   // Auto-calculate front9 and back9
   match.points.front9 = calculateNineFromHoles(match.points.holes, 1, 9);
   match.points.back9 = calculateNineFromHoles(match.points.holes, 10, 18);
+  match.points.total = calculateNineFromHoles(match.points.holes, 1, 18);
 
   // Keep the stored status in step with the scores
   const f = match.points.front9, b = match.points.back9;
@@ -1259,9 +1244,8 @@ function updateMatchInPlace(matchIndex) {
   const matchEl = document.getElementById(`match-${matchIndex}`);
   if (!matchEl) { render(); return; }
 
-  const [p1Id, p2Id] = match.playerIds;
-  const p1Name = p1Id ? escapeHTML(data.players[p1Id].name) : "P1";
-  const p2Name = p2Id ? escapeHTML(data.players[p2Id].name) : "P2";
+  const p1Name = escapeHTML(ClassicTeams.pairName(match, 0, data.players) || "Red");
+  const p2Name = escapeHTML(ClassicTeams.pairName(match, 1, data.players) || "Blue");
   const holes = match.points.holes || {};
 
   // Update each hole's button highlight from the current value. Buttons are
@@ -1277,6 +1261,7 @@ function updateMatchInPlace(matchIndex) {
   // Update the nine-result summary bar (clinch-aware) and dim dead holes.
   const f9 = nineState(holes, 1, 9);
   const b9 = nineState(holes, 10, 18);
+  const t18 = nineState(holes, 1, 18);
 
   const nineValues = matchEl.querySelectorAll('.nine-result-value');
   if (nineValues[0]) {
@@ -1289,19 +1274,24 @@ function updateMatchInPlace(matchIndex) {
     nineValues[1].classList.toggle('pending', b9.played === 0);
     nineValues[1].classList.toggle('clinched', b9.clinched);
   }
+  if (nineValues[2]) {
+    nineValues[2].textContent = nineSummaryText(t18, p1Name, p2Name);
+    nineValues[2].classList.toggle('pending', t18.played === 0);
+    nineValues[2].classList.toggle('clinched', t18.clinched);
+  }
 
   // Dim now-redundant (unplayed) holes in a clinched nine.
   matchEl.querySelectorAll('.hole-row[data-hole]').forEach(row => {
     const h = Number(row.getAttribute('data-hole'));
     const st = h <= 9 ? f9 : b9;
     const v = holes[h];
-    row.classList.toggle('hole-row--redundant', st.clinched && (v === null || v === undefined));
+    row.classList.toggle('hole-row--redundant', st.clinched && t18.clinched && (v === null || v === undefined));
   });
 
   // Update match header status badge (Final once both nines are decided).
   const front = match.points.front9;
   const back = match.points.back9;
-  const bothDecided = f9.decided && b9.decided;
+  const bothDecided = f9.decided && b9.decided && nineState(holes, 1, 18).decided;
   const closed = !!match.closed;
   let status = 'not-started';
   let statusText = 'Not Started';
@@ -1322,7 +1312,7 @@ function updateMatchInPlace(matchIndex) {
   // Update match preview F9/B9 line
   const preview = matchEl.querySelector('.match-preview div:last-child');
   if (preview) {
-    preview.textContent = `F9: ${front === null ? '-' : front} | B9: ${back === null ? '-' : back}`;
+    preview.textContent = `F9: ${front === null ? '-' : front} | B9: ${back === null ? '-' : back} | Tot: ${match.points.total == null ? '-' : match.points.total}`;
   }
 
   // Also update the totals panel (non-destructive)
@@ -1367,19 +1357,23 @@ function formatNineResult(result, p1Name, p2Name, holesPlayed) {
   return `Halved (${holesPlayed} holes)`;
 }
 
+// A valid 2v2 match has two different players on each side, every player on
+// the side's own team, and the two sides on opposite teams.
 function isValidMatchup(match) {
-  const [p1, p2] = match.playerIds;
-  if (!p1 || !p2) return false;
-  const side1 = data.players[p1].team; // "green" | "red" | null
-  const side2 = data.players[p2].team;
-  return !!side1 && !!side2 && side1 !== side2;
+  const sideTeams = [0, 1].map(side => {
+    const ids = ClassicTeams.pairIds(match, side);
+    if (ids.length !== 2 || ids[0] === ids[1]) return null;
+    const teams = ids.map(id => data.players[id] && data.players[id].team);
+    return teams[0] && teams[0] === teams[1] ? teams[0] : null;
+  });
+  return !!sideTeams[0] && !!sideTeams[1] && sideTeams[0] !== sideTeams[1];
 }
 
 /*************************
  * UPDATE FUNCTIONS
  *************************/
-function updatePlayer(matchIndex, playerIndex, playerId) {
-  data.matches[matchIndex].playerIds[playerIndex] = playerId || null;
+function updatePlayer(matchIndex, side, slot, playerId) {
+  setMatchSlot(data.matches[matchIndex], side, slot, playerId);
   markUnsaved();
   render();
 }
@@ -1402,8 +1396,10 @@ function clearAll() {
   // Reset all matches
   data.matches.forEach(match => {
     match.playerIds = [null, null];
+    match.partnerIds = [null, null];
     match.points.front9 = null;
     match.points.back9 = null;
+    match.points.total = null;
     if (match.points.holes) {
       for (let i = 1; i <= 18; i++) match.points.holes[i] = null;
     }
@@ -1438,6 +1434,7 @@ function clearMatch(matchIndex) {
   const match = data.matches[matchIndex];
   match.points.front9 = null;
   match.points.back9 = null;
+  match.points.total = null;
   if (match.points.holes) {
     for (let i = 1; i <= 18; i++) match.points.holes[i] = null;
   }
@@ -1667,25 +1664,28 @@ function buildHistoryMatches() {
     const [p1, p2] = m.playerIds;
     const pl1 = p1 ? data.players[p1] : null;
     const pl2 = p2 ? data.players[p2] : null;
+    const pair1 = ClassicTeams.pairName(m, 0, data.players);
+    const pair2 = ClassicTeams.pairName(m, 1, data.players);
     // Team side each player counts for: "green" | "red".
     const side1 = pl1 ? pl1.team : null;
     const side2 = pl2 ? pl2.team : null;
     const f = m.points.front9;
     const b = m.points.back9;
-    const p1pts = (f === null ? 0 : f) + (b === null ? 0 : b);
-    const p2pts = (f === null ? 0 : 1 - f) + (b === null ? 0 : 1 - b);
+    const t = m.points.total == null ? null : m.points.total;
+    const p1pts = (f === null ? 0 : f) + (b === null ? 0 : b) + (t === null ? 0 : t);
+    const p2pts = (f === null ? 0 : 1 - f) + (b === null ? 0 : 1 - b) + (t === null ? 0 : 1 - t);
     return {
       id: m.id,
-      player1: pl1 ? pl1.name : "TBD",
-      player2: pl2 ? pl2.name : "TBD",
+      player1: pair1 || "TBD",
+      player2: pair2 || "TBD",
+      format: { front9: "scramble", back9: "altshot" },
       side1,
       side2,
-      pops1: pl1 ? pl1.pops : null,
-      pops2: pl2 ? pl2.pops : null,
       holes: Object.assign({}, m.points.holes),
       gross: m.points.gross ? Object.assign({}, m.points.gross) : undefined,
       front9: f,
       back9: b,
+      total: t,
       result: { p1: p1pts, p2: p2pts }
     };
   });
@@ -1838,7 +1838,7 @@ function saveEventInfo() {
 
 function startNewSeason() {
   if (!data) return;
-  const hasScores = data.matches.some(m => m.points && (m.points.front9 !== null || m.points.back9 !== null));
+  const hasScores = data.matches.some(m => m.points && (m.points.front9 != null || m.points.back9 != null || m.points.total != null));
   const warn = "START A NEW SEASON?\n\n" +
     (hasScores ? "⚠ There are scores in the current event. Click \"Archive Round → History\" FIRST if you haven't.\n\n" : "") +
     "This will:\n" +
@@ -1855,11 +1855,12 @@ function startNewSeason() {
   // Clear matchups + scores.
   data.matches.forEach(m => {
     m.playerIds = [null, null];
-    m.points = { front9: null, back9: null, holes: {} };
+    m.partnerIds = [null, null];
+    m.points = { front9: null, back9: null, total: null, holes: {} };
     for (let i = 1; i <= 18; i++) m.points.holes[i] = null;
     m.status = "not_started";
   });
-  // Rotate scan-to-score tokens (4 playing groups for a 7v7 field).
+  // Rotate scan-to-score tokens (4 playing groups for an 8v8 field, one 2v2 match each).
   data.meta.foursomeTokens = { [genToken()]: 1, [genToken()]: 2, [genToken()]: 3, [genToken()]: 4 };
   // Clear last season's live score timeline.
   data.meta.scoreLog = [];

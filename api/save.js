@@ -2,9 +2,9 @@
 // Writes updated data.json to GitHub via the Contents API.
 // Requires GITHUB_TOKEN env var with repo Contents read+write permission.
 //
-// Concurrency model (a live round has 3 foursomes scoring at once):
-//   - Foursome scorers send { foursome: 0|1|2 }. The server merges ONLY that
-//     foursome's two matches onto the latest committed data, so two groups
+// Concurrency model (a live round has 4 foursomes scoring at once, one 2v2 match each):
+//   - Foursome scorers send { foursome: 0..3 }. The server merges ONLY that
+//     foursome's match onto the latest committed data, so two groups
 //     saving at the same time can never clobber each other's holes.
 //   - The admin console sends a full document with expectedLastUpdated; the
 //     server enforces that as an optimistic lock (409 on mismatch).
@@ -35,7 +35,7 @@ function computeTeamTotals(doc) {
     if (!p1 || !p2 || !players[p1] || !players[p2]) return;
     const s1 = players[p1].team, s2 = players[p2].team;
     if ((s1 !== "green" && s1 !== "red") || (s2 !== "green" && s2 !== "red")) return;
-    ["front9", "back9"].forEach((k) => {
+    ["front9", "back9", "total"].forEach((k) => {
       const v = m.points ? m.points[k] : null;
       if (v === null || v === undefined) return;
       totals[s1] += v;
@@ -139,12 +139,10 @@ module.exports = async function handler(req, res) {
     // 2. Build the document to write
     let toWrite;
     if (isFoursome && Array.isArray(currentData.matches) && Array.isArray(data.matches)) {
-      // Merge only this foursome's two matches onto the latest server truth.
+      // Merge only this foursome's match (one 2v2 match per group) onto the
+      // latest server truth.
       toWrite = currentData;
-      const idxA = foursome * 2;
-      const idxB = foursome * 2 + 1;
-      if (data.matches[idxA]) toWrite.matches[idxA] = data.matches[idxA];
-      if (data.matches[idxB]) toWrite.matches[idxB] = data.matches[idxB];
+      if (data.matches[foursome]) toWrite.matches[foursome] = data.matches[foursome];
       toWrite.meta = toWrite.meta || {};
       toWrite.meta.lastUpdated = new Date().toISOString();
     } else {
