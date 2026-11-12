@@ -588,7 +588,7 @@ function renderMatchupBuilder() {
       statusEl.textContent = "All matchups set! Switch to Score Entry to enter results.";
     } else {
       statusEl.className = "draft-status draft-status--live";
-      statusEl.textContent = `Assign players to match slots (${assignedGreen.size + assignedRed.size}/${matchSlots * 2} assigned)`;
+      statusEl.textContent = `Assign pairs to each match (${assignedGreen.size + assignedRed.size}/${matchSlots * 2} players assigned)`;
     }
   }
 
