@@ -95,6 +95,70 @@
         .cap-faceoff { gap: 8px; }
         .cap-side { padding: 16px 10px; }
       }
+    
+      /* ---- Draft tile (temporary; hides itself once pairings are set) ---- */
+      .draft-tile__status {
+        text-align: center; margin: -4px 0 18px;
+        font-size: 0.8em; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+        color: var(--color-muted);
+      }
+      .draft-tile__status.is-live { color: var(--masters-green); }
+      .draft-tile__status .dt-dot {
+        display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+        background: var(--masters-green); margin-right: 6px; vertical-align: 1px;
+        animation: dt-pulse 1.6s ease-in-out infinite;
+      }
+      @keyframes dt-pulse { 50% { opacity: 0.25; } }
+      .draft-tile__teams {
+        display: grid; grid-template-columns: 1fr 1fr; gap: clamp(10px, 3vw, 24px);
+        max-width: 760px; margin: 0 auto;
+      }
+      .dt-team {
+        background: var(--color-card); border: 1px solid var(--color-line);
+        border-radius: var(--radius-lg); overflow: hidden;
+      }
+      .dt-team--green { border-top: 5px solid var(--team-green); }
+      .dt-team--red { border-top: 5px solid var(--team-red); }
+      .dt-team__head {
+        display: flex; justify-content: space-between; align-items: baseline;
+        padding: 12px 14px 8px; font-weight: 900; letter-spacing: 0.04em;
+      }
+      .dt-team--green .dt-team__head { color: var(--team-green); }
+      .dt-team--red .dt-team__head { color: var(--team-red); }
+      .dt-team__count { font-size: 0.8em; font-weight: 700; color: var(--color-muted); }
+      .dt-row {
+        display: flex; align-items: center; gap: 8px; min-height: 40px;
+        padding: 6px 14px; border-top: 1px solid var(--color-line);
+      }
+      .dt-row--open { color: var(--color-muted); font-style: italic; }
+      .dt-rank {
+        flex: 0 0 2.2em; font-weight: 800; font-size: 0.85em; color: var(--color-muted);
+      }
+      .dt-name { flex: 1; min-width: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .dt-pops { font-size: 0.78em; color: var(--color-muted); white-space: nowrap; }
+      .dt-cap {
+        font-size: 0.65em; font-weight: 900; letter-spacing: 1px; color: #fff;
+        padding: 2px 6px; border-radius: 4px;
+      }
+      .dt-team--green .dt-cap { background: var(--team-green); }
+      .dt-team--red .dt-cap { background: var(--team-red); }
+      .dt-pool { max-width: 760px; margin: clamp(16px, 3vw, 24px) auto 0; }
+      .dt-pool__title {
+        font-size: 0.75em; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+        color: var(--color-muted); margin-bottom: 8px; text-align: center;
+      }
+      .dt-pool__list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+      .dt-chip {
+        display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+        background: var(--color-surface); border: 1px solid var(--color-line);
+        border-radius: 999px; font-weight: 700; font-size: 0.9em;
+      }
+      .dt-chip b { color: var(--color-muted); font-weight: 800; font-size: 0.85em; }
+      @media (max-width: 520px) {
+        .dt-row { padding: 6px 10px; gap: 6px; }
+        .dt-team__head { padding: 10px 10px 6px; }
+        .dt-pops { display: none; }
+      }
     </style>
 </head>
 <body class="homepage">
@@ -125,6 +189,27 @@
             <span class="number">4</span>
             <span class="label">Matches</span>
         </div>
+    </div>
+</div>
+
+<div class="container" id="draft-tile" style="display:none;">
+    <div class="section-header">
+        <h2 id="draft-tile-title">Draft Board</h2>
+    </div>
+    <div class="draft-tile__status" id="draft-tile-status"></div>
+    <div class="draft-tile__teams">
+        <div class="dt-team dt-team--green">
+            <div class="dt-team__head"><span id="dt-green-label">Team Red</span><span class="dt-team__count" id="dt-green-count"></span></div>
+            <div id="dt-green-rows"></div>
+        </div>
+        <div class="dt-team dt-team--red">
+            <div class="dt-team__head"><span id="dt-red-label">Team Blue</span><span class="dt-team__count" id="dt-red-count"></span></div>
+            <div id="dt-red-rows"></div>
+        </div>
+    </div>
+    <div class="dt-pool" id="dt-pool" style="display:none;">
+        <div class="dt-pool__title">Still Available &middot; by Rank</div>
+        <div class="dt-pool__list" id="dt-pool-list"></div>
     </div>
 </div>
 
@@ -336,11 +421,71 @@
             }
             card.style.display = "";
         };
-        fetch(`/api/data?t=${Date.now()}`, { cache: "no-store" })
-            .then(r => r.ok ? r.json() : Promise.reject())
-            .catch(() => fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" }).then(r => r.json()))
-            .then(d => { applyEventConfig(d && d.meta); applyCaptains(d); applyCourse(d); })
+        // ---- Draft tile (temporary) ------------------------------------------
+        // Shows each captain's team with drafted players and the ranked pool of
+        // players still available, straight from the live roster, so it updates
+        // as picks are assigned in the admin Draft tab. It hides itself (and stops
+        // polling) as soon as any pairing is set on the live match list.
+        const DRAFT_TEAM_SIZE = 8;   // captain + 7 picks per team (four 2v2 pairs)
+        const DRAFT_POLL_MS = 15000;
+        let draftTimer = null;
+        const dtEsc = (s) => { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; };
+        const pairingsSet = (d) => (d.matches || []).some(m => m && m.playerIds && (m.playerIds[0] || m.playerIds[1]));
+        const renderDraftTile = (d) => {
+            const tile = document.getElementById('draft-tile');
+            if (!tile || !d || !d.players) return;
+            if (pairingsSet(d)) {
+                tile.style.display = 'none';
+                if (draftTimer) { clearInterval(draftTimer); draftTimer = null; }
+                return;
+            }
+            const all = Object.values(d.players).filter(Boolean);
+            const byRank = (a, b) => (a.rank || 99) - (b.rank || 99);
+            const teamOf = (t) => all.filter(p => p.team === t);
+            const draftable = all.filter(p => !p.captain);
+            const drafted = draftable.filter(p => p.team === 'green' || p.team === 'red');
+            const pool = draftable.filter(p => p.team !== 'green' && p.team !== 'red').sort(byRank);
+
+            const row = (p) => `<div class="dt-row">` +
+                `<span class="dt-rank">#${dtEsc(p.rank)}</span>` +
+                `<span class="dt-name">${dtEsc(p.name)}</span>` +
+                (p.captain ? `<span class="dt-cap">CAPT</span>` : `<span class="dt-pops">${dtEsc(p.pops)} pops</span>`) +
+                `</div>`;
+            ['green', 'red'].forEach(t => {
+                const roster = teamOf(t).sort((a, b) => (b.captain ? 1 : 0) - (a.captain ? 1 : 0) || byRank(a, b));
+                let rows = roster.map(row).join('');
+                for (let i = roster.length; i < DRAFT_TEAM_SIZE; i++) {
+                    rows += `<div class="dt-row dt-row--open"><span class="dt-rank">&nbsp;</span><span class="dt-name">Open</span></div>`;
+                }
+                document.getElementById(`dt-${t}-rows`).innerHTML = rows;
+                document.getElementById(`dt-${t}-count`).textContent = `${roster.length}/${DRAFT_TEAM_SIZE}`;
+            });
+
+            const statusEl = document.getElementById('draft-tile-status');
+            if (drafted.length === 0) {
+                statusEl.className = 'draft-tile__status';
+                statusEl.textContent = 'Draft has not started';
+            } else if (drafted.length < draftable.length) {
+                statusEl.className = 'draft-tile__status is-live';
+                statusEl.innerHTML = `<span class="dt-dot"></span>Draft in progress &mdash; ${drafted.length} of ${draftable.length} picked`;
+            } else {
+                statusEl.className = 'draft-tile__status';
+                statusEl.textContent = 'Draft complete \u2014 pairings coming soon';
+            }
+            const poolWrap = document.getElementById('dt-pool');
+            poolWrap.style.display = pool.length ? '' : 'none';
+            document.getElementById('dt-pool-list').innerHTML = pool.map(p =>
+                `<span class="dt-chip"><b>#${dtEsc(p.rank)}</b>${dtEsc(p.name)}</span>`).join('');
+            tile.style.display = '';
+        };
+        const loadLiveData = () =>
+            fetch(`/api/data?t=${Date.now()}`, { cache: "no-store" })
+                .then(r => r.ok ? r.json() : Promise.reject())
+                .catch(() => fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" }).then(r => r.json()));
+        loadLiveData()
+            .then(d => { applyEventConfig(d && d.meta); applyCaptains(d); applyCourse(d); renderDraftTile(d); })
             .catch(() => {});
+        draftTimer = setInterval(() => { loadLiveData().then(renderDraftTile).catch(() => {}); }, DRAFT_POLL_MS);
 
         updateCountdown();
         setInterval(updateCountdown, 1000);
