@@ -73,18 +73,6 @@
       "rank": 12,
       "pops": 14,
       "team": null
-    },
-    "nick": {
-      "name": "Nick",
-      "rank": 13,
-      "pops": 12,
-      "team": null
-    },
-    "steve": {
-      "name": "Steve",
-      "rank": 14,
-      "pops": 13,
-      "team": null
     }
   },
   "matches": [
@@ -202,7 +190,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-11-12T17:17:44.000Z",
+    "lastUpdated": "2026-11-12T17:20:25.000Z",
     "eventName": "The 2027 Classic",
     "tournamentDate": "2027-09-04",
     "teeTime": "08:00",
