@@ -250,7 +250,7 @@
     </div>
 </section>
 
-<div class="container">
+<div class="container" id="course-container" style="display:none;">
     <div class="section-header">
         <h2>The Course</h2>
     </div>
@@ -419,6 +419,8 @@
             } else {
                 show("cc-stats", false); show("cc-holes", false); show("cc-tbd", true);
             }
+            // Hide the whole Course section until a venue is set.
+            show("course-container", !!(known && holes));
             card.style.display = "";
         };
         // ---- Draft tile (temporary) ------------------------------------------
