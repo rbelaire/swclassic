@@ -262,8 +262,9 @@ function validateData(d) {
   if (!Array.isArray(d.matches)) {
     errors.push("Matches array is missing.");
   } else {
-    if (d.matches.length !== 4) {
-      errors.push(`Expected 4 matches, found ${d.matches.length}.`);
+    const expectedMatches = ClassicTeams.teamSize(d) / 2;
+    if (d.matches.length !== expectedMatches) {
+      errors.push(`Expected ${expectedMatches} matches, found ${d.matches.length}.`);
     }
     d.matches.forEach((m, i) => {
       if (!Array.isArray(m.playerIds)) {
@@ -1910,8 +1911,9 @@ function startNewSeason() {
     for (let i = 1; i <= 18; i++) m.points.holes[i] = null;
     m.status = "not_started";
   });
-  // Rotate scan-to-score tokens (4 playing groups for an 8v8 field, one 2v2 match each).
-  data.meta.foursomeTokens = { [genToken()]: 1, [genToken()]: 2, [genToken()]: 3, [genToken()]: 4 };
+  // Rotate scan-to-score tokens (one per playing group; one 2v2 match each).
+  data.meta.foursomeTokens = {};
+  data.matches.forEach((m, i) => { data.meta.foursomeTokens[genToken()] = i + 1; });
   // Clear last season's live score timeline.
   data.meta.scoreLog = [];
 
