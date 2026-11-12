@@ -54,7 +54,7 @@
       "name": "Lane",
       "rank": 9,
       "pops": 12,
-      "team": null
+      "team": "green"
     },
     "alex": {
       "name": "Alex",
@@ -66,13 +66,13 @@
       "name": "Dexter",
       "rank": 11,
       "pops": 14,
-      "team": null
+      "team": "red"
     },
     "jv": {
       "name": "Jordan",
       "rank": 12,
       "pops": 14,
-      "team": null
+      "team": "green"
     }
   },
   "matches": [
@@ -190,7 +190,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-11-12T21:13:17.241Z",
+    "lastUpdated": "2026-11-12T21:23:01.607Z",
     "eventName": "The 2027 Classic",
     "tournamentDate": "2027-09-04",
     "teeTime": "08:00",
