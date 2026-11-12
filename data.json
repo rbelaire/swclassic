@@ -18,13 +18,13 @@
       "name": "Austin",
       "rank": 3,
       "pops": 5,
-      "team": null
+      "team": "green"
     },
     "bruce": {
       "name": "Bruce",
       "rank": 4,
       "pops": 7,
-      "team": null
+      "team": "red"
     },
     "brock": {
       "name": "Brock",
@@ -36,7 +36,7 @@
       "name": "Jared",
       "rank": 6,
       "pops": 7,
-      "team": null
+      "team": "red"
     },
     "hunter": {
       "name": "Hunter",
@@ -190,7 +190,7 @@
     }
   ],
   "meta": {
-    "lastUpdated": "2026-11-12T18:21:41.000Z",
+    "lastUpdated": "2026-11-12T21:02:29.362Z",
     "eventName": "The 2027 Classic",
     "tournamentDate": "2027-09-04",
     "teeTime": "08:00",
