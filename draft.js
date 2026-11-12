@@ -7,16 +7,17 @@ const REFRESH_INTERVAL = 10000; // 10 seconds for draft night
 let autoRefreshEnabled = true;
 let lastUpdateTime = Date.now();
 let refreshTimer = null;
-// Snake-style ownership of the 14 draft picks (7 per team; captains make 8) (green = team one, red = team two).
-const FINAL_DRAFT_ORDER = [
-  "green", "red", "red", "green", "green", "red", "red",
-  "green", "green", "red", "red", "green", "green", "red"
-];
-
-const TEAM_PICK_SLOTS = {
-  green: FINAL_DRAFT_ORDER.map((team, index) => ({ pick: index + 1, team })).filter(slot => slot.team === "green"),
-  red: FINAL_DRAFT_ORDER.map((team, index) => ({ pick: index + 1, team })).filter(slot => slot.team === "red")
-};
+// Snake-style ownership of the draft picks (green = team one, red = team two).
+// The number of picks follows the field size: 2 * (players per team - 1).
+function buildPickSlots(picks) {
+  const order = [];
+  for (let i = 0; i < picks; i++) {
+    order.push(i === 0 ? "green" : (((i - 1) >> 1) % 2 === 0 ? "red" : "green"));
+  }
+  const slots = { green: [], red: [] };
+  order.forEach((team, index) => slots[team].push({ pick: index + 1, team }));
+  return slots;
+}
 
 /*************************
  * LOAD DATA
@@ -135,12 +136,14 @@ function render() {
   const teamRed = players.filter(p => p.team === "red" && !p.captain).sort((a, b) => a.rank - b.rank);
   const undrafted = players.filter(p => (!p.team || p.team === null) && !p.captain).sort((a, b) => a.rank - b.rank);
 
-  const totalDraftable = players.filter(p => !p.captain).length;
+  // Only the draft's picks count; any extra signed-up players are alternates.
+  const totalDraftable = Math.min(players.filter(p => !p.captain).length, ClassicTeams.pickCount(data));
   const totalDrafted = teamGreen.length + teamRed.length;
+  const slots = buildPickSlots(ClassicTeams.pickCount(data));
 
   renderStatus(totalDrafted, totalDraftable);
-  renderTeam("green", teamGreen, TEAM_PICK_SLOTS.green);
-  renderTeam("red", teamRed, TEAM_PICK_SLOTS.red);
+  renderTeam("green", teamGreen, slots.green);
+  renderTeam("red", teamRed, slots.red);
   renderPool(undrafted);
 }
 

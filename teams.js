@@ -76,6 +76,19 @@
   // (side 0 = "green" slot / Team Red, side 1 = "red" slot / Team Blue) and
   // `partnerIds[i]` is that side's partner. Keeping the lead in `playerIds`
   // means every team/side lookup written for 1v1 still works.
+  // Field size is a setting (meta.format.playersPerTeam = players per team INCLUDING
+  // the captain), so the same code runs 6v6 or 8v8. A pair is two players, so
+  // matches = teamSize / 2 and the draft has 2 * (teamSize - 1) picks.
+  ClassicTeams.teamSize = function (data) {
+    var f = data && data.meta && data.meta.format;
+    var n = f && +f.playersPerTeam;
+    if (n >= 4 && n % 2 === 0) return n;
+    var m = data && data.matches ? data.matches.length : 0;
+    return m ? m * 2 : 6;
+  };
+  ClassicTeams.pickLimit = function (data) { return ClassicTeams.teamSize(data) - 1; };   // picks per team
+  ClassicTeams.pickCount = function (data) { return ClassicTeams.pickLimit(data) * 2; };  // picks in the draft
+
   // Every match is worth three points: front nine, back nine, and the overall
   // 18 holes. Older archived matches have no `total`, so readers skip nulls.
   ClassicTeams.POINT_KEYS = ["front9", "back9", "total"];

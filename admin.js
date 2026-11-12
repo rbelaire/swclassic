@@ -9,7 +9,9 @@ const VALID_USERS = ["admin", "foursome1", "foursome2", "foursome3", "foursome4"
 // Scan-to-score tokens now live in data.json (meta.foursomeTokens) so they can
 // be rotated each season from the admin console without a code change.
 let hasUnsavedChanges = false;
-const TEAM_PICK_LIMIT = 7; // drafted players per team; the captain makes 8, i.e. four 2v2 pairs
+// Drafted players per team (the captain makes one more). Follows the Event Setup
+// "players per team" setting: 6v6 = 5 picks and 3 pairs, 8v8 = 7 picks and 4 pairs.
+function teamPickLimit() { return ClassicTeams.pickLimit(data); }
 
 async function hashPassword(password) {
   const encoder = new TextEncoder();
@@ -354,7 +356,7 @@ function detectDefaultTab() {
   const drafted = draftable.filter(p => p.team === "green" || p.team === "red");
 
   // Not all drafted yet -> Draft tab
-  if (drafted.length < draftable.length) return "draft";
+  if (drafted.length < Math.min(draftable.length, ClassicTeams.pickCount(data))) return "draft";
 
   // All drafted but no matchups set -> Matchups tab
   const hasMatchups = data.matches.some(m => m.playerIds[0] && m.playerIds[1]);
@@ -427,8 +429,8 @@ function renderDraft() {
   renderDraftStatus(totalDrafted, totalDraftable);
 
   // Team columns
-  renderAdminTeamColumn("admin-team-green-slots", teamGreen, TEAM_PICK_LIMIT);
-  renderAdminTeamColumn("admin-team-red-slots", teamRed, TEAM_PICK_LIMIT);
+  renderAdminTeamColumn("admin-team-green-slots", teamGreen, teamPickLimit());
+  renderAdminTeamColumn("admin-team-red-slots", teamRed, teamPickLimit());
 
   // Player pool
   renderDraftPool(pool);
@@ -512,9 +514,9 @@ function draftPlayer(id, team) {
 
   // Count drafted players on the team (captains don't count toward the 5 picks).
   const teamCount = Object.values(data.players).filter(p => p.team === team && !p.captain).length;
-  if (teamCount >= TEAM_PICK_LIMIT) {
+  if (teamCount >= teamPickLimit()) {
     const T = ClassicTeams(data);
-    alert(`${T.label(team)} is full (${TEAM_PICK_LIMIT} players).`);
+    alert(`${T.label(team)} is full (${teamPickLimit()} picks plus the captain).`);
     return;
   }
 
@@ -557,10 +559,10 @@ function renderMatchupBuilder() {
     .sort((a, b) => a[1].rank - b[1].rank);
 
   // Check draft completeness (each team needs its picks + captain = 8)
-  if (greenPlayers.length <= TEAM_PICK_LIMIT || redPlayers.length <= TEAM_PICK_LIMIT) {
+  if (greenPlayers.length <= teamPickLimit() || redPlayers.length <= teamPickLimit()) {
     if (statusEl) {
       statusEl.className = "draft-status draft-status--waiting";
-      statusEl.textContent = `Draft not complete. Assign all ${TEAM_PICK_LIMIT * 2} players before building matchups.`;
+      statusEl.textContent = `Draft not complete. Draft ${ClassicTeams.pickCount(data)} players (${teamPickLimit()} per team) before building matchups.`;
     }
     container.innerHTML = "";
     return;
@@ -580,7 +582,7 @@ function renderMatchupBuilder() {
     });
   });
 
-  const matchSlots = TEAM_PICK_LIMIT + 1; // drafted players + captain (8 per team)
+  const matchSlots = teamPickLimit() + 1; // drafted players + captain
   const allAssigned = assignedGreen.size === matchSlots && assignedRed.size === matchSlots;
   if (statusEl) {
     if (allAssigned) {
@@ -1809,6 +1811,8 @@ function renderEventSetup() {
   set("es-teetime", m.teeTime || "");
   set("es-tz", m.timezoneOffset || "-05:00");
   set("es-tees", Array.isArray(m.teeTimes) ? m.teeTimes.join(", ") : "");
+  const sizeEl = document.getElementById("es-size");
+  if (sizeEl) sizeEl.value = String(ClassicTeams.teamSize(data));
   renderEventSetup._done = true;
 }
 
@@ -1825,10 +1829,51 @@ function readEventInputs() {
   };
 }
 
+// Set the field size (players per team, captain included) and resize the match
+// list to match: size / 2 pairs per team = size / 2 matches. Growing adds blank
+// matches; shrinking only removes trailing matches that are still empty, and is
+// refused if a team already has more drafted players than the new size allows.
+// Returns an error string, or "" on success.
+function applyTeamSize(size) {
+  size = Number(size);
+  if (!(size >= 4 && size % 2 === 0)) return "Players per team must be an even number.";
+  const wantMatches = size / 2;
+  const picks = size - 1;
+  const over = ["green", "red"].filter(t =>
+    Object.values(data.players).filter(p => p.team === t && !p.captain).length > picks);
+  if (over.length) return `A team already has more than ${picks} drafted players. Undraft some before shrinking to ${size} per team.`;
+  const isEmpty = m => !(m.playerIds && (m.playerIds[0] || m.playerIds[1]))
+    && !(m.partnerIds && (m.partnerIds[0] || m.partnerIds[1]))
+    && m.points && m.points.front9 == null && m.points.back9 == null;
+  while (data.matches.length > wantMatches) {
+    if (!isEmpty(data.matches[data.matches.length - 1])) return "The extra matches already have pairings or scores. Clear them first.";
+    data.matches.pop();
+  }
+  while (data.matches.length < wantMatches) {
+    const holes = {};
+    for (let i = 1; i <= 18; i++) holes[i] = null;
+    const nextId = data.matches.reduce((mx, m) => Math.max(mx, Number(m.id) || 0), 0) + 1;
+    data.matches.push({
+      id: nextId, playerIds: [null, null], partnerIds: [null, null],
+      points: { front9: null, back9: null, total: null, holes },
+      status: "not_started", closed: false
+    });
+  }
+  const fmt = Object.assign({}, data.meta && data.meta.format, { playersPerTeam: size });
+  delete fmt.teamSize; // older key that meant pair size; unused
+  data.meta = Object.assign({}, data.meta, { format: fmt });
+  return "";
+}
+
 function saveEventInfo() {
   if (!data) return;
   const statusEl = document.getElementById("es-status");
   const info = readEventInputs();
+  const sizeEl = document.getElementById("es-size");
+  if (sizeEl && Number(sizeEl.value) !== ClassicTeams.teamSize(data)) {
+    const err = applyTeamSize(sizeEl.value);
+    if (err) { showToast(err, "error"); return; }
+  }
   data.meta = Object.assign({}, data.meta, info);
   if (statusEl) statusEl.textContent = "Saving…";
   saveFullData()
@@ -1848,7 +1893,12 @@ function startNewSeason() {
     "This cannot be undone. Continue?";
   if (!confirm(warn)) return;
 
-  // Apply any edited event info first.
+  // Apply any edited event info first (including the field size).
+  const sizeEl = document.getElementById("es-size");
+  if (sizeEl && Number(sizeEl.value) !== ClassicTeams.teamSize(data)) {
+    const sizeErr = applyTeamSize(sizeEl.value);
+    if (sizeErr) { showToast(sizeErr, "error"); return; }
+  }
   data.meta = Object.assign({}, data.meta, readEventInputs());
   // Undraft everyone except captains (they keep their team slot).
   Object.values(data.players).forEach(p => { if (!p.captain) p.team = null; });

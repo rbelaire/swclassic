@@ -178,15 +178,15 @@
     <h1 id="event-title">THE CLASSIC 2027</h1>
     <div class="quick-stats">
         <div class="stat-box">
-            <span class="number">8v8</span>
+            <span class="number" id="stat-format">6v6</span>
             <span class="label">Team Battle</span>
         </div>
         <div class="stat-box">
-            <span class="number">16</span>
+            <span class="number" id="stat-golfers">12</span>
             <span class="label">Golfers</span>
         </div>
         <div class="stat-box">
-            <span class="number">4</span>
+            <span class="number" id="stat-matches">3</span>
             <span class="label">Matches</span>
         </div>
     </div>
@@ -426,7 +426,20 @@
         // players still available, straight from the live roster, so it updates
         // as picks are assigned in the admin Draft tab. It hides itself (and stops
         // polling) as soon as any pairing is set on the live match list.
-        const DRAFT_TEAM_SIZE = 8;   // captain + 7 picks per team (four 2v2 pairs)
+        // Field size comes from the live data (meta.format.playersPerTeam = players per team,
+        // captain included): 6 -> 3 pairs/3 matches, 8 -> 4 pairs/4 matches.
+        const teamSizeOf = (d) => {
+            const n = d && d.meta && d.meta.format && +d.meta.format.playersPerTeam;
+            if (n >= 4 && n % 2 === 0) return n;
+            return ((d && d.matches && d.matches.length) || 3) * 2;
+        };
+        const applyFieldStats = (d) => {
+            const n = teamSizeOf(d);
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            set('stat-format', `${n}v${n}`);
+            set('stat-golfers', n * 2);
+            set('stat-matches', n / 2);
+        };
         const DRAFT_POLL_MS = 15000;
         let draftTimer = null;
         const dtEsc = (s) => { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; };
@@ -442,6 +455,8 @@
             const all = Object.values(d.players).filter(Boolean);
             const byRank = (a, b) => (a.rank || 99) - (b.rank || 99);
             const teamOf = (t) => all.filter(p => p.team === t);
+            const TEAM_SIZE = teamSizeOf(d);
+            const picksTotal = (TEAM_SIZE - 1) * 2;
             const draftable = all.filter(p => !p.captain);
             const drafted = draftable.filter(p => p.team === 'green' || p.team === 'red');
             const pool = draftable.filter(p => p.team !== 'green' && p.team !== 'red').sort(byRank);
@@ -454,25 +469,27 @@
             ['green', 'red'].forEach(t => {
                 const roster = teamOf(t).sort((a, b) => (b.captain ? 1 : 0) - (a.captain ? 1 : 0) || byRank(a, b));
                 let rows = roster.map(row).join('');
-                for (let i = roster.length; i < DRAFT_TEAM_SIZE; i++) {
+                for (let i = roster.length; i < TEAM_SIZE; i++) {
                     rows += `<div class="dt-row dt-row--open"><span class="dt-rank">&nbsp;</span><span class="dt-name">Open</span></div>`;
                 }
                 document.getElementById(`dt-${t}-rows`).innerHTML = rows;
-                document.getElementById(`dt-${t}-count`).textContent = `${roster.length}/${DRAFT_TEAM_SIZE}`;
+                document.getElementById(`dt-${t}-count`).textContent = `${roster.length}/${TEAM_SIZE}`;
             });
 
             const statusEl = document.getElementById('draft-tile-status');
             if (drafted.length === 0) {
                 statusEl.className = 'draft-tile__status';
                 statusEl.textContent = 'Draft has not started';
-            } else if (drafted.length < draftable.length) {
+            } else if (drafted.length < Math.min(picksTotal, draftable.length)) {
                 statusEl.className = 'draft-tile__status is-live';
-                statusEl.innerHTML = `<span class="dt-dot"></span>Draft in progress &mdash; ${drafted.length} of ${draftable.length} picked`;
+                statusEl.innerHTML = `<span class="dt-dot"></span>Draft in progress &mdash; ${drafted.length} of ${Math.min(picksTotal, draftable.length)} picked`;
             } else {
                 statusEl.className = 'draft-tile__status';
                 statusEl.textContent = 'Draft complete \u2014 pairings coming soon';
             }
             const poolWrap = document.getElementById('dt-pool');
+            const complete = drafted.length >= Math.min(picksTotal, draftable.length);
+            document.querySelector('.dt-pool__title').innerHTML = complete ? 'Alternates &middot; by Rank' : 'Still Available &middot; by Rank';
             poolWrap.style.display = pool.length ? '' : 'none';
             document.getElementById('dt-pool-list').innerHTML = pool.map(p =>
                 `<span class="dt-chip"><b>#${dtEsc(p.rank)}</b>${dtEsc(p.name)}</span>`).join('');
@@ -483,7 +500,7 @@
                 .then(r => r.ok ? r.json() : Promise.reject())
                 .catch(() => fetch(`./data.json?t=${Date.now()}`, { cache: "no-store" }).then(r => r.json()));
         loadLiveData()
-            .then(d => { applyEventConfig(d && d.meta); applyCaptains(d); applyCourse(d); renderDraftTile(d); })
+            .then(d => { applyEventConfig(d && d.meta); applyFieldStats(d); applyCaptains(d); applyCourse(d); renderDraftTile(d); })
             .catch(() => {});
         draftTimer = setInterval(() => { loadLiveData().then(renderDraftTile).catch(() => {}); }, DRAFT_POLL_MS);
 
